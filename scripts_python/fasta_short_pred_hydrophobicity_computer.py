@@ -53,7 +53,7 @@ def hydro_segment_computer(in_txt, in_fasta, field_keyword, scale, number_max_it
                         left_extr = int(segment[0]) - 1
                         right_extr = None
                         if segment[1] == 'inf':
-                            right_extr = len(seq) + 1 
+                            right_extr = len(seq)
                         else:
                             right_extr = int(segment[1])
                         for aa in seq[left_extr:right_extr]:
