@@ -30,7 +30,14 @@ if (params.help) {
         log.info '      	#pos    aa      i       o       M       S       m       l'
         log.info '      where the first comment line contains the id present in the line of the txt, remember the order has to be the same in the two files'
         log.info '      this module computes the average and the maximum plp value associated to what ever region of the prediciton is inputed'
-        log.info '      this region can be selected simply giving in the command line the  --KEYWORD argument'
+        log.info '      this region can be selected simply giving in the command line the  --KEYWORD argument'i
+        log.info '	and it delimits the segment region to take into consideration it is in fct the main keyword label'
+        log.info '	usefull when we want to know other averages for a given segment that are not the predicted label like,'
+        log.info '	for example the selected main field keyword is s (special helix) but we want to compute also the average for'
+        log.info '	the normal helix colum and loop for that predicted special helix segment'
+        log.info '	use the --SEC_KEYWORD option, as for example  --KEYWORD s --SEC_KEYWORD n,c,l'
+        log.info '	or --KEYWORD s --SEC_KEYWORD n,  this computes the average over the column in the plp for normal helix for the'
+        log.info '	special helix segment that has beeen predicted on top of the average for such segment for special helix' 
         log.info '\n'
         exit 1
 }
@@ -41,6 +48,7 @@ params.CONTAINER = "alessiovignoli3/tango-project:python_field_retr@sha256:36cc2
 params.INPUT_TXT = "${params.TEST_DIR}bubbabubba"
 params.INPUT_PLP = "${params.TEST_DIR}bubbabubba"
 params.KEYWORD = false
+params.SEC_KEYWORD = false	// used when we want to know average on n for predicted s segment or any other possible combination of labels 
 params.MAX_ITER = false
 params.SWITCH = "multi"					// flag used for the switch from search on a multi plp file or regular single plp
 params.OUTPUT_DIR = "${params.TEST_DIR}"
@@ -74,7 +82,7 @@ process based_on_short_average_plp {
 	prefix_plp = "${plp}".split('\\.')[0]
 	output_name = prefix_plp + ".average"
 	"""
-	./${pyscript1} ${params.SWITCH} ${plp} ${field_id} ${txt} ${params.MAX_ITER} 2>tmp.err 1>${output_name}
+	./${pyscript1} ${params.SWITCH} ${plp} ${field_id} ${txt} ${params.MAX_ITER} ${params.SEC_KEYWORD} 2>tmp.err 1>${output_name}
 	cat tmp.err
 	"""
 }
@@ -82,7 +90,7 @@ process based_on_short_average_plp {
 
 process  average_unifier {
 	publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false, saveAs: { filename -> if ("${params.KEYWORD}" == "all") null
-										else if ("${params.KEYWORD}"[1] == ",") null
+										else if ("${params.KEYWORD}".contains(',')) null
 										else filename
 										})
 	tag { "${outname}" }
