@@ -34,7 +34,7 @@ def plp_averager(single_plp_file, field_keyword, range_of_aa=False):
 
 
 def multi_plp_averager(in_pred_txt, multi_plp_file, field_keyword, number_max_iter=False, secondary_field_keywords=False):
-    print(in_pred_txt, multi_plp_file, field_keyword, number_max_iter, secondary_field_keywords[0])
+    #print(in_pred_txt, multi_plp_file, field_keyword, number_max_iter, secondary_field_keywords[0])
     check_keyword = {"i":2, "o":3, "-":4, "n":4, "c":5, "s":6, "l":7}
     if field_keyword not in check_keyword:
         print('please give a keyword for selecting the field \nit can be passed from command line --KEYWORD in nextflow or with third argument in python', file=sys.stderr)
