@@ -34,22 +34,22 @@ def plp_averager(single_plp_file, field_keyword, range_of_aa=False):
 
 
 def multi_plp_averager(in_pred_txt, multi_plp_file, field_keyword, number_max_iter=False, secondary_field_keywords=False):
-    #print(in_pred_txt, multi_plp_file, field_keyword, number_max_iter)
+    print(in_pred_txt, multi_plp_file, field_keyword, number_max_iter, secondary_field_keywords[0])
     check_keyword = {"i":2, "o":3, "-":4, "n":4, "c":5, "s":6, "l":7}
     if field_keyword not in check_keyword:
         print('please give a keyword for selecting the field \nit can be passed from command line --KEYWORD in nextflow or with third argument in python', file=sys.stderr)
         print("the allowed keywords are: [c, i, o, -, n, s, l] \n c = signal peptide, i = inside membrane(cytoplasm), o = outside membrane, - = helix (in phobius originalmodel) \n (only in phobius-M7or later) => -n- = normal-helix  -s- = special-helix and -l- = loop-inramembrane", file=sys.stderr)
         raise SystemExit
-    print(field_keyword, end='')
+    #print('#', field_keyword, end='')
     look_other_columns = False
-    if secondary_field_keywords != False:
+    if secondary_field_keywords != False and secondary_field_keywords[0] != "false":
         for sec_keyword in secondary_field_keywords:
             if sec_keyword not in check_keyword:
                 print('please give a set of keywords separated by a comma for selecting the others field to look for \nit can be passed from command line --SEC_KEYWORD in nextflow or with fifth argument in python', file=sys.stderr)
                 print("the allowed keywords are: [c, i, o, -, n, s, l] \n c = signal peptide, i = inside membrane(cytoplasm), o = outside membrane, - = helix (in phobius originalmodel) \n (only in phobius-M7or later) => -n- = normal-helix  -s- = special-helix and -l- = loop-inramembrane", file=sys.stderr)
                 raise SystemExit
         look_other_columns = True
-        print('', secondary_field_keywords, 'protein_id start end max_vaues')
+        #print('', secondary_field_keywords, 'protein_id start end max_vaues')
     #print(look_other_columns, secondary_field_keywords)
     with open(in_pred_txt, 'r') as intxt, open(multi_plp_file, 'r') as inplp:
         first_iter_counter = True
