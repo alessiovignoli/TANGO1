@@ -40,7 +40,7 @@ def multi_plp_aacomp(in_pred_txt, multi_plp_file, field_keyword, number_max_iter
         raise SystemExit
     aa_dict = {'A':0, 'C':0, 'D':0, 'E':0, 'F':0, 'G':0, 'H':0, 'I':0, 'K':0, 'L':0, 'M':0, 'N':0, 'P':0, 'Q':0, 'R':0, 'S':0, 'T':0, 'V':0, 'W':0, 'Y':0, 'X':0, 'B':0, 'U':0, 'Z':0}
     with open(in_pred_txt, 'r') as intxt, open(multi_plp_file, 'r') as inplp:
-        print('protein_id length_segment A C D E F G H I K L M N P Q R S T V W Y X B U Z class_label')
+        #print('protein_id length_segment A C D E F G H I K L M N P Q R S T V W Y X B U Z class_label')
         first_iter_counter = True
         next_header = ''
         iter_num = 0
@@ -63,27 +63,45 @@ def multi_plp_aacomp(in_pred_txt, multi_plp_file, field_keyword, number_max_iter
                     columns = inplp.readline()
                 #print('header:',header, end='')
                 #print('columns :',columns, end='')
+                aa_num = 0
                 if seq_id in header:
                     for plpline in inplp:
                         #print(plpline, end='')
                         if '#' in plpline:
                             next_header = plpline
-                            #print('next_header:',next_header, end='')
-                            break
+                            #print('next_header:',next_header, end=''
+                            if list_boundaries == []:
+                                break
+                            else:
+                                len_seg1 = aa_num - int(list_boundaries[-1][0]) + 1
+                                print(seq_id, list_boundaries[0], len_seg1, end=' ')
+                                for elem1 in aa_dict:
+                                    print((int(aa_dict[elem1])/len_seg1), end=' ')
+                                print(label_strings[field_keyword])
+                                list_boundaries.pop()
+                                iter_num += 1
+                                aa_dict = {'A':0, 'C':0, 'D':0, 'E':0, 'F':0, 'G':0, 'H':0, 'I':0, 'K':0, 'L':0, 'M':0, 'N':0, 'P':0, 'Q':0, 'R':0, 'S':0, 'T':0, 'V':0, 'W':0, 'Y':0, 'X':0, 'B':0, 'U':0, 'Z':0}
+                                break
                         else:
                             aa_num = int(plpline.split()[0])
                             #print(aa_num, list_boundaries)
                             if list_boundaries == []:
                                 continue
                             else:
-                                if aa_num >= float(list_boundaries[-1][0]) and aa_num <= float(list_boundaries[-1][1]):
+                                left_extr = int(list_boundaries[-1][0])
+                                right_extr = None
+                                if list_boundaries[-1][1] == 'inf':
+                                    right_extr = 9999999999
+                                else:
+                                    right_extr = int(list_boundaries[-1][1])
+                                if aa_num >= left_extr and aa_num <= right_extr:
                                     #print(plpline, end='')
                                     requested_field = (plpline.split())[1]
                                     aa_dict[requested_field] += 1
                                     #print(seq_id, aa_num, requested_field)
-                                    if aa_num == list_boundaries[-1][1]:
-                                        len_seg = float(list_boundaries[-1][1]) - float(list_boundaries[-1][0]) + 1.0
-                                        print(seq_id, len_seg, end=' ')
+                                    if aa_num == right_extr:
+                                        len_seg = right_extr - left_extr + 1
+                                        print(seq_id, list_boundaries[-1], len_seg, end=' ')
                                         for elem in aa_dict:
                                             print((int(aa_dict[elem])/len_seg), end=' ')
                                         print(label_strings[field_keyword])
