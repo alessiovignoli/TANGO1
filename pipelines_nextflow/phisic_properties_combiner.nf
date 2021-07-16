@@ -81,6 +81,7 @@ params.INPUT_TXT = "${params.OUTPUT_DIR}test19_1.txt"
 params.INPUT_FASTA =  "${params.OUTPUT_DIR}test18_1.fasta"
 params.INPUT_PLP = "${params.TEST_DIR}bubbabubba"
 params.KEYWORD = false
+params.SEC_KEYWORD = false      // used when we want to know average on n for predicted s segment or any other possible combination of labels
 params.MAX_ITER = 9999999999
 params.HYDRO_SCALE = "kyte"
 
@@ -90,8 +91,9 @@ params.HYDRO_SCALE = "kyte"
 // this computes Hydrophobicity
 include { average_hydrophobicity } from "${params.PIPES}hydrophobicity_fasta_short_pred.nf" addParams(MAX_ITER: "${params.MAX_ITER}")
 // this computes the average plp
-include { short_pred_average_plp  } from "${params.PIPES}average_plp_short_pred.nf" addParams(MAX_ITER: "${params.MAX_ITER}")
-
+include { short_pred_average_plp  } from "${params.PIPES}average_plp_short_pred.nf" addParams(MAX_ITER: "${params.MAX_ITER}", SEC_KEYWORD: "${params.SEC_KEYWORD}")
+// this computes the amminoacid frequency = amminoacid compositio)
+include { short_pred_aacomposition_plp } from "${params.PIPES}amminoacid_composition_plp_short_pred.nf" addParams(MAX_ITER: "${params.MAX_ITER}")
 
 
 workflow properties_computer_i {
@@ -107,6 +109,8 @@ workflow properties_computer_i {
 	hydro_cyto.finalavghydro.view()
 	average_plp_cyto = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
 	average_plp_cyto.finalaverage.view()
+	aacomp_cyto = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	aacomp_cyto.finalaacompplp.view()
 }
 
 workflow properties_computer_n {
@@ -143,9 +147,7 @@ workflow {
 	list_of_labels = ''
 	if ( "${params.KEYWORD}"=="allM7" ) {
 		list_of_labels = [ 'c', 'i', 'o', 'n', 's', 'l' ]
-	} else 
-	
-	if("${params.KEYWORD}"=="allOM") {
+	} else 	if("${params.KEYWORD}"=="allOM") {
 		list_of_labels = [ 'c', 'i', 'o', '-', 's', 'l' ]
 	} else {
 		tmp_list_of_labels = "${params.KEYWORD}".split(',')
@@ -163,7 +165,7 @@ workflow {
 		properties_computer_o(params.INPUT_TXT, params.INPUT_FASTA, params.INPUT_PLP, 'o')
 	}
 	if (list_of_labels.contains('-')) {
-                properties_computer_-(params.INPUT_TXT, params.INPUT_FASTA, params.INPUT_PLP, '-')
+                properties_computer_(params.INPUT_TXT, params.INPUT_FASTA, params.INPUT_PLP, '-')
         }
 	if (list_of_labels.contains('n')) {
 		properties_computer_n(params.INPUT_TXT, params.INPUT_FASTA, params.INPUT_PLP, 'n')
