@@ -96,6 +96,20 @@ include { short_pred_average_plp  } from "${params.PIPES}average_plp_short_pred.
 include { short_pred_aacomposition_plp } from "${params.PIPES}amminoacid_composition_plp_short_pred.nf" addParams(MAX_ITER: "${params.MAX_ITER}")
 
 
+workflowpattern_to_fastas properties_computer_c {
+
+	take:
+	pattern_to_txt
+	pattern_to_fastas
+	pattern_to_plp
+	field_keyword
+
+	main:
+	hydro_signal = average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword
+	average_plp_signal = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	aacomp_signal = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+}
+
 workflow properties_computer_i {
 
 	take:
@@ -113,6 +127,34 @@ workflow properties_computer_i {
 	aacomp_cyto.finalaacompplp.view()
 }
 
+workflow properties_computer_o {
+
+	take:
+	pattern_to_txt
+	pattern_to_fastas
+	pattern_to_plp
+	field_keyword
+
+	main:
+	hydro_noncyto = average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
+	average_plp_noncyto = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	aacomp_noncyto = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+}
+
+workflow properties_computer_ {
+
+	take:
+	pattern_to_txt
+	pattern_to_fastas
+	pattern_to_plp
+	field_keyword
+	
+	main:
+	hydro_om = average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
+	average_plp_om = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	aacomp_om = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+}
+
 workflow properties_computer_n {
 
 	take:
@@ -126,6 +168,7 @@ workflow properties_computer_n {
 	hydro_normal.finalavghydro.view()
 	average_plp_normal = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
 	average_plp_normal.finalaverage.view()
+	aacomp_normal = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
 }
 
 workflow properties_computer_s {
@@ -141,7 +184,25 @@ workflow properties_computer_s {
 	hydro_special.finalavghydro.view()
 	average_plp_special = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
 	average_plp_special.finalaverage.view()
+	aacomp_special = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
 }
+
+workflow properties_computer_l {
+
+	take:
+	pattern_to_txt
+	pattern_to_fastas
+	pattern_to_plp
+	field_keyword
+
+	main:
+	hydro_loop = average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
+	average_plp_loop = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	aacomp_loop = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+}
+
+
+
 
 workflow {
 	list_of_labels = ''
