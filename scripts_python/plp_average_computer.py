@@ -41,16 +41,18 @@ def multi_plp_averager(in_pred_txt, multi_plp_file, field_keyword, number_max_it
         print("the allowed keywords are: [c, i, o, -, n, s, l] \n c = signal peptide, i = inside membrane(cytoplasm), o = outside membrane, - = helix (in phobius originalmodel) \n (only in phobius-M7or later) => -n- = normal-helix  -s- = special-helix and -l- = loop-inramembrane", file=sys.stderr)
         raise SystemExit
     #print('#', field_keyword, end='')
-    look_other_columns = False
     if secondary_field_keywords != False and secondary_field_keywords[0] != "false":
         for sec_keyword in secondary_field_keywords:
             if sec_keyword not in check_keyword:
                 print('please give a set of keywords separated by a comma for selecting the others field to look for \nit can be passed from command line --SEC_KEYWORD in nextflow or with fifth argument in python', file=sys.stderr)
                 print("the allowed keywords are: [c, i, o, -, n, s, l] \n c = signal peptide, i = inside membrane(cytoplasm), o = outside membrane, - = helix (in phobius originalmodel) \n (only in phobius-M7or later) => -n- = normal-helix  -s- = special-helix and -l- = loop-inramembrane", file=sys.stderr)
                 raise SystemExit
-        look_other_columns = True
-        #print('', secondary_field_keywords, 'protein_id start end max_vaues')
-    #print(look_other_columns, secondary_field_keywords)
+    for order_key in check_keyword:
+        if order_key in field_keyword or order_key in secondary_field_keywords:
+            continue
+        else:
+            check_keyword[order_key] = False
+    #print(check_keyword)
     with open(in_pred_txt, 'r') as intxt, open(multi_plp_file, 'r') as inplp:
         first_iter_counter = True
         next_header = ''
@@ -76,10 +78,12 @@ def multi_plp_averager(in_pred_txt, multi_plp_file, field_keyword, number_max_it
                 #print('columns :',columns, end='')
                 summatory = [[0.0]]
                 max_plp = [[0.0]]
-                if look_other_columns:
-                    for elem in secondary_field_keywords:
+                for elem in check_keyword:
+                    if check_keyword[elem]:
                         summatory.append([0.0])
                         max_plp.append([0.0])
+                summatory.pop()
+                max_plp.pop()
                 aa_num = 0
                 if seq_id in header:
                     for plpline in inplp:
@@ -90,15 +94,15 @@ def multi_plp_averager(in_pred_txt, multi_plp_file, field_keyword, number_max_it
                             if list_boundaries == []:
                                 break
                             else:
-                                #print(summatory, max_plp)
                                 tmp1 = []
+                                print(seq_id, list_boundaries[-1], end=' ')
                                 for n in range (0,len(summatory)):
                                     average_plp = summatory[n][0] / (aa_num - left_extr + 1)
-                                    print(average_plp, '',  end='')
+                                    print(average_plp, end=' ')
                                     summatory[n][0] = 0.0
                                     tmp1.append(max_plp[n][0])
                                     max_plp[n][0] = 0.0
-                                print(seq_id, list_boundaries[-1], tmp1)
+                                print(tmp1)
                                 list_boundaries.pop()
                                 iter_num += 1
                                 break
@@ -116,28 +120,26 @@ def multi_plp_averager(in_pred_txt, multi_plp_file, field_keyword, number_max_it
                                     right_extr = int(list_boundaries[-1][1])
                                 if aa_num >= left_extr and aa_num <= right_extr:
                                     #print(plpline, end='')
-                                    requested_field = float((plpline.split())[check_keyword[field_keyword]])
-                                    #print(aa_num, requested_field)
-                                    summatory[0][0] += requested_field
-                                    #print(summatory)
-                                    max_plp[0][0] = max(max_plp[0][0], requested_field)
-                                    if look_other_columns:
-                                        i = 1
-                                        for sec_key in secondary_field_keywords:
-                                            tmp = float((plpline.split())[check_keyword[sec_key]])
-                                            summatory[i][0] += tmp
-                                            max_plp[i][0] = max(max_plp[i][0], tmp)
-                                            i += 1
+                                    i = 0
+                                    for elem in check_keyword:
+                                        if check_keyword[elem]:
+                                            requested_field = float((plpline.split())[check_keyword[elem]])
+                                            #print(aa_num, requested_field)
+                                            summatory[i][0] += requested_field
+                                            #print(summatory)
+                                            max_plp[i][0] = max(max_plp[i][0], requested_field)
+                                            i += 1 
                                     if aa_num == right_extr:
                                         #print(summatory, max_plp)
                                         tmp1 = []
+                                        print(seq_id, list_boundaries[-1], end=' ')
                                         for n in range (0,len(summatory)):
                                             average_plp = summatory[n][0] / (right_extr - left_extr + 1)
-                                            print(average_plp, '',  end='')
+                                            print(average_plp, end=' ')
                                             summatory[n][0] = 0.0
                                             tmp1.append(max_plp[n][0])
                                             max_plp[n][0] = 0.0
-                                        print(seq_id, list_boundaries[-1], tmp1)
+                                        print(tmp1)
                                         list_boundaries.pop()
                                         iter_num += 1
                         if number_max_iter != False and iter_num == number_max_iter:
