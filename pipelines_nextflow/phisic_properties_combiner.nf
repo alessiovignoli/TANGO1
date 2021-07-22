@@ -71,6 +71,12 @@ if (params.help) {
         log.info '	-s- = special-helix and -l- = loop-inramembrane'
         log.info '	they have to be given like this:'
         log.info '		--KEYWORD s,n,c    or  i,l,\\-'
+        log.info '      usefull when we want to know other averages for a given segment that are not the predicted label like,'
+        log.info '      for example the selected main field keyword is s (special helix) but we want to compute also the average for'
+        log.info '      the normal helix colum and loop for that predicted special helix segment'
+        log.info '      use the --SEC_KEYWORD option, as for example  --KEYWORD s --SEC_KEYWORD n,c,l'
+        log.info '      or --KEYWORD s --SEC_KEYWORD n,  this computes the average over the column in the plp for normal helix for the'
+        log.info '      special helix segment that has beeen predicted on top of the average for such segment for special helix'
         log.info '\n'
 }
 
@@ -82,6 +88,7 @@ params.INPUT_FASTA =  "${params.OUTPUT_DIR}test18_1.fasta"
 params.INPUT_PLP = "${params.TEST_DIR}bubbabubba"
 params.KEYWORD = false
 params.SEC_KEYWORD = false      // used when we want to know average on n for predicted s segment or any other possible combination of labels
+params.MAX_PROT = false		// used to limit the number of protein to look at
 params.MAX_ITER = 9999999999
 params.HYDRO_SCALE = "kyte"
 
@@ -94,9 +101,12 @@ include { average_hydrophobicity } from "${params.PIPES}hydrophobicity_fasta_sho
 include { short_pred_average_plp  } from "${params.PIPES}average_plp_short_pred.nf" addParams(MAX_ITER: "${params.MAX_ITER}", SEC_KEYWORD: "${params.SEC_KEYWORD}")
 // this computes the amminoacid frequency = amminoacid compositio)
 include { short_pred_aacomposition_plp } from "${params.PIPES}amminoacid_composition_plp_short_pred.nf" addParams(MAX_ITER: "${params.MAX_ITER}")
+// this instead is the module that unites the above result files in a single one
+include { phisic_prop_louncher } from "${params.PIPES}uniter_property_fields.nf"
 
 
-workflowpattern_to_fastas properties_computer_c {
+
+workflow properties_computer_c {
 
 	take:
 	pattern_to_txt
@@ -105,7 +115,7 @@ workflowpattern_to_fastas properties_computer_c {
 	field_keyword
 
 	main:
-	hydro_signal = average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword
+	hydro_signal = average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
 	average_plp_signal = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
 	aacomp_signal = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
 }
@@ -119,12 +129,11 @@ workflow properties_computer_i {
 	field_keyword
 
 	main:
-	hydro_cyto = average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
-	hydro_cyto.finalavghydro.view()
-	average_plp_cyto = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
-	average_plp_cyto.finalaverage.view()
-	aacomp_cyto = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
-	aacomp_cyto.finalaacompplp.view()
+	average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
+	short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	//phisic_prop_louncher(average_hydrophobicity.out.finalavghydro, short_pred_average_plp.out.finalaverage, short_pred_aacomposition_plp.out.finalaacompplp)
+	//phisic_prop_louncher.out.stout1.view()
 }
 
 workflow properties_computer_o {
@@ -180,11 +189,11 @@ workflow properties_computer_s {
 	field_keyword
 
 	main:
-	hydro_special = average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
-	hydro_special.finalavghydro.view()
-	average_plp_special = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
-	average_plp_special.finalaverage.view()
-	aacomp_special = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
+	short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	//phisic_prop_louncher(average_hydrophobicity.out.finalavghydro, short_pred_average_plp.out.finalaverage, short_pred_aacomposition_plp.out.finalaacompplp)
+	//phisic_prop_louncher.out.stout1.view()
 }
 
 workflow properties_computer_l {
@@ -200,7 +209,6 @@ workflow properties_computer_l {
 	average_plp_loop = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
 	aacomp_loop = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
 }
-
 
 
 
@@ -237,5 +245,4 @@ workflow {
 	if (list_of_labels.contains('l')) {
                 properties_computer_l(params.INPUT_TXT, params.INPUT_FASTA, params.INPUT_PLP, 'l')
         }
-	
 }
