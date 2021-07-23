@@ -48,10 +48,16 @@ def multi_plp_averager(in_pred_txt, multi_plp_file, field_keyword, number_max_it
                 print("the allowed keywords are: [c, i, o, -, n, s, l] \n c = signal peptide, i = inside membrane(cytoplasm), o = outside membrane, - = helix (in phobius originalmodel) \n (only in phobius-M7or later) => -n- = normal-helix  -s- = special-helix and -l- = loop-inramembrane", file=sys.stderr)
                 raise SystemExit
     for order_key in check_keyword:
-        if order_key in field_keyword or order_key in secondary_field_keywords:
-            continue
+        if secondary_field_keywords != False and secondary_field_keywords[0] != "false":
+            if order_key in field_keyword or order_key in secondary_field_keywords:
+                continue
+            else:
+                check_keyword[order_key] = False
         else:
-            check_keyword[order_key] = False
+            if order_key in field_keyword:
+                continue
+            else:
+                check_keyword[order_key] = False
     #print(check_keyword)
     with open(in_pred_txt, 'r') as intxt, open(multi_plp_file, 'r') as inplp:
         first_iter_counter = True
@@ -144,6 +150,20 @@ def multi_plp_averager(in_pred_txt, multi_plp_file, field_keyword, number_max_it
                                         iter_num += 1
                         if number_max_iter != False and iter_num == number_max_iter:
                             break
+                    if list_boundaries == []:
+                        continue
+                    else:
+                        tmp1 = []
+                        print(seq_id, list_boundaries[-1], end=' ')
+                        for n in range (0,len(summatory)):
+                            average_plp = summatory[n][0] / (aa_num - left_extr + 1)
+                            print(average_plp, end=' ')
+                            summatory[n][0] = 0.0
+                            tmp1.append(max_plp[n][0])
+                            max_plp[n][0] = 0.0
+                        print(tmp1)
+                        list_boundaries.pop()
+                        iter_num += 1
                 else:
                     print('the sequence ID obtained : ', seq_id, 'is not present in the plp file examined or check the orders of the protein of the input files, they must have the same protein sequence order', file=sys.stderr)
                     raise SystemExit
@@ -151,6 +171,8 @@ def multi_plp_averager(in_pred_txt, multi_plp_file, field_keyword, number_max_it
 
 
 if __name__ == "__main__":
+    num_max_iterations = None
+
     try:
         switch = sys.argv[1]
     except:
