@@ -109,7 +109,7 @@ process  average_unifier {
 	outname = "${params.INPUT_PLP}".split('\\.')[0].split('\\*')[0].split('/')[-1] + "-${prefix}.${params.MAX_ITER}tot_${params.SUFFIX}"
 	"""
 	for i in `echo ${list_of_averages}`; do cat `echo \$i | cut -d '[' -f 2 | cut -d ',' -f 1 | cut -d ']' -f 1` >> TMP ; done
-	head -n ${params.MAX_ITER} TMP > ${outname}
+	sort TMP | head -n ${params.MAX_ITER} > ${outname}
 	#for i in `echo ${list_of_averages}`; do head `echo \$i | cut -d '[' -f 2 | cut -d ',' -f 1 | cut -d ']' -f 1`; done
 	"""
 }
