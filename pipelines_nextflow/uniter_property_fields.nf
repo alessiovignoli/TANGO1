@@ -11,8 +11,8 @@ nextflow.enable.dsl=2
 params.CONTAINER = "python:slim-buster@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43" 
 
 process properties_combiner {
-        publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
-        tag { "${outname}" }
+        //publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
+        tag { "${output_name}" }
         container params.CONTAINER
 
         input:
@@ -22,12 +22,14 @@ process properties_combiner {
         path pyscript1
 
         output:
-        //path "${output_name}", emit: outname
+        path "${output_name}", emit: outname
         stdout emit: standardout
 
         script:
+	output_name = "${hydro_file}".split('\\.')[0] + ".${params.SEC_KEYWORD}_uni"
         """
-        ./${pyscript1} ${hydro_file} ${average_file} ${aacomp_file}
+        ./${pyscript1} ${hydro_file} ${average_file} ${aacomp_file} 2>tmp.err 1>${output_name}
+	cat tmp.err
         """
 }
 
@@ -44,5 +46,7 @@ workflow phisic_prop_louncher {
 
 	emit:
         stout1 = properties_combiner.out.standardout
+	unified_phi =  properties_combiner.out.outname
+	
 }
 

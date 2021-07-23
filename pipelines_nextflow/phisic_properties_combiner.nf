@@ -88,7 +88,7 @@ params.INPUT_FASTA =  "${params.OUTPUT_DIR}test18_1.fasta"
 params.INPUT_PLP = "${params.TEST_DIR}bubbabubba"
 params.KEYWORD = false
 params.SEC_KEYWORD = false      // used when we want to know average on n for predicted s segment or any other possible combination of labels
-params.MAX_PROT = false		// used to limit the number of protein to look at
+//params.MAX_PROT = false		// used to limit the number of protein to look at
 params.MAX_ITER = 9999999999
 params.HYDRO_SCALE = "kyte"
 
@@ -115,9 +115,12 @@ workflow properties_computer_c {
 	field_keyword
 
 	main:
-	hydro_signal = average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
-	average_plp_signal = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
-	aacomp_signal = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
+	short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	phisic_prop_louncher(average_hydrophobicity.out.finalavghydro, short_pred_average_plp.out.finalaverage, short_pred_aacomposition_plp.out.finalaacompplp)
+	phisic_prop_louncher.out.stout1.view()
+	phisic_prop_louncher.out.unified_phi.view()
 }
 
 workflow properties_computer_i {
@@ -132,8 +135,9 @@ workflow properties_computer_i {
 	average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
 	short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
 	short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
-	//phisic_prop_louncher(average_hydrophobicity.out.finalavghydro, short_pred_average_plp.out.finalaverage, short_pred_aacomposition_plp.out.finalaacompplp)
-	//phisic_prop_louncher.out.stout1.view()
+	phisic_prop_louncher(average_hydrophobicity.out.finalavghydro, short_pred_average_plp.out.finalaverage, short_pred_aacomposition_plp.out.finalaacompplp)
+	phisic_prop_louncher.out.stout1.view()
+	phisic_prop_louncher.out.unified_phi.view()
 }
 
 workflow properties_computer_o {
@@ -145,9 +149,12 @@ workflow properties_computer_o {
 	field_keyword
 
 	main:
-	hydro_noncyto = average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
-	average_plp_noncyto = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
-	aacomp_noncyto = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
+	short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	phisic_prop_louncher(average_hydrophobicity.out.finalavghydro, short_pred_average_plp.out.finalaverage, short_pred_aacomposition_plp.out.finalaacompplp)
+	phisic_prop_louncher.out.stout1.view()
+	phisic_prop_louncher.out.unified_phi.view()
 }
 
 workflow properties_computer_ {
@@ -159,9 +166,12 @@ workflow properties_computer_ {
 	field_keyword
 	
 	main:
-	hydro_om = average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
-	average_plp_om = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
-	aacomp_om = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
+	short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	phisic_prop_louncher(average_hydrophobicity.out.finalavghydro, short_pred_average_plp.out.finalaverage, short_pred_aacomposition_plp.out.finalaacompplp)
+	phisic_prop_louncher.out.stout1.view()
+	phisic_prop_louncher.out.unified_phi.view()
 }
 
 workflow properties_computer_n {
@@ -173,11 +183,12 @@ workflow properties_computer_n {
 	field_keyword
 
 	main:
-	hydro_normal = average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
-	hydro_normal.finalavghydro.view()
-	average_plp_normal = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
-	average_plp_normal.finalaverage.view()
-	aacomp_normal = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
+	short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	phisic_prop_louncher(average_hydrophobicity.out.finalavghydro, short_pred_average_plp.out.finalaverage, short_pred_aacomposition_plp.out.finalaacompplp)
+	phisic_prop_louncher.out.stout1.view()
+	phisic_prop_louncher.out.unified_phi.view()
 }
 
 workflow properties_computer_s {
@@ -192,8 +203,9 @@ workflow properties_computer_s {
 	average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
 	short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
 	short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
-	//phisic_prop_louncher(average_hydrophobicity.out.finalavghydro, short_pred_average_plp.out.finalaverage, short_pred_aacomposition_plp.out.finalaacompplp)
-	//phisic_prop_louncher.out.stout1.view()
+	phisic_prop_louncher(average_hydrophobicity.out.finalavghydro, short_pred_average_plp.out.finalaverage, short_pred_aacomposition_plp.out.finalaacompplp)
+	phisic_prop_louncher.out.stout1.view()
+	phisic_prop_louncher.out.unified_phi.view()
 }
 
 workflow properties_computer_l {
@@ -205,9 +217,12 @@ workflow properties_computer_l {
 	field_keyword
 
 	main:
-	hydro_loop = average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
-	average_plp_loop = short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
-	aacomp_loop = short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	average_hydrophobicity(pattern_to_txt, pattern_to_fastas, field_keyword)
+	short_pred_average_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	short_pred_aacomposition_plp(pattern_to_txt, pattern_to_plp, field_keyword)
+	phisic_prop_louncher(average_hydrophobicity.out.finalavghydro, short_pred_average_plp.out.finalaverage, short_pred_aacomposition_plp.out.finalaacompplp)
+	phisic_prop_louncher.out.stout1.view()
+	phisic_prop_louncher.out.unified_phi.view()
 }
 
 
