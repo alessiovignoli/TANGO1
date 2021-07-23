@@ -59,9 +59,9 @@ def hydro_segment_computer(in_txt, in_fasta, field_keyword, scale, number_max_it
                         for aa in seq[left_extr:right_extr]:
                             #print(aa, end='')
                             summatory += to_be_used_dict[aa]
-                        print((right_extr - left_extr))
+                        #print((right_extr - left_extr))
                         average_hydro_segment = summatory / (right_extr - left_extr)
-                        print(average_hydro_segment, seq_id, segment, label_strings[field_keyword])
+                        print(seq_id, segment, average_hydro_segment, label_strings[field_keyword])
                         iter_num += 1
                         if number_max_iter != False and iter_num == number_max_iter:
                             break
