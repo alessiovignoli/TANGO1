@@ -34,8 +34,12 @@ def plp_averager(single_plp_file, field_keyword, range_of_aa=False):
 
 
 def multi_plp_averager(in_pred_txt, multi_plp_file, field_keyword, number_max_iter=False, secondary_field_keywords=False):
-    #print(in_pred_txt, multi_plp_file, field_keyword, number_max_iter, secondary_field_keywords[0])
+    #print(in_pred_txt, multi_plp_file, field_keyword, number_max_iter, secondary_field_keywords)
     check_keyword = {"i":2, "o":3, "-":4, "n":4, "c":5, "s":6, "l":7}
+    if number_max_iter == "false":
+        number_max_iter == False
+    else:
+        number_max_iter == int(number_max_iter)
     if field_keyword not in check_keyword:
         print('please give a keyword for selecting the field \nit can be passed from command line --KEYWORD in nextflow or with third argument in python', file=sys.stderr)
         print("the allowed keywords are: [c, i, o, -, n, s, l] \n c = signal peptide, i = inside membrane(cytoplasm), o = outside membrane, - = helix (in phobius originalmodel) \n (only in phobius-M7or later) => -n- = normal-helix  -s- = special-helix and -l- = loop-inramembrane", file=sys.stderr)
@@ -197,7 +201,7 @@ if __name__ == "__main__":
                 plp_file = sys.argv[2]
                 field_keyword = sys.argv[3]
                 phobius_short_stdout_txt_file = sys.argv[4]
-                num_max_iterations = int(sys.argv[5])
+                num_max_iterations = sys.argv[5]
                 secondary_field_keywords = sys.argv[6].split(',')
             except:
                 if num_max_iterations != None:
