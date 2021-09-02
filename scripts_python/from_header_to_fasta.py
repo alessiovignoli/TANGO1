@@ -30,7 +30,7 @@ def fasta_retriever(headers_file, list_files_to_search, output_filepath):
                 if search_key in elem:
                     new_header = elem.replace(' ', '_', 1) 
                     outfile.write(new_header)
-                    print(elem, end='')
+                    #print(elem, end='')
                     break
 
 
