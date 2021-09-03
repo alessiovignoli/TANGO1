@@ -70,6 +70,21 @@ workflow oneliner {
 	//stout = fasta_oneliner.out.standardout
 }	
 
+workflow oneliner_ch {
+
+	take:
+	channel_fasta
+	out_filename
+
+	main:
+	out_name = channel_fasta.map { "${params.TEST_DIR}" + "${it}".split('\\.')[0].split('/')[-1] + ".${out_filename}" }
+	one_line_py = params.SCRIPTS + "one_line_per_fasta.py"
+	fasta_oneliner(channel_fasta, out_name, one_line_py)
+
+	emit:
+	onelinefasta = fasta_oneliner.out.oneline_fasta
+	//stout = fasta_oneliner.out.standardout
+}
 
 workflow {
 	oneliner(params.INPUT, params.OUTPUT_NAME)
