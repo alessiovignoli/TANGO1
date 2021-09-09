@@ -89,6 +89,7 @@ if __name__ == "__main__":
     posterior_prob_filename = None
     rename_filename = None
     trimm_value = None
+    signal_pept_cutoff = None
     special_tm_switch = None 
     try:
         posterior_prob_filename = sys.argv[1]
@@ -101,6 +102,8 @@ if __name__ == "__main__":
         if posterior_prob_filename is not None and rename_filename is not None:
             if trimm_value is None:
                 pp_colist_prep(posterior_prob_filename, rename_filename)
+            elif trimm_value is not None and signal_pept_cutoff is None:
+                pp_colist_prep(posterior_prob_filename, rename_filename, False, False, trimm_value)
             elif trimm_value is not None and special_tm_switch is None:
                 pp_colist_prep(posterior_prob_filename, rename_filename, trimm_value, signal_pept_cutoff)
             else:
