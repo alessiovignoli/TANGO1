@@ -26,11 +26,14 @@ def hydro_segment_computer(in_txt, in_fasta, field_keyword, scale, number_max_it
         raise SystemExit
     kyte_doolittle_hydro_dict = {'A':1.8, 'C':2.5, 'D':-3.5, 'E':-3.5, 'F':2.8, 'G':-0.4, 'H':-3.2, 'I':4.5, 'K':-3.9, 'L':3.8, 'M':1.9, 'N':-3.5, 'P':-1.6, 'Q':-3.5, 'R':-4.5, 'S':-0.8, 'T':-0.7, 'V':4.2, 'W':-0.9, 'Y':-1.3, 'X':0.0, 'B':0.0, 'U':0.0, 'Z':0.0}
     GES_hydro_dict = {'A':1.6, 'C':2.0, 'D':-9.2, 'E':-8.2, 'F':3.7, 'G':1.0, 'H':-3.0, 'I':3.1, 'K':-8.8, 'L':2.8, 'M':3.4, 'N':-4.8, 'P':-0.2, 'Q':-4.1, 'R':-12.3, 'S':0.6, 'T':1.2, 'V':2.6, 'W':1.9, 'Y':-0.7, 'X':0.0, 'B':0.0, 'U':0.0, 'Z':0.0}
+    UHS_hydro_dict = {'A':0.16, 'C':-0.01, 'D':-0.73, 'E':-0.7, 'F':0.46, 'G':0.2, 'H':-0.38, 'I':0.39, 'K':-0.9, 'L':0.3, 'M':0.2, 'N':-0.5, 'P':-0.5, 'Q':-0.46, 'R':-0.55, 'S':-0.06, 'T':0.01, 'V':0.25, 'W':0.03, 'Y':0.12, 'X':0.0, 'B':0.0, 'U':0.0, 'Z':0.0}
     to_be_used_dict = None
     if scale == "kyte":
         to_be_used_dict = kyte_doolittle_hydro_dict
     elif scale == "GES":
         to_be_used_dict = GES_hydro_dict
+    elif scale == 'UHS':
+        to_be_used_dict = UHS_hydro_dict
     else:
         print('please specify a valid argument for the selection of the Hydrophobicity scale, valid are "kyte" and "GES" it has been given:', scale, file=sys.stderr)
         raise SystemExit
