@@ -4,9 +4,25 @@
 
 import sys
 
-def hydro_colist_prep(trimmflnm, renameflnm, outfilepath,  maskrange=None):
+def hydro_colist_prep(trimmflnm, renameflnm, outfilepath,  scale, maskrange=None):
     #print(trimmflnm, renameflnm, outfile, maskrange)
     #print(outfilepath)
+    majority_hydro_dict = {'A':6, 'C':7, 'D':1, 'E':0, 'F':8, 'G':5, 'H':3, 'I':9, 'K':1, 'L':7, 'M':6, 'N':2, 'P':3, 'Q':2, 'R':0, 'S':4, 'T':4, 'V':8, 'W':9, 'Y':5, 'X':'', 'B':'', 'U':'', 'Z':''}
+    kyte_doolittle_hydro_dict = {'A':6, 'C':7, 'D':2, 'E':2, 'F':8, 'G':6, 'H':3, 'I':9, 'K':0, 'L':8, 'M':7, 'N':1, 'P':3, 'Q':1, 'R':0, 'S':5, 'T':5, 'V':9, 'W':4, 'Y':4, 'X':'', 'B':'', 'U':'', 'Z':''}
+    GES_hydro_dict = {'A':6, 'C':7, 'D':0, 'E':1, 'F':9, 'G':5, 'H':3, 'I':8, 'K':1, 'L':8, 'M':9, 'N':2, 'P':4, 'Q':2, 'R':0, 'S':4, 'T':5, 'V':7, 'W':6, 'Y':3, 'X':'', 'B':'', 'U':'', 'Z':''}
+    UHS_hydro_dict = {'A':6, 'C':4, 'D':0, 'E':1, 'F':9, 'G':7, 'H':3, 'I':9, 'K':0, 'L':8, 'M':7, 'N':2, 'P':2, 'Q':3, 'R':1, 'S':4, 'T':5, 'V':8, 'W':5, 'Y':6, 'X':'', 'B':'', 'U':'', 'Z':''}
+    to_be_used_dict = None
+    if scale == "kyte":
+        to_be_used_dict = kyte_doolittle_hydro_dict
+    elif scale == "GES":
+        to_be_used_dict = GES_hydro_dict
+    elif scale == 'UHS':
+        to_be_used_dict = UHS_hydro_dict
+    elif scale == 'majority':
+        to_be_used_dict = majority_hydro_dict
+    else:
+        print('please specify a valid argument for the selection of the Hydrophobicity scale, valid are "kyte", "GES", "UHS" and "majority" it has been given:', scale, file=sys.stderr)
+        raise SystemExit
     with open(renameflnm, 'r') as rename_file, open(outfilepath, 'w') as outfile:
         #print(fasta_file, rename_file)
         for line in rename_file:
@@ -31,74 +47,18 @@ def hydro_colist_prep(trimmflnm, renameflnm, outfilepath,  maskrange=None):
                             #print(old_header + '\n' + seq_line[:r_ext])
                             for aa_pos in range(l_ext, r_ext):
                                 aa = seq_line[aa_pos]
-                                if aa == 'E' or aa == 'R':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '0' + '\n' 
-                                    outfile.write(to_write_line)
-                                elif aa == 'D' or aa == 'K':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '1' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'N' or aa == 'Q':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '2' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'H' or aa == 'P':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '3' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'S' or aa == 'T':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '4' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'Y' or aa == 'G':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '5' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'M' or aa == 'A':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '6' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'C' or aa == 'L':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '7' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'F' or aa == 'V':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '8' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'I' or aa == 'W':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '9' + '\n'
-                                    outfile.write(to_write_line)
+                                to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + str(to_be_used_dict[aa]) + '\n'
+                                outfile.write(to_write_line)
                         else:
                             l_ext = int(maskrange.split(',')[0]) - 1
                             r_ext = int(maskrange.split(',')[1]) 
                             #print(l_ext, r_ext)
                             for aa_pos in range(l_ext, r_ext):
                                 aa = seq_line[aa_pos]
-                                if aa == 'E' or aa == 'R':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '0' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'D' or aa == 'K':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '1' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'N' or aa == 'Q':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '2' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'H' or aa == 'P':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '3' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'S' or aa == 'T':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '4' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'Y' or aa == 'G':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '5' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'M' or aa == 'A':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '6' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'C' or aa == 'L':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '7' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'F' or aa == 'V':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '8' + '\n'
-                                    outfile.write(to_write_line)
-                                elif aa == 'I' or aa == 'W':
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + '9' + '\n'
-                                    outfile.write(to_write_line)
-
+                                to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + str(to_be_used_dict[aa]) + '\n'
                         i = 0
+
+
 
 if __name__ == "__main__":
     mask_range = None
