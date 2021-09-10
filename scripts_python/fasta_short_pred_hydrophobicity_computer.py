@@ -35,7 +35,7 @@ def hydro_segment_computer(in_txt, in_fasta, field_keyword, scale, number_max_it
     elif scale == 'UHS':
         to_be_used_dict = UHS_hydro_dict
     else:
-        print('please specify a valid argument for the selection of the Hydrophobicity scale, valid are "kyte" and "GES" it has been given:', scale, file=sys.stderr)
+        print('please specify a valid argument for the selection of the Hydrophobicity scale, valid are "kyte", "GES" and "UHS" it has been given:', scale, file=sys.stderr)
         raise SystemExit
     with open(in_txt, 'r') as intxt, open(in_fasta, 'r') as infasta:
         iter_num = 0
