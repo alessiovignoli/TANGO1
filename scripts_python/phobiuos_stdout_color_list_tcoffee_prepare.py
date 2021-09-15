@@ -24,7 +24,7 @@ def phobstout_colist_prep(phobstdout, output_f, renameflnm, plp_dir=False, trimm
                                 if plp_keyword in plp_filename and plp_filename.endswith(".plp"):
                                     counter = 1
                                     #print(plp_filename)
-                                    plp_filepath = plp_dir + plp_filename
+                                    plp_filepath = plp_dir + '/' + plp_filename
                                     with open(plp_filepath, 'r') as plp_file:
                                         for res_line in plp_file:
                                             if res_line[0] == '#':
