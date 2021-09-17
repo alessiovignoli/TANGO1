@@ -155,6 +155,7 @@ process align_generation {
 	script:
 	tcoffee_outfilepath = "${multifasta}".split('\\.')[0] + '.aln'
 	"""
+	export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/ncbi-blast/bin:/opt/tcoffee/bin:/opt/tcoffee/plugins/linux/ TEMP=/tmp PERL5LIB=/opt/tcoffee/perl/lib/perl5 DIR_4_TCOFFEE=/opt/tcoffee EMAIL_4_TCOFFEE=tcoffee.msa@gmail.com CACHE_4_TCOFFEE=/tmp/cache/ LOCKDIR_4_TCOFFEE=/tmp/lck/ TMP_4_TCOFFEE=/tmp/				# for singularity env variables
 	t_coffee -in ${multifasta} -outfile ${tcoffee_outfilepath}
 	"""
 }
@@ -181,7 +182,7 @@ process rename_gen {
 
 	script:
 	outfile_path = "${aln_outfile}".split('\\.')[0] + '.rename'
-	color_list_to_remove = "${aln_outfile}".split('\\.')[0] + '.color'  // this has indeed the same name of what will be created after so it is wiped out every time right before the step of creation of such file
+	//color_list_to_remove = "${aln_outfile}".split('\\.')[0] + '.color'   this has indeed the same name of what will be created after so it is wiped out every time right before the step of creation of such file
 	"""
 	#!/usr/bin/env python3
 	
@@ -382,6 +383,7 @@ process couloring_aln  {
 	ascii_scorefile = "${rename_file}".split('\\.')[0] + '.score_ascii'
 	if(params.SPECIAL_HELIX == false)
 		"""
+		export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/ncbi-blast/bin:/opt/tcoffee/bin:/opt/tcoffee/plugins/linux/ TEMP=/tmp PERL5LIB=/opt/tcoffee/perl/lib/perl5 DIR_4_TCOFFEE=/opt/tcoffee EMAIL_4_TCOFFEE=tcoffee.msa@gmail.com CACHE_4_TCOFFEE=/tmp/cache/ LOCKDIR_4_TCOFFEE=/tmp/lck/ TMP_4_TCOFFEE=/tmp/                           # for singularity env variables
 		export ALN_LINE_LENGTH=150		# to make allignments of that length in html format
 		touch ${html_sH_outfile}
 		echo ${html_outfile}
@@ -416,6 +418,7 @@ process couloring_aln  {
 		"""
 	else
 		"""
+		export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/ncbi-blast/bin:/opt/tcoffee/bin:/opt/tcoffee/plugins/linux/ TEMP=/tmp PERL5LIB=/opt/tcoffee/perl/lib/perl5 DIR_4_TCOFFEE=/opt/tcoffee EMAIL_4_TCOFFEE=tcoffee.msa@gmail.com CACHE_4_TCOFFEE=/tmp/cache/ LOCKDIR_4_TCOFFEE=/tmp/lck/ TMP_4_TCOFFEE=/tmp/                           # for singularity env variables
 		export ALN_LINE_LENGTH=150              # to make allignments of that length in html format
 		echo ${html_outfile}
 		t_coffee -other_pg seq_reformat -in ${aln_file} -rename ${rename_file} -out ${renamed_aln}
