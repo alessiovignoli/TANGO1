@@ -295,7 +295,7 @@ process residues_hydrophobicity_colors {
 	path hydrocolor_list_outfilepath, emit: hydrocolor_list_file
 
 	script:
-	hydrocolor_list_outfilepath = "${rename_outfile}".split('\\.')[0] + '.hydrocolor' 
+	hydrocolor_list_outfilepath = "${rename_outfile}".split('\\.')[0] + "-${params.HYDRO_SCALE}.hydrocolor" 
 	if(params.MASK == false)
 		"""
 		./${hydro_color_aa_pyscript} ${in_fasta} ${rename_outfile} ${hydrocolor_list_outfilepath} ${params.HYDRO_SCALE}
@@ -378,7 +378,7 @@ process couloring_aln  {
 	html_outfile = "${rename_file}".split('\\.')[0] + '-pp.html'
 	html_sH_outfile = "${rename_file}".split('\\.')[0] + '-specialH_pp.html'
 	renamed_aln = "${rename_file}".split('\\.')[0] + '-renamed.aln'
-	html_hydro_outfile = "${rename_file}".split('\\.')[0] + '-hydro.html'
+	html_hydro_outfile = "${rename_file}".split('\\.')[0] + "-${params.HYDRO_SCALE}-hydro.html"
 	html_phob_tmcolor_outfile = "${rename_file}".split('\\.')[0] + '-phobtm.html'
 	ascii_scorefile = "${rename_file}".split('\\.')[0] + '.score_ascii'
 	if(params.SPECIAL_HELIX == false)
