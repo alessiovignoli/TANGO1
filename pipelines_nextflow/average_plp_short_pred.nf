@@ -111,7 +111,7 @@ process  average_unifier {
 	stdout emit: standardout
 	
 	script:
-	outname = "${params.INPUT_PLP}".split('\\.')[0].split('\\*')[0].split('/')[-1] + "-${prefix}.${params.MAX_ITER}tot_${params.SUFFIX}"
+	outname = "${params.INPUT_PLP}".split('/')[-1].split('\\.')[0].split('\\*')[0] + "-${prefix}.${params.MAX_ITER}tot_${params.SUFFIX}"
 	"""
 	for i in `echo ${list_of_averages}`; do cat `echo \$i | cut -d '[' -f 2 | cut -d ',' -f 1 | cut -d ']' -f 1` >> TMP ; done
 	sort TMP | head -n ${params.MAX_ITER} > ${outname}
