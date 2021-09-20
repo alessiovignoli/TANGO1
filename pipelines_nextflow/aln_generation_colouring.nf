@@ -331,7 +331,7 @@ process phob_stout_colours {
 	if(params.TRIMM == false)
 		if(params.SPECIAL_HELIX == false)
 			"""
-			./${pysript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath}
+			./${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath}
 			"""
 		else
 			"""
