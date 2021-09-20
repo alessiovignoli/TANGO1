@@ -47,8 +47,16 @@ if (params.help) {
         log.info '	So this pipeline based on a segment obtained from the predfile computes the Hydrophobicity associated to such segment'
         log.info '	for this reason the order of the proteins in the predfile must be the same for the fasta one'
         log.info '	basically first protein in pred must also be the first protein in fasta and so on'
+        log.info '	both the previous flags are mandatory and ihf the input is a pattern to many files the script assumes that for each txt'
+        log.info '	there is a corresponding fasta file, remember that to be recognized as pattern do like --INPUT_FASTA "test*.fasta"'
+        log.info '	it is mandatory to specify the region of the prediciton on which do the computation, --KEYWORD argument '
+        log.info '	allowed values are the allowed keywords are: [c, i, o, -, n, s, l]  c = signal peptide, i = inside membrane(cytoplasm),'
+        log.info '      o = outside membrane, - = helix (in phobius originalmodel), (only in phobius-M7or later) => -n- = normal-helix'
+        log.info '      -s- = special-helix and -l- = loop-inramembrane'
+        log.info '      they have to be given like this:'
+        log.info '              --KEYWORD s,n,c    or  i,l,\\-'
         log.info '      optionally the name for the hydrophobicity scale can be specified using --HYDRO_SCALE'
-        log.info '	the supported arguments are kyte for Kyte-Doolittle (default) and GES for GES scale'
+        log.info '	the supported arguments are kyte for Kyte-Doolittle (default), GES for GES scale, UHS for Unified Hydrophob Scale'
         log.info '	'
         log.info '\n'
         exit 1
@@ -113,11 +121,6 @@ workflow average_hydrophobicity {
 	avghydro = pred_avg_hydro_fasta.out.avg_hydro
 	finalavghydro = "there is nothing here, the --MAX_ITER has not been given a values, hence no need for this block to be executed this is not an error"
 	if ( params.MAX_ITER != false) {
-		//avghydro.branch {
-		//	special : it.endsWith("_s.${params.HYDRO_SCALE}_averagehydro")
-		//	normal : it.endsWith("_n.${params.HYDRO_SCALE}_averagehydro")
-		//}
-		//.set{ tmp_collections }
 		average_unifier(avghydro.collect(), hydrophobicity_computer_py, field_keyword)
 		finalavghydro = average_unifier.out.final_average
 	}

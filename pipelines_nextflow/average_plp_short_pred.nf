@@ -30,7 +30,12 @@ if (params.help) {
         log.info '      	#pos    aa      i       o       M       S       m       l'
         log.info '      where the first comment line contains the id present in the line of the txt, remember the order has to be the same in the two files'
         log.info '      this module computes the average and the maximum plp value associated to what ever region of the prediciton is inputed'
-        log.info '      this region can be selected simply giving in the command line the  --KEYWORD argument'i
+        log.info '      this region can be selected simply giving in the command line the  --KEYWORD argument'
+        log.info '      allowed values are the allowed keywords are: [c, i, o, -, n, s, l]  c = signal peptide, i = inside membrane(cytoplasm),'
+        log.info '      o = outside membrane, - = helix (in phobius originalmodel), (only in phobius-M7or later) => -n- = normal-helix'
+        log.info '      -s- = special-helix and -l- = loop-inramembrane'
+        log.info '      they have to be given like this:'
+        log.info '              --KEYWORD s,n,c    or  i,l,\\-'
         log.info '	and it delimits the segment region to take into consideration it is in fct the main keyword label'
         log.info '	usefull when we want to know other averages for a given segment that are not the predicted label like,'
         log.info '	for example the selected main field keyword is s (special helix) but we want to compute also the average for'
