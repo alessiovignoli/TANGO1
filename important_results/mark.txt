@@ -1,0 +1,1868 @@
+### PHOBIUS EDITS TO phobius.model RECORD ###
+
+phobius.model mark one id = M1 
+	
+	changes to original : The helixIOLengthDist state has had the following changes to the emission probs:
+		only    A:0.01:70.947 C:0.01:14.578 D:0.01:3.985 E:0.01:4.050 F:0.01:53.323
+			G:0.01:53.809 H:0.01:4.147 I:0.01:72.695 K:0.01:2.041 L:0.01:102.079
+			M:0.01:23.714 N:0.01:8.877 P:0.81:14.222 Q:0.01:4.892 R:0.01:1.976;
+		  All emission probs except the proline one have been set to 0.01, the proline emission prob
+		  has been set to 0.81, no changes were made to the second values <70.947 , 53.809 , 23.714 ecc,>
+
+
+phobius.model mark two id = M2
+
+	changes to original : The helixIOLengthDist state has had the following changes to the emission probs:
+		only    A:0.125718:6.0 C:0.0256954:6.0 D:0.00371686:6.0 E:0.00394872:6.0 F:0.0912202:6.0
+			G:0.0720512:6.0 H:0.00508179:6.0 I:0.132166:6.0 K:0.00204625:6.0 L:0.189386:6.0
+			M:0.0412358:6.0 N:0.00779492:6.0 P:0.0135996:486.0 Q:0.00548422:6.0 R:0.00202563:6.0
+			S:0.0456952:6.0 T:0.0513129:6.0 V:0.146299:6.0 W:0.0159998:6.0 Y:0.0195234:6.0;
+		  All the second values <6.0 , 6.0 ecc.> were set to 6.0 except the one associated with the proline,
+		  the emission probabilities instead were kept the same.
+
+
+phobius.model mark three id = M3
+
+	changes to original : A trialState state was added to the model, a completely new state that predicts well prolines
+			      the state has the following charachteristics:
+		trialState {
+  		  trans  trialState: 0.993001: 396.559
+        		inTube1: 0.0069991: 3.441;
+  		  label i;
+  		  only   A:0.01:70.947 C:0.01:14.578 D:0.01:3.985 E:0.01:4.050 F:0.01:53.323
+         		 G:0.01:53.809 H:0.01:4.147 I:0.01:72.695 K:0.01:2.041 L:0.01:102.079
+         		 M:0.01:23.714 N:0.01:8.877 P:0.81:14.222 Q:0.01:4.892 R:0.01:1.976
+         		 S:0.01:41.096 T:0.01:51.142 V:0.01:32.420 W:0.01:9.132 Y:0.01:11.872;
+		}
+
+			      it points toward itself, so it is a looping state, and towards the citoplasmic loop <inTube1>
+			      the only state that points towards this <trialState> is <outTube20>, 
+			      taht has been changed as follows:
+		outTube20 {
+  		  trans outerEndOI1: 0.9: 394.000
+        		trialState: 0.1:  6.0;
+
+
+phobius.model mark four id = M4
+
+	changes to M3 : the trial state has been given a different label, not present anywhere else in the model:
+		trialState {
+  		  trans  trialState: 0.993001: 396.559
+        		inTube1: 0.0069991: 3.441;
+  		  label m;
+
+
+phobius.model mark five id = M5
+
+	changes to M4 : adjusted pseudocounts for <outTube20> and especially the creation/copy of the <helixOI> block
+			(all 27 states), that points to <inTube1>, and is reachable from <outTube20> and <outLTube20>
+			trial state changed into:
+		shelixOILengthDist {
+		  trans shelixOI26: 0.00140932: 0.564
+  		  	shelixOI25: 0.00122239: 0.489
+        		shelixOI24: 0.00220634: 0.883
+        		shelixOI23: 0.00390424: 1.562
+		        shelixOI22: 0.00675658: 2.703
+		        shelixOI21: 0.0114012: 4.560
+		        shelixOI20: 0.0186913: 7.477
+		        shelixOI19: 0.0296392: 11.856
+		        shelixOI18: 0.0452084: 18.083
+		        shelixOI17: 0.0658619: 26.345
+		        shelixOI16: 0.0908087: 36.323
+		        shelixOI15: 0.117057: 46.823
+		        shelixOI14: 0.138732: 55.493
+		        shelixOI13: 0.14761: 59.044
+		        shelixOI12: 0.136078: 54.431
+		        shelixOI11: 0.102751: 41.100
+		        shelixOI10: 0.0577113: 23.085
+		        shelixOI9: 0.0200501: 8.020
+		        shelixOI8: 0.00285052: 1.140
+		        shelixOI7: 4.99366e-05: 0.020;
+		  label m;
+		  end 0;
+		  fix_trans 1;
+		  only   A:0.01:70.947 C:0.01:14.578 D:0.01:3.985 E:0.01:4.050 F:0.01:53.323
+		         G:0.01:53.809 H:0.01:4.147 I:0.01:72.695 K:0.01:2.041 L:0.01:102.079
+		         M:0.01:23.714 N:0.01:8.877 P:0.81:14.222 Q:0.01:4.892 R:0.01:1.976
+		         S:0.01:41.096 T:0.01:51.142 V:0.01:32.420 W:0.01:9.132 Y:0.01:11.872;
+		}
+			
+			the emission probs are identical to M3-M4,
+			states added:
+
+		shelixOI26 {
+		  trans  shelixOI25: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+
+		shelixOI25 {
+		  trans  shelixOI24: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+	
+		shelixOI24 {
+		  trans  shelixOI23: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+
+		shelixOI23 {
+		  trans  shelixOI22: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI23 {
+		  trans  shelixOI22: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI22 {
+		  trans  shelixOI21: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI21 {
+		  trans  shelixOI20: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI20 {
+		  trans  shelixOI19: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI19 {
+		  trans  shelixOI18: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI18 {
+		  trans  shelixOI17: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI17 {
+		  trans  shelixOI16: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI16 {
+		  trans  shelixOI15: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI15 {
+		  trans shelixOI14: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI14 {
+		  trans  shelixOI13: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI13 {
+		  trans  shelixOI12: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI12 {
+		  trans  shelixOI11: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI11 {
+		  trans  shelixOI10: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI10 {
+		  trans  shelixOI9: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+	
+		shelixOI9 {
+		  trans  shelixOI8: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI8 {
+		  trans  shelixOI7: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI7 {
+		  trans  shelixOI6: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI6 {	
+		  trans  shelixOI5: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI5 {
+		  trans shelixOI4: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI4 {
+		  trans  shelixOI3: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI3 {
+		  trans shelixOI2: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixOI2 {
+		  trans inTube1: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelishelixOILengthDist;
+		}
+
+
+phobius.model mark six id = M6
+
+        changes to M5 : Another helix has been added, so that there can be any permutations and combinations of
+			special/peculiar adn normal helices. So <shelixIOLengthDist> state has been added with the same 
+			transions of <shelixOILengthDist> that are the same of both <helixOILengthDist> and <helixIOLengthDist>.
+			This state have coupled emission to <shelixIOLengthDist> and is as follows:
+		shelixIOLengthDist {
+		  trans shelixIO26: 0.00140932: 0.564
+		        shelixIO25: 0.00122239: 0.489
+		        shelixIO24: 0.00220634: 0.883
+		        shelixIO23: 0.00390424: 1.562
+		        shelixIO22: 0.00675658: 2.703
+		        shelixIO21: 0.0114012: 4.560
+		        shelixIO20: 0.0186913: 7.477
+		        shelixIO19: 0.0296392: 11.856
+		        shelixIO18: 0.0452084: 18.083
+		        shelixIO17: 0.0658619: 26.345
+		        shelixIO16: 0.0908087: 36.323
+		        shelixIO15: 0.117057: 46.823
+		        shelixIO14: 0.138732: 55.493
+		        shelixIO13: 0.14761: 59.044
+		        shelixIO12: 0.136078: 54.431
+		        shelixIO11: 0.102751: 41.100
+		        shelixIO10: 0.0577113: 23.085
+		        shelixIO9: 0.0200501: 8.020
+		        shelixIO8: 0.00285052: 1.140
+		        shelixIO7: 4.99366e-05: 0.020;
+		  label m;
+		  end 0;
+		  fix_trans 1;
+		  tied_letter shelixOILengthDist;
+		}
+			This state is reachable from <inTube20>, so <inTube20> trans section has been modified as follows:
+		inTube20 {
+		  trans innerEndIO1: 0.9: 360.000
+		        shelixIOLengthDist: 0.1: 40.000;
+		  label i;
+		  end 0;
+		  tied_letter inTube1;
+		}
+			In the end all theese states have been added:
+		shelixIO26 {
+		  trans shelixIO25: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO25 {
+		  trans shelixIO24: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO24 {
+		  trans shelixIO23: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO23 {
+		  trans shelixIO22: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO22 {
+		  trans shelixIO21: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO21 {
+		  trans shelixIO20: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO20 {
+		  trans shelixIO19: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO19 {
+		  trans shelixIO18: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO18 {
+		  trans shelixIO17: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO17 {
+		  trans shelixIO16: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO16 {
+		  trans shelixIO15: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO15 {
+		  trans shelixIO14: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO14 {
+		  trans shelixIO13: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO13 {
+		  trans shelixIO12: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO12 {
+		  trans shelixIO11: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO11 {
+		  trans shelixIO10: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO10 {
+		  trans shelixIO9: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO9 {
+		  trans shelixIO8: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO8 {
+		  trans shelixIO7: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO7 {
+		  trans shelixIO6: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO6 {
+		  trans shelixIO5: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO5 {
+		  trans shelixIO4: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO4 {
+		  trans shelixIO3: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO3 {
+		  trans shelixIO2: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+		
+		shelixIO2 {
+		  trans outTube1: 0.9: 360.000
+		        outLTube1: 0.1: 40.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+			has shown this helix block points to <outTube1> and <outLTube1>, closing a loop and creating a model that freely moves 
+			between cytoplasm and non-cytoplasm through a membrane whatever it will be, the frequencies are not distant from thoose
+			of <outerEndIO4> that already points to the same states.
+
+
+
+
+phobius.model mark seven id = M7
+
+        changes to M6 : The transition probabilities from  <outTube20> , <outLTube20> and <inTube20>, basically all entry points 
+			to the newly added <shelix> blocks. States represented as:
+		outTube20 {
+		  trans outerEndOI1: 0.999: 360.000
+		        shelixOILengthDist: 0.001:  40.0;
+		  label o;
+		  end 0;
+		  tied_letter outTube1;
+		}
+
+		outLTube20 {
+		  trans outerEndOI1: 0.999: 360.000
+		        shelixOILengthDist: 0.001:  40.0;
+		  label O;
+		  end 0;
+		  tied_letter outLTube1;
+		}
+
+		inTube20 {
+		  trans innerEndIO1: 0.999: 360.000
+		        shelixIOLengthDist: 0.001: 40.000;
+		  label i;
+		  end 0;
+		  tied_letter inTube1;
+		}
+
+phobius.model mark eight id = M8
+
+	changes to M7 : the values of the above states (M7 changes) are still under countinous change, but the main out of the box change is
+			to the state <inTube3> :
+		inTube3 {
+		  trans  inTube4: 0.908384: 365.698
+		        inTube18: 0.0816162: 34.302
+		        inTube19: 0: 0.010;
+		  label i;
+		  tied_letter inTube1;
+		}
+
+			where the transition prob to <inTube19> has been set to 0.01 rather than zero, in consequence the transition to 
+			<inTube4> has been lowered of 0.01 from 0.918384 to 0.908384.
+
+
+BACK TO M7 M8 WAS NOT USED AT ALL AND IS NOT THE USED NOW
+
+phobius.model mark nine id = M9
+
+	changet to M5 : a completely new <loop> section has been added, reachable from the peculiar helix block <shelix>
+			that does not point towards <inTube1>, this <loop> section points towards <outerEndOI1>,
+			changes:
+		shelixOI2 {
+		  trans loop1: 1: 400.000;
+		  label m;
+		  end 0;
+		  tied_letter shelixOILengthDist;
+		}
+
+		outTube20 {
+		  trans outerEndOI1: 0.925: 360.000
+		        shelixOILengthDist: 0.075:  40.0;
+		  label o;
+		  end 0;
+		  tied_letter outTube1;
+		}
+
+		outLTube20 {
+		  trans outerEndOI1: 0.925: 360.000
+		        shelixOILengthDist: 0.075:  40.0;
+		  label O;
+		  end 0;
+		  tied_letter outLTube1;
+		}
+
+		
+
+
+phobius.model mark ten id = M10
+
+	changes to phobius_original_model : The cytoplasmic loop now does not point to the helic anymore it is a sort of dead end.
+					    the innerEndIO1 is not reachable anymore.
+					    But a special helix block has been inserted s follows:
+sphelixIOLengthDist {
+  trans sphelixIO26: 0.00140932: 0.564
+        sphelixIO25: 0.00122239: 0.489
+        sphelixIO24: 0.00220634: 0.883
+        sphelixIO23: 0.00390424: 1.562
+        sphelixIO22: 0.00675658: 2.703
+        sphelixIO21: 0.0114012: 4.560
+        sphelixIO20: 0.0186913: 7.477
+        sphelixIO19: 0.0296392: 11.856
+        sphelixIO18: 0.0452084: 18.083
+        sphelixIO17: 0.0658619: 26.345
+        sphelixIO16: 0.0908087: 36.323
+        sphelixIO15: 0.117057: 46.823
+        sphelixIO14: 0.138732: 55.493
+        sphelixIO13: 0.14761: 59.044
+        sphelixIO12: 0.136078: 54.431
+        sphelixIO11: 0.102751: 41.100
+        sphelixIO10: 0.0577113: 23.085
+        sphelixIO9: 0.0200501: 8.020
+        sphelixIO8: 0.00285052: 1.140
+        sphelixIO7: 4.99366e-05: 0.020;
+  label m;
+  end 0;
+  fix_trans 1;
+  only   A:0.0905512:70.947 C:0.0059055:14.578 D:0.0521653:3.985 E:0.0541338:4.050 F:0.0472441:53.323
+         G:0.0187:53.809 H:0.011811:4.147 I:0.069882:72.695 K:0.032481:2.041 L:0.1692913:102.079
+         M:0.020669:23.714 N:0.0305118:8.877 P:0.07185:14.222 Q:0.0029528:4.892 R:0.011811:1.976
+         S:0.0708661:35.117 T:0.0895669:32.719 V:0.101378:73.829 W:0.010826:9.816 Y:0.0374:13.185;
+}
+
+sphelixIO26 {
+  trans sphelixIO25: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO25 {
+  trans sphelixIO24: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO24 {
+  trans sphelixIO23: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO23 {
+  trans sphelixIO22: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO22 {
+  trans sphelixIO21: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO21 {
+  trans sphelixIO20: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO20 {
+  trans sphelixIO19: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO19 {
+  trans sphelixIO18: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO18 {
+  trans sphelixIO17: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO17 {
+  trans sphelixIO16: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO16 {
+  trans sphelixIO15: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO15 {
+  trans sphelixIO14: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO14 {
+  trans sphelixIO13: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO13 {
+  trans sphelixIO12: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO12 {
+  trans sphelixIO11: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO11 {
+  trans sphelixIO10: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO10 {
+  trans sphelixIO9: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO9 {
+  trans sphelixIO8: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO8 {
+  trans sphelixIO7: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO7 {
+  trans sphelixIO6: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO6 {
+  trans sphelixIO5: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO5 {
+  trans sphelixIO4: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO4 {
+  trans sphelixIO3: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO3 {
+  trans sphelixIO2: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+sphelixIO2 {
+  trans loop_intraM1: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+					this above block is reachable from both:
+
+outTube20 {
+  trans sphelixIOLengthDist: 1: 400.000;
+  label o;
+  end 0;
+  tied_letter outTube1;
+}
+
+outLTube20 {
+  trans sphelixIOLengthDist: 1: 400.000;
+  label O;
+  end 0;
+  tied_letter outLTube1;
+}
+
+					the last state of the special helix points towards the imtramembrane loop <loop_intraM1>.
+					This loop states are edited as follows:
+
+loop_intraM10 {
+  trans loop_intraM9: 0.00140932: 0.564
+        loop_intraM8: 0.00122239: 0.489
+        loop_intraM7: 0.00220634: 0.883
+        loop_intraM6: 0.00390424: 1.562
+	loop_intraM5: 0.117057: 46.823
+	loop_intraM4: 0.117057: 46.823;
+  label l;
+  end 0;
+  fix_trans 1;
+  only   A:0.0:70.947 C:0.0123457:14.578 D:0.115226:3.985 E:0.0658436:4.050 F:0.0823:53.323
+         G:0.1481481:53.809 H:0.0370371:4.147 I:0.0123457:72.695 K:0.0123457:2.041 L:0.0329218:102.079
+         M:0.0123457:23.714 N:0.004115:8.877 P:0.242798:14.222 Q:0.069958:4.892 R:0.02881:1.976
+         S:0.0:35.117 T:0.020576:32.719 V:0.0370371:73.829 W:0.0370371:9.816 Y:0.0288:13.185;
+}
+
+loop_intraM9 {
+  trans loop_intraM8: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM8 {
+  trans loop_intraM7: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM7 {
+  trans loop_intraM6: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM6 {
+  trans loop_intraM5: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM5 {
+  trans loop_intraM4: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM4 {
+  trans loop_intraM3: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM3 {
+  trans loop_intraM2: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM2 {
+  trans loop_intraM1: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM1 {
+  trans outerEndOI1: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+
+
+
+
+phobius.model mark eleven id = M11
+
+        changes to M10 : The special helix + loop region is now one of two options reachable from the same state as M10:
+
+outTube20 {
+  trans outerEndOI1: 0.9: 360.000 
+	sphelixIOLengthDist: 0.1: 40.000;
+  label o;
+  end 0;
+  tied_letter outTube1;
+}
+
+outLTube20 {
+  trans outerEndOI1: 0.9: 360.000 
+	sphelixIOLengthDist: 0.1: 400.000;
+  label O;
+  end 0;
+  tied_letter outLTube1;
+}
+
+		the previous dead end in the cytoplasmic region is no more:
+
+inTube20 {
+  trans innerEndIO1: 1: 400.000;
+  label i;
+  end 0;
+  tied_letter inTube1;
+}
+
+
+
+
+
+phobius.model mark twelve id = M12
+
+        changes to M11 : a minor change to the transition prob. towards the special helix:
+
+outTube20 {
+  trans outerEndOI1: 0.95: 380.000
+        sphelixIOLengthDist: 0.05: 20.000;
+  label o;
+  end 0;
+  tied_letter outTube1;
+}
+
+outLTube20 {
+  trans outerEndOI1: 0.95: 360.000
+        sphelixIOLengthDist: 0.05: 400.000;
+  label O;
+  end 0;
+  tied_letter outLTube1;
+}
+
+
+
+
+phobius.model mark thirteen id = M13
+
+        changes to M11 : a minor change to the transition prob. towards the special helix:
+
+outTube20 {
+  trans outerEndOI1: 0.85: 380.000
+        sphelixIOLengthDist: 0.15: 20.000;
+  label o;
+  end 0;
+  tied_letter outTube1;
+}
+
+outLTube20 {
+  trans outerEndOI1: 0.85: 360.000
+        sphelixIOLengthDist: 0.15: 400.000;
+  label O;
+  end 0;
+  tied_letter outLTube1;
+}
+
+
+
+
+phobius.model mark fourteen id = M14
+
+        changes to M11 : a minor change to the transition prob. towards the special helix:
+
+outTube20 {
+  trans outerEndOI1: 0.7: 380.000
+        sphelixIOLengthDist: 0.3: 20.000;
+  label o;
+  end 0;
+  tied_letter outTube1;
+}
+
+outLTube20 {
+  trans outerEndOI1: 0.7: 360.000
+        sphelixIOLengthDist: 0.3: 400.000;
+  label O;
+  end 0;
+  tied_letter outLTube1;
+}
+
+
+
+
+
+phobius.model mark fifteen id = M15
+
+        changes to M11 : a minor change to the transition prob. towards the special helix:
+
+outTube20 {
+  trans outerEndOI1: 0.5: 380.000
+        sphelixIOLengthDist: 0.5: 20.000;
+  label o;
+  end 0;
+  tied_letter outTube1;
+}
+
+outLTube20 {
+  trans outerEndOI1: 0.5: 360.000
+        sphelixIOLengthDist: 0.5: 400.000;
+  label O;
+  end 0;
+  tied_letter outLTube1;
+}
+
+
+
+
+phobius.model mark sixteen id = M16
+
+        changes to M11 : all the transition probabilities of the state sphelixIOLengthDist are set equal to each other, also the name of this state is modified to sphelixLengthDist and so all the other sphelix states:
+
+sphelixLengthDist {
+  trans sphelix26: 0.05: 0.564
+        sphelix25: 0.05: 0.489
+        sphelix24: 0.05: 0.883
+        sphelix23: 0.05: 1.562
+        sphelix22: 0.05: 2.703
+        sphelix21: 0.05: 4.560
+        sphelix20: 0.05: 7.477
+        sphelix19: 0.05: 11.856
+        sphelix18: 0.05: 18.083
+        sphelix17: 0.05: 26.345
+        sphelix16: 0.05: 36.323
+        sphelix15: 0.05: 46.823
+        sphelix14: 0.05: 55.493
+        sphelix13: 0.05: 59.044
+        sphelix12: 0.05: 54.431
+        sphelix11: 0.05: 41.100
+        sphelix10: 0.05: 23.085
+        sphelix9: 0.05: 8.020
+        sphelix8: 0.05: 1.140
+        sphelix7: 0.05: 0.020;
+  label m;
+  end 0;
+  fix_trans 1;
+  only   A:0.0905512:70.947 C:0.0059055:14.578 D:0.0521653:3.985 E:0.0541338:4.050 F:0.0472441:53.323
+         G:0.0187:53.809 H:0.011811:4.147 I:0.069882:72.695 K:0.032481:2.041 L:0.1692913:102.079
+         M:0.020669:23.714 N:0.0305118:8.877 P:0.07185:14.222 Q:0.0029528:4.892 R:0.011811:1.976
+         S:0.0708661:35.117 T:0.0895669:32.719 V:0.101378:73.829 W:0.010826:9.816 Y:0.0374:13.185;
+}
+
+		also the transition probs of the loop model have been set equal to each other and the loop region has been remodelled to the following:
+
+sphelix2 {
+  trans loop_intraM18: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixLengthDist;
+}
+
+loop_intraM18 {
+  trans loop_intraM17: 0.0714285: 0.564
+        loop_intraM16: 0.0714285: 0.564
+        loop_intraM15: 0.0714285: 0.489
+        loop_intraM14: 0.0714285: 0.883
+        loop_intraM13: 0.0714285: 1.562
+        loop_intraM12: 0.0714285: 46.823
+        loop_intraM11: 0.0714285: 46.823
+        loop_intraM10: 0.0714285: 46.823
+        loop_intraM9: 0.0714285: 0.564
+        loop_intraM8: 0.0714285: 0.489
+        loop_intraM7: 0.0714285: 0.883
+        loop_intraM6: 0.0714285: 1.562
+        loop_intraM5: 0.0714285: 46.823
+        loop_intraM4: 0.0714285: 46.823;
+  label l;
+  end 0;
+  fix_trans 1;
+  only   A:0.0:70.947 C:0.0123457:14.578 D:0.115226:3.985 E:0.0658436:4.050 F:0.0823:53.323
+         G:0.1481481:53.809 H:0.0370371:4.147 I:0.0123457:72.695 K:0.0123457:2.041 L:0.0329218:102.079
+         M:0.0123457:23.714 N:0.004115:8.877 P:0.242798:14.222 Q:0.069958:4.892 R:0.02881:1.976
+         S:0.0:35.117 T:0.020576:32.719 V:0.0370371:73.829 W:0.0370371:9.816 Y:0.0288:13.185;
+}
+
+loop_intraM17 {
+  trans loop_intraM16: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM16 {
+  trans loop_intraM15: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM15 {
+  trans loop_intraM14: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM14 {
+  trans loop_intraM13: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM13 {
+  trans loop_intraM12: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM12 {
+  trans loop_intraM11: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM11 {
+  trans loop_intraM10: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM10 {
+  trans loop_intraM9: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+loop_intraM9 {
+  trans loop_intraM8: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM8 {
+  trans loop_intraM7: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM7 {
+  trans loop_intraM6: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM6 {
+  trans loop_intraM5: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM5 {
+  trans loop_intraM4: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM4 {
+  trans loop_intraM3: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM3 {
+  trans loop_intraM2: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM2 {
+  trans loop_intraM1: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+loop_intraM1 {
+  trans outerEndOI1: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM18;
+}
+
+
+
+
+
+phobius.model mark siventeen id = M17
+
+        changes to M16 : the loop_intraM18 does not exist anymore and so is all the loop region, instead sphelix2 and the sphelix region points toward outerEndOI1 (the cytoplasm):
+
+sphelix2 {
+  trans outerEndOI1: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixLengthDist;
+}
+
+
+
+
+phobius.model mark eighteen id = M18
+
+        changes to M17 : The transition towards the sphelix region have been changed as follows:
+
+outTube20 {
+  trans outerEndOI1: 0.5: 360.000
+        sphelixLengthDist: 0.5: 400.000;
+  label o;
+  end 0;
+  tied_letter outTube1;
+}
+
+outLTube20 {
+  trans outerEndOI1: 0.5: 360.000
+        sphelixLengthDist: 0.5: 400.000;
+  label O;
+  end 0;
+  tied_letter outLTube1;
+}
+
+
+
+
+phobius.model mark nineteen id = M19
+
+        changes to M17 : the Transition probabilities of the sphelixLengthDist state have been re-set to the one found in helixIOLengthDist,
+			 also the emission probabilities have been changed accordinbg to frequency_set2 as follows:
+sphelixLengthDist {
+  trans sphelix26: 0.00140932: 0.564
+        sphelix25: 0.00122239: 0.489
+        sphelix24: 0.00220634: 0.883
+        sphelix23: 0.00390424: 1.562
+        sphelix22: 0.00675658: 2.703
+        sphelix21: 0.0114012: 4.560
+        sphelix20: 0.0186913: 7.477
+        sphelix19: 0.0296392: 11.856
+        sphelix18: 0.0452084: 18.083
+        sphelix17: 0.0658619: 26.345
+        sphelix16: 0.0908087: 36.323
+        sphelix15: 0.117057: 46.823
+        sphelix14: 0.138732: 55.493
+        sphelix13: 0.14761: 59.044
+        sphelix12: 0.136078: 54.431
+        sphelix11: 0.102751: 41.100
+        sphelix10: 0.0577113: 23.085
+        sphelix9: 0.0200501: 8.020
+        sphelix8: 0.00285052: 1.140
+        sphelix7: 4.99366e-05: 0.020;
+  label m;
+  end 0;
+  fix_trans 1;
+  only   A:0.0927835:70.947 C:0.0051546:14.578 D:0.0051546:3.985 E:0.017182:4.050 F:0.080756:53.323
+         G:0.025773:53.809 H:0.010309:4.147 I:0.0773196:72.695 K:0.032646:2.041 L:0.21477663:102.079
+         M:0.0274914:23.714 N:0.0292096:8.877 P:0.0446735:14.222 Q:0.010309:4.892 R:0.0154639:1.976
+         S:0.049828:35.117 T:0.0927835:32.719 V:0.11683849:73.829 W:0.006872:9.816 Y:0.0446735:13.185;
+}
+
+also
+
+sphelix2 {
+  trans inTube1: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixLengthDist;
+}
+
+
+phobius.model mark twenty id = M20
+
+        changes to M19 : The emision probabilities of the sphelix region have been averaged with thoose of the normal helix:
+
+sphelixLengthDist {
+  trans sphelix26: 0.00140932: 0.564
+        sphelix25: 0.00122239: 0.489
+        sphelix24: 0.00220634: 0.883
+        sphelix23: 0.00390424: 1.562
+        sphelix22: 0.00675658: 2.703
+        sphelix21: 0.0114012: 4.560
+        sphelix20: 0.0186913: 7.477
+        sphelix19: 0.0296392: 11.856
+        sphelix18: 0.0452084: 18.083
+        sphelix17: 0.0658619: 26.345
+        sphelix16: 0.0908087: 36.323
+        sphelix15: 0.117057: 46.823
+        sphelix14: 0.138732: 55.493
+        sphelix13: 0.14761: 59.044
+        sphelix12: 0.136078: 54.431
+        sphelix11: 0.102751: 41.100
+        sphelix10: 0.0577113: 23.085
+        sphelix9: 0.0200501: 8.020
+        sphelix8: 0.00285052: 1.140
+        sphelix7: 4.99366e-05: 0.020;
+  label m;
+  end 0;
+  fix_trans 1;
+  only   A:0.10925075:70.947 C:0.015425:14.578 D:0.00443573:3.985 E:0.01056536:4.050 F:0.0859881:53.323
+         G:0.0489121:53.809 H:0.007695395:4.147 I:0.1047428:72.695 K:0.017346125:2.041 L:0.202081315:102.079
+         M:0.0343636:3.714 N:0.01850226:8.877 P:0.02913655:14.222 Q:0.00789661:4.892 R:0.008744765:1.976
+         S:0.0477616:35.117 T:0.0720482:32.719 V:0.131568745:73.829 W:0.0114359:9.816 Y:0.03209845:13.185;
+}
+
+
+
+phobius.model mark twentyone id = M21
+
+        changes to M20 : Changes to emission probabilities of sphelixLengthDist, this new frequencies are obtained only from well predicted tm
+
+sphelixLengthDist {
+  trans sphelix26: 0.00140932: 0.564
+        sphelix25: 0.00122239: 0.489
+        sphelix24: 0.00220634: 0.883
+        sphelix23: 0.00390424: 1.562
+        sphelix22: 0.00675658: 2.703
+        sphelix21: 0.0114012: 4.560
+        sphelix20: 0.0186913: 7.477
+        sphelix19: 0.0296392: 11.856
+        sphelix18: 0.0452084: 18.083
+        sphelix17: 0.0658619: 26.345
+        sphelix16: 0.0908087: 36.323
+        sphelix15: 0.117057: 46.823
+        sphelix14: 0.138732: 55.493
+        sphelix13: 0.14761: 59.044
+        sphelix12: 0.136078: 54.431
+        sphelix11: 0.102751: 41.100
+        sphelix10: 0.0577113: 23.085
+        sphelix9: 0.0200501: 8.020
+        sphelix8: 0.00285052: 1.140
+        sphelix7: 4.99366e-05: 0.020;
+  label m;
+  end 0;
+  fix_trans 1;
+  only   A:0.08695652:70.947 C:0.00767263:14.578 D:0.002557545:3.985 E:0.01534526:4.050 F:0.0818414:53.323
+         G:0.03324808:53.809 H:0.010230179:4.147 I:0.084398976:72.695 K:0.02813299:2.041 L:0.2404092:102.079
+         M:0.0230179:3.714 N:0.0230179:8.877 P:0.03324808:14.222 Q:0.010230:4.892 R:0.0076726:1.976
+         S:0.04859335:35.117 T:0.0920716:32.719 V:0.10741687:73.829 W:0.007672634:9.816 Y:0.058823529:13.185;
+}
+
+
+
+
+phobius.model mark twentytwo id = M22
+
+        changes to M21 : The sphelix region points towrds the lop region that have been modelled as follows:
+
+sphelixIO2 {
+  trans loop_intraM11: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixIOLengthDist;
+}
+
+loop_intraM11 {
+  trans loop_intraM10: 1: 400.000;
+  label l;
+  end 0;
+  fix_trans 1;
+  only   A:0.0042735:70.947 C:0.0042735:14.578 D:0.17094017:3.985 E:0.0555556:4.050 F:0.081196581:53.323
+         G:0.15384615:53.809 H:0.034188:4.147 I:0.01282051:72.695 K:0.017094017:2.041 L:0.02136752:102.079
+         M:0.017094017:23.714 N:0.0042735:8.877 P:0.1923076923:14.222 Q:0.059829:4.892 R:0.025641:1.976
+         S:0.01282051:35.117 T:0.017094:32.719 V:0.055555556:73.829 W:0.017094017:9.816 Y:0.047008547:13.185;
+}
+
+loop_intraM10 {
+  trans loop_intraM9: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM11;
+}
+
+
+loop_intraM9 {
+  trans loop_intraM8: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM11;
+}
+
+loop_intraM8 {
+  trans loop_intraM7: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM11;
+}
+
+loop_intraM7 {
+  trans loop_intraM6: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM11;
+}
+
+loop_intraM6 {
+  trans loop_intraM5: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM11;
+}
+
+loop_intraM5 {
+  trans loop_intraM4: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM11;
+}
+
+loop_intraM4 {
+  trans loop_intraM3: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM11;
+}
+
+loop_intraM3 {
+  trans loop_intraM2: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM11;
+}
+
+loop_intraM2 {
+  trans loop_intraM1: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM11;
+}
+
+loop_intraM1 {
+  trans outerEndOI1: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM11;
+}
+
+
+
+
+phobius.model mark twentythree id = M23
+
+        changes to M22 : The <sphelixLengthDist> has got different aa emission frequencies
+			 since the frequency set has change to a non redundant one 
+			 frequency_set3, the freq are taken from all the sequences in set
+			 and the loop grammar has changed to the one of the cytoplasmic loop
+			 the freq of the loop are again based on frequency_set3.
+
+sphelixLengthDist {
+  trans sphelix26: 0.00140932: 0.564
+        sphelix25: 0.00122239: 0.489
+        sphelix24: 0.00220634: 0.883
+        sphelix23: 0.00390424: 1.562
+        sphelix22: 0.00675658: 2.703
+        sphelix21: 0.0114012: 4.560
+        sphelix20: 0.0186913: 7.477
+        sphelix19: 0.0296392: 11.856
+        sphelix18: 0.0452084: 18.083
+        sphelix17: 0.0658619: 26.345
+        sphelix16: 0.0908087: 36.323
+        sphelix15: 0.117057: 46.823
+        sphelix14: 0.138732: 55.493
+        sphelix13: 0.14761: 59.044
+        sphelix12: 0.136078: 54.431
+        sphelix11: 0.102751: 41.100
+        sphelix10: 0.0577113: 23.085
+        sphelix9: 0.0200501: 8.020
+        sphelix8: 0.00285052: 1.140
+        sphelix7: 4.99366e-05: 0.020;
+  label m;
+  end 0;
+  fix_trans 1;
+  only   A:0.1093023:70.947 C:0.018604651:14.578 D:0.0116279:3.985 E:0.0302326:4.050 F:0.06744186:53.323
+         G:0.02790698:53.809 H:0.004651:4.147 I: 0.0744186:72.695 K:0.03488372:2.041 L:0.1930232558:102.079
+         M:0.0302325581:3.714 N:0.02093:8.877 P:0.0604651:14.222 Q:0.0069767:4.892 R:0.0093023:1.976
+         S:0.0604651:35.117 T:0.08372:32.719 V:0.10697674:73.829 W:0.0116279:9.816 Y:0.0372093:13.185;
+}
+
+
+		loop part 
+
+
+loop_intraM1 {
+  trans  loop_intraM2: 1: 400.000
+        loop_intraM20: 0: 0.000;
+  label l;
+  only   A:0.00813:39.894 C:0.00813:6.743 D:0.1504065:22.985 E:0.081300813:28.959 F:0.077236:22.477
+         G:0.16260:39.365 H:0.036585:15.217 I:0.0243902:28.453 K:0.012195:57.112 L:0.036585:44.271
+         M:0.0203252:21.915 N:0.00813:26.158 P:0.203252:26.306 Q:0.03252:24.942 R:0.0406504:64.025
+         S:0.004065:43.137 T:0.01219512:32.325 V:0.03252:27.986 W:0.0203252:11.150 Y:0.03252:16.580;
+}
+
+loop_intraM2 {
+  trans  loop_intraM3: 0.992482: 396.293
+        loop_intraM19: 0.00751813: 3.707
+        loop_intraM20: 0: 0.000;
+  label l;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM3 {
+  trans  loop_intraM4: 0.918384: 365.698
+        loop_intraM18: 0.0816162: 34.302
+        loop_intraM19: 0: 0.000;
+  label l;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM4 {
+  trans  loop_intraM5: 0.970483: 387.084
+        loop_intraM17: 0.0268236: 11.742
+        loop_intraM18: 0.00269348: 1.174;
+  label l;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM5 {
+  trans  loop_intraM6: 0.992904: 396.948
+        loop_intraM16: 0: 0.000
+        loop_intraM17: 0.0070965: 3.052;
+  label l;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM6 {
+  trans  loop_intraM7: 0.690197: 286.322
+        loop_intraM15: 1.71131e-05: 0.015
+        loop_intraM16: 0.309786: 113.662;
+  label l;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM7 {
+  trans  loop_intraM8: 0.987896: 395.472
+        loop_intraM14: 0.0070018: 2.801
+        loop_intraM15: 0.00510173: 1.727;
+  label l;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM8 {
+  trans  loop_intraM9: 0.988686: 395.902
+        loop_intraM13: 1.46214e-05: 0.012
+        loop_intraM14: 0.0112998: 4.086;
+  label l;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM9 {
+  trans loop_intraM10: 0.996835: 398.652
+        loop_intraM12: 8.60477e-06: 0.007
+        loop_intraM13: 0.00315657: 1.341;
+  label l;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM10 {
+  trans loop_intraM11: 0.19448: 75.172
+        loop_intraM12: 0.10576: 40.571;
+  label l;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM11 {
+  trans loop_intraM12: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM12 {
+  trans loop_intraM13: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM13 {
+  trans loop_intraM14: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM14 {
+  trans loop_intraM15: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM15 {
+  trans loop_intraM16: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM16 {
+  trans loop_intraM17: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM17 {
+  trans loop_intraM18: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM18 {
+  trans loop_intraM19: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM19 {
+  trans loop_intraM20: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM20 {
+  trans outerEndOI1: 1: 400.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+
+
+
+
+phobius.model mark twentyfour id = M24
+
+        changes to M23 : This model has only changes in the emission probabilities of both 
+			 sphelix region and loop_intraM region. The emission prob have been
+			 computed based on all the sequences in positive_set3. This is a 
+			 samity check model: train on positive set and predict on positive set
+
+sphelixLengthDist {
+  trans sphelix26: 0.00140932: 0.564
+        sphelix25: 0.00122239: 0.489
+        sphelix24: 0.00220634: 0.883
+        sphelix23: 0.00390424: 1.562
+        sphelix22: 0.00675658: 2.703
+        sphelix21: 0.0114012: 4.560
+        sphelix20: 0.0186913: 7.477
+        sphelix19: 0.0296392: 11.856
+        sphelix18: 0.0452084: 18.083
+        sphelix17: 0.0658619: 26.345
+        sphelix16: 0.0908087: 36.323
+        sphelix15: 0.117057: 46.823
+        sphelix14: 0.138732: 55.493
+        sphelix13: 0.14761: 59.044
+        sphelix12: 0.136078: 54.431
+        sphelix11: 0.102751: 41.100
+        sphelix10: 0.0577113: 23.085
+        sphelix9: 0.0200501: 8.020
+        sphelix8: 0.00285052: 1.140
+        sphelix7: 4.99366e-05: 0.020;
+  label m;
+  end 0;
+  fix_trans 1;
+  only   A:0.08588957:70.947 C:0.0081799591:14.578 D:0.00408997955:3.985 E:0.03374233:4.050 F:0.07566462:53.323
+         G:0.0388548:53.809 H:0.00511247:4.147 I:0.0777096:72.695 K:0.0306748:2.041 L:0.2126789366:102.079
+         M:0.0184049:3.714 N:0.03169734:8.877 P:0.046012:14.222 Q:0.0173824:4.892 R:0.0245399:1.976
+         S:0.05112474:35.117 T:0.0787321:32.719 V:0.112474:73.829 W:0.007157:9.816 Y:0.0388548:13.185;
+}
+
+		the loop
+
+loop_intraM1 {
+  trans  loop_intraM2: 1: 400.000
+        loop_intraM20: 0: 0.000;
+  label l;
+  only   A:0.0033557:39.894 C:0.00838926:6.743 D:0.1191275:22.985 E:0.110738255:28.959 F:0.0771812:22.477
+         G:0.159395973:39.365 H:0.043624:15.217 I:0.033557:28.453 K:0.01174:57.112 L:0.03691275:44.271
+         M:0.0134228:21.915 N:0.00503:26.158 P:0.20302013:26.306 Q:0.030201:24.942 R:0.045302:64.025
+         S:0.0033557:43.137 T:0.0151:32.325 V:0.025167785:27.986 W:0.025167:11.150 Y:0.030201:16.580;
+}
+
+
+
+
+
+
+phobius.model mark twentyfive id = M25
+
+        changes to M24 : The changes are to the emision probabilities of both sphelix region 
+			 and loop_intraM region. The emission prob have been computed based 
+			 on all the sequences in frequency_set4. The non-redundant set 
+			 obtained from blastclusting with coverage 90 and percentage id 80 
+			 on enlarged_mia3_set.fasta.
+
+sphelixLengthDist {
+  trans sphelix26: 0.00140932: 0.564
+        sphelix25: 0.00122239: 0.489
+        sphelix24: 0.00220634: 0.883
+        sphelix23: 0.00390424: 1.562
+        sphelix22: 0.00675658: 2.703
+        sphelix21: 0.0114012: 4.560
+        sphelix20: 0.0186913: 7.477
+        sphelix19: 0.0296392: 11.856
+        sphelix18: 0.0452084: 18.083
+        sphelix17: 0.0658619: 26.345
+        sphelix16: 0.0908087: 36.323
+        sphelix15: 0.117057: 46.823
+        sphelix14: 0.138732: 55.493
+        sphelix13: 0.14761: 59.044
+        sphelix12: 0.136078: 54.431
+        sphelix11: 0.102751: 41.100
+        sphelix10: 0.0577113: 23.085
+        sphelix9: 0.0200501: 8.020
+        sphelix8: 0.00285052: 1.140
+        sphelix7: 4.99366e-05: 0.020;
+  label m;
+  end 0;
+  fix_trans 1;
+  only   A:0.099462:70.947 C:0.0107526881:14.578 D:0.0053763:3.985 E:0.0376344:4.050 F:0.051075:53.323
+         G:0.0349462:53.809 H:0.002688172:4.147 I:0.077956989:72.695 K:0.04301075:2.041 L:0.198924731:102.079
+         M:0.0241935:3.714 N:0.0188172:8.877 P:0.04301075:14.222 Q:0.0080645:4.892 R:0.021505:1.976
+         S:0.0725806:35.117 T:0.10215053:32.719 V:0.0913978:73.829 W:0.016129:9.816 Y:0.04032258:13.185;
+}
+
+                the loop
+
+loop_intraM1 {
+  trans  loop_intraM2: 1: 400.000
+        loop_intraM20: 0: 0.000;
+  label l;
+  only   A:0.004464:39.894 C:0.013392857:76.743 D:0.120535714:22.985 E:0.098214:28.959 F:0.075892857:22.477
+         G:0.1517857:39.365 H:0.0267857:15.217 I:0.02678571:28.453 K:0.0223214:57.112 L:0.0446428571:44.271
+         M:0.013392857:21.915 N:0.004464:26.158 P:0.2142857:26.306 Q:0.0267857:24.942 R:0.035714:64.025
+         S:0.0044642857:43.137 T:0.0267857:32.325 V:0.035714:27.986 W:0.03125:11.150 Y:0.0267857:16.580;
+}
+
+
+
+
+
+phobius.model mark twentysix id = M26
+
+        changes to M23 : the loop10 transsition have been changed as follows
+
+loop_intraM10 {
+  trans loop_intraM11: 0.65: 75.172
+        loop_intraM12: 0.35: 40.571;
+  label l;
+  tied_letter loop_intraM1;
+}
+
+
+
+
+hobius.model mark twentyseven id = M27
+
+        changes to M23 : It is basicaly M23, but now the <loop_intraM> region can not point to the end. 
+			The protein can not finish in this region anymore. This is achieved by adding <end 0;> flag 
+			in all the states that missed it. 
+
+loop_intraM1 {
+  trans  loop_intraM2: 1: 400.000
+        loop_intraM20: 0: 0.000;
+  label l;
+  end 0;
+  only   A:0.00813:39.894 C:0.00813:6.743 D:0.1504065:22.985 E:0.081300813:28.959 F:0.077236:22.477
+         G:0.16260:39.365 H:0.036585:15.217 I:0.0243902:28.453 K:0.012195:57.112 L:0.036585:44.271
+         M:0.0203252:21.915 N:0.00813:26.158 P:0.203252:26.306 Q:0.03252:24.942 R:0.0406504:64.025
+         S:0.004065:43.137 T:0.01219512:32.325 V:0.03252:27.986 W:0.0203252:11.150 Y:0.03252:16.580;
+}
+
+loop_intraM2 {
+  trans  loop_intraM3: 0.992482: 396.293
+        loop_intraM19: 0.00751813: 3.707
+        loop_intraM20: 0: 0.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM3 {
+  trans  loop_intraM4: 0.918384: 365.698
+        loop_intraM18: 0.0816162: 34.302
+        loop_intraM19: 0: 0.000;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM4 {
+  trans  loop_intraM5: 0.970483: 387.084
+        loop_intraM17: 0.0268236: 11.742
+        loop_intraM18: 0.00269348: 1.174;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM5 {
+  trans  loop_intraM6: 0.992904: 396.948
+        loop_intraM16: 0: 0.000
+        loop_intraM17: 0.0070965: 3.052;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM6 {
+  trans  loop_intraM7: 0.690197: 286.322
+        loop_intraM15: 1.71131e-05: 0.015
+        loop_intraM16: 0.309786: 113.662;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM7 {
+  trans  loop_intraM8: 0.987896: 395.472
+        loop_intraM14: 0.0070018: 2.801
+        loop_intraM15: 0.00510173: 1.727;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM8 {
+  trans  loop_intraM9: 0.988686: 395.902
+        loop_intraM13: 1.46214e-05: 0.012
+        loop_intraM14: 0.0112998: 4.086;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM9 {
+  trans loop_intraM10: 0.996835: 398.652
+        loop_intraM12: 8.60477e-06: 0.007
+        loop_intraM13: 0.00315657: 1.341;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
+loop_intraM10 {
+  trans loop_intraM11: 0.19448: 75.172
+        loop_intraM12: 0.10576: 40.571;
+  label l;
+  end 0;
+  tied_letter loop_intraM1;
+}
+
