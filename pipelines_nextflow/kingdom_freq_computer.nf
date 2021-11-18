@@ -50,11 +50,11 @@ if (params.help) {
         log.info "4	|	PLN	|	Plants and Fungi	|	Eukaryota 	|"
         log.info "5	|	PRI	|	Primates	|	Eukaryota	|"
         log.info "6	|	ROD	|	Rodents	|	Eukaryota	|"
-        log.info "7	|	SYN	|	Synthetic and Chimeric	|	Eukaryota 	|"
+        log.info "7	|	SYN	|	Synthetic and Chimeric	|	other 	|"
         log.info "8	|	UNA	|	Unassigned	|	Unassigned	|"
         log.info "9	|	VRL	|	Viruses	|	 Viruses	|"
         log.info "10	|	VRT	|	Vertebrates	|	Eukaryota 	|"
-        log.info "11	|	ENV	|	Environmental samples	|	Anonymous sequences cloned directly from the environment	|"
+        log.info "11	|	ENV	|	Environmental samples	|		|"
         log.info ""
         log.info "### 	WARNING  ####    archea are classified as Bacterias in nodes.dmp"
         exit 1
@@ -77,34 +77,69 @@ process ncbi_searcher {
     path pyscript
 
     output:
-    stdout emit: standardout            // used only for check during debugging
+    stdout emit: standardout           
+    path "${outname_404}", emit: not_found_taxids
 
     script:
+    outname_404 = "not_found_in_species-" + "${in_fasta}".split('\\.')[0] + ".headers"
     """
-    ./${pyscript} ${in_fasta} ${in_ncbi}
+    ./${pyscript} ${in_fasta} ${in_ncbi} ${outname_404}
     """
 }
+
+process ncbi_nodes_searcher {
+    //publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
+    container params.CONTAINER
+    tag { "${in_fasta}" }
+
+    input:
+    path in_fastalike
+    path in_ncbi_db
+    //val already_computed_kingdoms
+    path pyscript
+
+    output:
+    stdout emit: standardout            
+    //path "${outname_404}", emit: not_found_taxids
+
+    script:
+    out_404 = "not_found_in_nodes-" + "${in_fastalike}".split('-')[1]
+    """
+    ./${pyscript} ${in_fastalike} ${in_ncbi_db} ${out_404} "false"
+    """
+}
+
 
 workflow ncbi_taxa_parser {
 
     take:
     pattern_to_input
     pattern_to_db
+    pattern_nodes_db
 
     main:
     in_id = Channel.fromPath(pattern_to_input)
     in_db = Channel.fromPath(pattern_to_db)
     fastalike_ncbi_search = params.SCRIPTS + "ncbi_file_querier.py"
-    ncbi_searcher(in_id, in_db, fastalike_ncbi_search)
+    ncbi_searcher(in_id, in_db.first(), fastalike_ncbi_search)
+    stout = false
+    not_found = false
+    if ( pattern_nodes_db != false ) {
+         in_nodes_db = Channel.fromPath(pattern_nodes_db)
+         ncbi_nodes_searcher(ncbi_searcher.out.not_found_taxids, in_nodes_db.first(), fastalike_ncbi_search)
+         stout = ncbi_nodes_searcher.out.standardout
+    } else {
+         stout = ncbi_searcher.out.standardout
+         not_found = ncbi_searcher.out.not_found_taxids
+    }
 
     emit:
-    stout = ncbi_searcher.out.standardout
+    stout
+    not_found
 }
 
-
 workflow {
-    if ( params.NCBI_DB != false ) {
-        ncbi_taxa_parser(params.INPUT, params.NCBI_DB)
-        ncbi_taxa_parser.out.stout.view()
-    }
+    ncbi_taxa_parser(params.INPUT, params.NCBI_DB, params.NCBI_FULL_DB)
+    ncbi_taxa_parser.out.stout.view()
+    ncbi_taxa_parser.out.not_found.view()
 }
