@@ -44,8 +44,8 @@ def ncbi_nodes_db_formatter (in_ncbi_nodes):
                 list_nodes_db[number_sublist][1].append(species_id)
             else:
                 list_nodes_db.append([kingdom_key, [species_id]])
-    print(list_nodes_db[0][0], "\t", list_nodes_db[1][0], "\t", list_nodes_db[2][0], "\t", list_nodes_db[3][0], "\t", list_nodes_db[4][0], "\t", list_nodes_db[5][0])
-    print(len(list_nodes_db[0][1]), len(list_nodes_db[1][1]), len(list_nodes_db[2][1]), len(list_nodes_db[3][1]), len(list_nodes_db[4][1]), len(list_nodes_db[5][1]))
+    #print(list_nodes_db[0][0], "\t", list_nodes_db[1][0], "\t", list_nodes_db[2][0], "\t", list_nodes_db[3][0], "\t", list_nodes_db[4][0], "\t", list_nodes_db[5][0])
+    #print(len(list_nodes_db[0][1]), len(list_nodes_db[1][1]), len(list_nodes_db[2][1]), len(list_nodes_db[3][1]), len(list_nodes_db[4][1]), len(list_nodes_db[5][1]))
     #print(list_nodes_db)
     return list_nodes_db
 
@@ -76,13 +76,16 @@ def fasta_ncbi_querier (in_fasta, list_ncbi, not_found, swith=False):
                                 #print(species_id, list_ncbi[n_sublist][0])
                                 presence_of_taxid_in_db = True
                                 if list_ncbi[n_sublist][0] == 'env':                ## aybe put this in the above def
-                                    outfile.write(fasta_line)                        ## maybe put this in the above def
+                                    outfile.write(species_id)                        ## maybe put this in the above def
                                 for letter_index in range(0, len(list_kingdom_nums)):
                                     if list_ncbi[n_sublist][0] == list_kingdom_nums[letter_index]:
                                         list_kingdom_nums[(letter_index+1)] += 1
                         if presence_of_taxid_in_db==False:                              ## GET BACK HERE FOR THE PRINT OF NOT FUND
                             #print(species_id)
-                            outfile.write(fasta_line)
+                            if swith!=False:
+                                outfile.write(species_id + '\n')
+                            else:
+                                outfile.write(fasta_line)
                         break
                 #print(presence_taxid_keyword)
                 if presence_taxid_keyword==False:
@@ -110,7 +113,7 @@ if __name__ == "__main__":
             formatted_categories = ncbi_categories_db_formatter(in_database)
             fasta_ncbi_querier(infasta, formatted_categories, not_found_file_name)
         else:
-            print('Program usage: text.py <a fasta file that have in the header (the line called header has to start with >) and again in the header the tax id associated to such id/sequence, the format is actually the one of Uniprot with OX=taxid_num or the Uniref format with TaxID=tax_num and variation of them lice all lower case ecc. to see them take a look at the actual code if sections.> < a ncbi downloaded file with three columd tab separsted, with first column is the kingdom one letter identifier, the second is astrand taxid, and the third the species id (both fields are checked for a match) ### ATTENTION  ### or another databese of ncbi called nodes.dmp with a specific architecture, look at kingdom_freq_computer.nf help section or at https://ftp.ncbi.nih.gov/pub/taxonomy/ readme file> <third mandatory field that defines the name of the output file of mot found taxids> <fourth optional field for the switch to the use of nodes.dmp databes command line would be like:\n inputfasta nodes.dmp outputfilename false>\n  WARNING \n the script spits out the ids that are not fond, with replicas, if it does not find 849 every time it encounters it along the inputfastalike it will print it, if you want to avoid this behaviour just add a third field with false', file=sys.stderr)
+            print('Program usage: text.py <a fasta file that have in the header (the line called header has to start with >) and again in the header the tax id associated to such id/sequence, the format is actually the one of Uniprot with OX=taxid_num or the Uniref format with TaxID=tax_num and variation of them lice all lower case ecc. to see them take a look at the actual code if sections.> < a ncbi downloaded file with three columd tab separsted, with first column is the kingdom one letter identifier, the second is astrand taxid, and the third the species id (both fields are checked for a match) ### ATTENTION  ### or another databese of ncbi called nodes.dmp with a specific architecture, look at kingdom_freq_computer.nf help section or at https://ftp.ncbi.nih.gov/pub/taxonomy/ readme file> <third mandatory field that defines the name of the output file of mot found taxids> <fourth optional field for the switch to the use of nodes.dmp databes command line would be like:\n inputfasta nodes.dmp outputfilename true>\n  WARNING \n the script spits out the ids that are not fond, with replicas, if it does not find 849 every time it encounters it along the inputfastalike it will print it, if you want to avoid this behaviour just add a third field with false', file=sys.stderr)
             raise SystemExit
     else:
         formatted_nodes = ncbi_nodes_db_formatter(in_database)
