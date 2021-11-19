@@ -82,6 +82,7 @@ process ncbi_searcher {
 
     script:
     outname_404 = "not_found_in_species-" + "${in_fasta}".split('\\.')[0] + ".headers"
+t_found =
     """
     ./${pyscript} ${in_fasta} ${in_ncbi} ${outname_404}
     """
@@ -90,7 +91,7 @@ process ncbi_searcher {
 process ncbi_nodes_searcher {
     //publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
     container params.CONTAINER
-    tag { "${in_fasta}" }
+    tag { "${in_fastalike}" }
 
     input:
     path in_fastalike
@@ -100,12 +101,71 @@ process ncbi_nodes_searcher {
 
     output:
     stdout emit: standardout            
-    //path "${outname_404}", emit: not_found_taxids
+    path "${out_404}", emit: not_found_taxids2
 
     script:
-    out_404 = "not_found_in_nodes-" + "${in_fastalike}".split('-')[1]
+    tmp = "${in_fastalike}".split('-').size()
+    out_404 = "not_found_in_nodes-"
+    for(int i = 1;i<tmp;i++) {
+        out_404 += "${in_fastalike}".split('-')[i]
+    }
     """
-    ./${pyscript} ${in_fastalike} ${in_ncbi_db} ${out_404} "false"
+    ./${pyscript} ${in_fastalike} ${in_ncbi_db} ${out_404} "true"
+    """
+}
+
+
+process ena_rest_api_xml {
+    //publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
+    container 'alessiovignoli3/tango-project:bash_curl@sha256:82126097c7ed5f374a7e0c0ca4dcd92f7a7678bfac35aa60aa52abcfd9443401'
+    tag { "${not_found_ids}" }
+
+    input:
+    path not_found_ids
+
+    output:
+    stdout emit: standardout
+
+    script:
+    """
+    Bacteria=0
+    Archaea=0
+    Eukaryota=0
+    Virus=0
+    Unclassified=0
+    for i in `cat "${not_found_ids}"`; do STR=`curl https://www.ebi.ac.uk/ena/browser/api/xml/\$i | grep 'rank="superkingdom"'`; 
+    if [[ \$STR == *"2759"* ]]; then
+        Eukaryota=\$((\$Eukaryota + 1))
+    elif [[ \$STR == *"10239"* ]]; then
+        Virus=\$((\$Virus + 1))
+    elif [[ \$STR == *"2157"* ]]; then
+        Archaea=\$((\$Archaea + 1))
+    elif [[ \$STR == *"2"* ]]; then
+        Bacteria=\$((\$Bacteria + 1))
+    else
+       Unclassified=\$((\$Unclassified + 1))
+    fi; done
+    echo  "${not_found_ids}"
+    echo ['B', \$Bacteria, 'A', \$Archaea, 'E', \$Eukaryota, 'V', \$Virus, 'U', \$Unclassified, 'O', 0]
+    echo total taxid found =   `expr \$Bacteria + \$Archaea + \$Eukaryota + \$Virus`
+    """
+
+}
+
+process stdout_collecter {
+    //publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
+    container 'alessiovignoli3/tango-project:bash_curl@sha256:82126097c7ed5f374a7e0c0ca4dcd92f7a7678bfac35aa60aa52abcfd9443401'
+    tag { "${not_found_ids}" }
+
+    input:
+    val in_stdout
+
+    output:
+    path "${resume_tmp.txt}", emit: final_out
+
+    script:
+    """
+    echo in_stdout > resume_tmp.txt
     """
 }
 
@@ -124,10 +184,15 @@ workflow ncbi_taxa_parser {
     ncbi_searcher(in_id, in_db.first(), fastalike_ncbi_search)
     stout = false
     not_found = false
+    final_out = false
     if ( pattern_nodes_db != false ) {
          in_nodes_db = Channel.fromPath(pattern_nodes_db)
          ncbi_nodes_searcher(ncbi_searcher.out.not_found_taxids, in_nodes_db.first(), fastalike_ncbi_search)
-         stout = ncbi_nodes_searcher.out.standardout
+         //stout = ncbi_nodes_searcher.out.standardout
+         not_found = ncbi_nodes_searcher.out.not_found_taxids2
+         ena_rest_api_xml(not_found)
+         //stout = ena_rest_api_xml.out.standardout
+         stdout_collecter(ncbi_searcher.out.standardout, ncbi_nodes_searcher.out.standardout, )
     } else {
          stout = ncbi_searcher.out.standardout
          not_found = ncbi_searcher.out.not_found_taxids
@@ -143,3 +208,4 @@ workflow {
     ncbi_taxa_parser.out.stout.view()
     ncbi_taxa_parser.out.not_found.view()
 }
+
