@@ -1,0 +1,3 @@
+# to ectract the TaxId from uniref50 headers oneliner
+
+cat uniref50-splt6.fasta | grep '>' | sed 's/TaxID=/</gi;s/ RepID=/</gi' | cut -d '<' -f 2 
