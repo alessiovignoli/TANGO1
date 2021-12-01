@@ -95,20 +95,12 @@ def uniprot_rest_dealer(uniprot_https, out_file):
                     ids_of_feature = arguments_dict[2]
                     extremities = arguments_dict[0] + ';' + arguments_dict[1]
                     for n in range(3, len(arguments_dict), 3):
-                        try:
-                            extremities += (';' + arguments_dict[n] + ';' + arguments_dict[(n+1)])
-                        except:
-                            print(url, file=sys.stderr)
-                            print('n =', n, 'length dict=', len(arguments_dict))
-                            print('key = ', dict_key)
-                            print(line_tmp_dict)
-                            raise SystemExit
+                        extremities += (';' + arguments_dict[n] + ';' + arguments_dict[(n+1)])
+                        if arguments_dict[(n+2)] in ids_of_feature:
+                            continue
                         else:
-                            if arguments_dict[(n+2)] in ids_of_feature:
-                                continue
-                            else:
-                                ids_of_feature += (' ' + arguments_dict[(n+2)])
-                        outfile.write((' [' + ids_of_feature + ';' + dict_key + ';' + extremities + ']'))
+                            ids_of_feature += (' ' + arguments_dict[(n+2)])
+                    outfile.write((' [' + ids_of_feature + ';' + dict_key + ';' + extremities + ']'))
                 outfile.write('\n')
             else:
                 print(url, file=sys.stderr)
