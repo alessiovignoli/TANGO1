@@ -7,7 +7,7 @@ def all_annotation_freq_computer(inputfile, outputfile):
         list_of_descript = []
         for line in in_file:
             #print(line.split('[')[0])
-            for annotation in line.split('[')[1:]:
+            for annotation in line.split(' [')[1:]:
                 description = annotation.split(';')[1]
                 #print('description=', description)
                 if description in list_of_descript:
