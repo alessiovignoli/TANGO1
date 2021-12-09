@@ -8,16 +8,20 @@ def all_annotation_freq_computer(inputfile, outputfile):
         for line in in_file:
             #print(line.split('[')[0])
             for annotation in line.split(' [')[1:]:
-                description = annotation.split(';')[1]
-                #print('description=', description)
-                if description in list_of_descript:
-                    for n in range(0, len(list_of_descript), 2):
-                        if description == list_of_descript[n]:      #try and remove inside spaces lines and dashes
-                           list_of_descript[(n+1)] += 1
-                           break
+                try:                                                #taking care of open sqare brachets in annotation names
+                    description = annotation.split(';')[1]
+                    #print('description=', description)
+                except:
+                    continue
                 else:
-                    list_of_descript.append(description)
-                    list_of_descript.append(1)
+                    if description in list_of_descript:
+                        for n in range(0, len(list_of_descript), 2):
+                            if description == list_of_descript[n]:      #try and remove inside spaces lines and dashes
+                                list_of_descript[(n+1)] += 1
+                                break
+                    else:
+                        list_of_descript.append(description)
+                        list_of_descript.append(1)
         #print('\nlist =\n', list_of_descript)
         #print('unique annotations found =', (len(list_of_descript)/2))
         total_count = 0
