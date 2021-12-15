@@ -145,24 +145,31 @@ if __name__ == "__main__":
         #print(len(y_ar_1), len(correct_y2), len(correct_y3))
 
         
-        #bar1 = ax.bar(br1, y_ar_1, color=newcmp(colist), width=barWidth, edgecolor='gray',  align='edge', label='TANGO1-like')
-        bar1 = ax.bar(br1, y_ar_1, color='tomato', width=barWidth, edgecolor='gray',  align='edge', label='TANGO1-like     unique annotations found = 6362     total annotation found = 192522')
-        bar2 = ax.bar(br2, correct_y2, color='lawngreen', width=barWidth, edgecolor='gray',  align='edge', label='TM non TANGO1     unique annotations found = 7668     total annotation found = 225831')
-        bar3 = ax.bar(br3, correct_y3, color='dodgerblue', width=barWidth, edgecolor='gray',  align='edge', label='non TM     unique annotations found =  10124    total annotation found = 192248')
+        #bar1 = ax.bar(br1, y_ar_1, color='tomato', width=barWidth, edgecolor='gray',  align='edge', label='TANGO1-like     unique annotations found = 6362     total annotation found = 192522')
+        #bar1 = ax.bar(br1, y_ar_1, color='lawngreen', width=barWidth, edgecolor='gray',  align='edge', label='TM non TANGO1     unique annotations found = 7668     total annotation found = 225831')
+        bar1 = ax.bar(br1, y_ar_1, color='dodgerblue', width=barWidth, edgecolor='gray',  align='edge', label='non TM     unique annotations found =  10124    total annotation found = 192248')
+        #bar2 = ax.bar(br2, correct_y2, color='lawngreen', width=barWidth, edgecolor='gray',  align='edge', label='TM non TANGO1     unique annotations found = 7668     total annotation found = 225831')
+        bar2 = ax.bar(br2, correct_y2, color='tomato', width=barWidth, edgecolor='gray',  align='edge', label='TANGO1-like     unique annotations found = 6362     total annotation found = 192522')
+        #bar3 = ax.bar(br3, correct_y3, color='dodgerblue', width=barWidth, edgecolor='gray',  align='edge', label='non TM     unique annotations found =  10124    total annotation found = 192248')
+        bar3 = ax.bar(br3, correct_y3, color='lawngreen', width=barWidth, edgecolor='gray',  align='edge', label='TM non TANGO1     unique annotations found = 7668     total annotation found = 225831')
 
         # Adding labels and ticks
         ax.set_title('Domain presence', fontweight ='bold', fontsize = 28)
         #ax.set_xlabel('Domain presence', fontweight ='bold', fontsize = 28)
-        ax.set_ylabel('Number of protein with specific annotatio', fontweight ='bold', fontsize = 25)
-        plt.xticks(br3, ['TM helix', 'disorder', 'polar res', 'coiled coil', 'basic acidic res', 'chain', 'signal pept', 'pro res', 'non-term res', 'acid res', 'pmt_2', 'nuc bind atp', 'abc transpor', 'HIS kinase', 'tpr repeat', 'basic res', 'ion_trans', 'abc trans t1', 'pas', 'lactamase_b', 'acyl_transf_3', 'mfs', 'pac', 'prot kinase', 'response reg', '4-ASPphosphate', 'ftsx', 'cyclic nuc-bind', 'competence', 'pas', 'sgnh', 'ank repeat', 'p-loop N3P hydrolase', 'signal transduct HIS kinase', 'ggdef', 'comec/rec2-related prot', 'hsp90-like atpase', 'duf4131', 'tgc', 'ATP bindsite', 'stas', 'zn(2)-c6 fungal', 'ef-hand', 'yfho prot fam', 'ggdef'], fontweight ='bold', fontsize = 22)
+        ax.set_ylabel('Number of protein with annotation', fontweight ='bold', fontsize = 24)
+        #plt.xticks(br3, ['pmt_2', 'nuc bind atp', 'abc transpor', 'HIS kinase', 'tpr repeat', 'basic res', 'ion_trans', 'abc trans t1', 'pas', 'lactamase_b', 'acyl_transf_3', 'mfs', 'pac', 'prot kinase', 'response reg', '4-ASPphosphate', 'ftsx', 'cyclic nuc-bind', 'competence',  'sgnh', 'ank repeat', 'p-loop N3P hydrolase', 'signal transduct HIS kinase', 'ggdef', 'comec/rec2-related prot', 'hsp90-like atpase', 'duf4131', 'tgc', 'ATP bindsite', 'stas', 'zn(2)-c6 fungal', 'ef-hand', 'yfho prot fam'], fontweight ='bold', fontsize = 22)
+        #plt.xticks(br3, ['TM helix', 'disorder', 'polar res', 'coiled coil', 'basic acidic res', 'chain', 'signal pept', 'pro res', 'non-term res', 'acid res', 'pmt_2', 'nuc bind atp', 'abc transpor', 'HIS kinase', 'tpr repeat', 'basic res', 'ion_trans', 'abc trans t1', 'pas', 'lactamase_b', 'acyl_transf_3', 'mfs', 'pac', 'prot kinase', 'response reg', '4-ASPphosphate', 'ftsx', 'cyclic nuc-bind', 'competence', 'pas', 'sgnh', 'ank repeat', 'p-loop N3P hydrolase', 'signal transduct HIS kinase', 'ggdef', 'comec/rec2-related prot', 'hsp90-like atpase', 'duf4131', 'tgc', 'ATP bindsite', 'stas', 'zn(2)-c6 fungal', 'ef-hand', 'yfho prot fam', 'ggdef'], fontweight ='bold', fontsize = 22)
+        #plt.xticks(br3, ['TM helix', 'disorder', 'polar res', 'coiled coil', 'basic acidic res', 'chain', 'signal pept', 'non-term res', 'pro res', 'HIS kinase', 'prot kinase', 'acid res', 'ATP bindsite', 'pas', 'response reg', 'hamp', '4-ASPphosphate', 'nuc bind atp', 'pac', 'abc transpor', 'basic res', 'tpr repeat', 'ggdef', 'signal transduct HIS kinase', 'hsp90-like atpase', 'pas', 'p-loop N3P hydrolase', 'hsp90-like atpase', 'abc trans t1', 'ggdef', 'disulfide bond', 'eal', 'signal transduct resp reg', 'ftsx', 'ig-like fold', 'meth acc transduct', 'fibronectine iii', 'egf-like', 'prot kinase', 'egf-like', 'mfs', 'eal', 'ig-like', 'fibronectine iii', 'hamp' ], fontweight ='bold', fontsize = 22)
+        plt.xticks(br3, ['disorder', 'polar res', 'coiled coil', 'basic acidic res', 'chain', 'signal pept', 'non-term res', 'pro res', 'acid res', 'basic res', 'p-loop N3P hydrolase', 'prot kinase', 'helicase atp-bind', 'helicase c-term', 'tpr repeat', 'HIS kinase', 'pas', 'zn fing c2h2', 'plug', 'carrier', 'o-pantetheine4PhosphoSER',  'tonb_dep_rec', 'pac', 'ATP bindsite', 'c2h2-type', 'response reg', '4-ASPphosphate', 'nuc bind atp', 'repeat wd', 'repeat ank', 'tetratricopeptide-like', 'integrase catalytic', 'ig-like fold', 'pas', 'fibronectine iii', 'reverse transcriptase', 'fibronectine iii', 'phosphopant. bind acp', 'acp-like superfam', 'aaa', 'ring-type', 'por_secre_tail', 'zn(2)-c6 fungal', 'cchc-type', 'pkd' ], fontweight ='bold', fontsize = 22)
         for tick in ax.get_xticklabels():
             tick.set_rotation(90)
         plt.yticks(fontsize = 22)
         ax.set_xlim(left=-0.2, auto=True)                           # adjust to decrease or increase space between y axis and bars
         ax.set_xlim(right=45.5)                                       # adjust to increase or decrease space between bars and end
 
-        fig.subplots_adjust(left=0.06, right=0.98, top=0.96, bottom=0.25)
+        fig.subplots_adjust(left=0.08, right=0.98, top=0.96, bottom=0.25)
         #fig.tight_layout()
         plt.legend()
+        #plt.savefig("M27-hits_normal_nonTM_55190_comparison_uniprot_annotation.png")
         plt.show()
     
