@@ -36,7 +36,7 @@ def uniparc_rest_dealer(uniparc_https, out_file):
             if 'signatureSequenceMatch ' in tmp_str:
                 tmp_list = tmp_str.split('signatureSequenceMatch')
                 #print(tmp_list[1:])
-                domains_of_id = (url.split('/')[-1]).split('.')[0]
+                domains_of_id = (url.split('/')[-1]).split('.')[0]          ## protein id creation
                 for substring in tmp_list[1:-1]:
                     #print(substring)
                     if 'ipr id' in substring:
