@@ -16,7 +16,7 @@ from phobius_short_prediction_field_retriever import phobius_short_pred_field_se
 
 
 
-def  adjacent_annot_finder(in_domain_info, in_shortpred, input_field):
+def  adjacent_annot_finder(in_domain_info, in_shortpred, input_field, prefix):
     list_of_range = []
     range_uncertainty_value = 5                     ## change this to deal with how much is used to consider adjacency
                                                     ## the left adj is considered to have the right margin at most range_uncertainty_value
@@ -29,27 +29,38 @@ def  adjacent_annot_finder(in_domain_info, in_shortpred, input_field):
                 single_boundary.append(seq_id.split('_')[-1])       ## done so that Uniref50_A0A6L2KD28 gives only the real id part
                 list_of_range.append(single_boundary)
     #print(list_of_range)
-    with open(in_domain_info, 'r') as in_domain:
+    output_filenames = [(prefix + '.left_adj'), (prefix + '.center_adj'), (prefix + '.right_adj')]
+    with open(in_domain_info, 'r') as in_domain, open(output_filenames[0], 'w') as left_adj, open(output_filenames[1], 'w') as center_adj, open(output_filenames[2], 'w') as right_adj:
         for domain_line in in_domain:
             for boundary in list_of_range:
                 if boundary[2] == domain_line.split()[0].split('_')[-1]:           ## exact string match of prot ids
                     left_margin = boundary[0]
                     right_margin = boundary[1]
-                    print(boundary[2])
-                    tmp_left_adjacent = 0
+                    #print(boundary[2])
+                    tmp_left_adjacent = 0 
+                    buffer1 = [0, None]
                     tmp_right_adjacent = float('inf')
+                    buffer2 = [0, None]
                     for annotation in domain_line.split('[')[1:]:
                         for i, left_extr in enumerate(annotation.split(';')[2::2]):
                             #print('i:', i, ' left extremity:', left_extr)           ## i has to be multiplied by two to represent the index
                             right_extr = int((annotation.split(';')[2:][(i+1)]).split(']')[0])  ## it can end with the closed square brachet
                             if int(left_extr) <= left_margin and right_extr >= right_margin:
-                                print('0: ', left_extr, right_extr,  annotation.split(';')[1], left_margin, right_margin)
+                                #print('0: ', left_extr, right_extr,  annotation.split(';')[1], left_margin, right_margin)
+                                center_adj.write((annotation.split(';')[1] + ' ' + left_extr + ' ' + str(right_extr) + ' ' + str(left_margin) + ' ' + str(right_margin) + '\n' ))
                             elif right_extr < (right_margin - range_uncertainty_value) and right_extr >= tmp_left_adjacent:
                                 tmp_left_adjacent = right_extr
+                                buffer1 = [left_extr, annotation.split(';')[1]]
                             elif int(left_extr) > (left_margin + range_uncertainty_value) and int(left_extr) <= tmp_right_adjacent:
                                 tmp_right_adjacent = int(left_extr)
-                    print('-1: ', tmp_left_adjacent, left_margin, right_margin)
-                    print('+1: ', tmp_right_adjacent, left_margin, right_margin)
+                                buffer2 = [str(right_extr), annotation.split(';')[1]]
+                    #print('-1: ', tmp_left_adjacent, left_margin, right_margin)
+                    #print('+1: ', tmp_right_adjacent, left_margin, right_margin)
+                    #print(buffer1, buffer2)
+                    if buffer1[1] is not None:
+                        left_adj.write((buffer1[1] + ' ' + buffer1[0] + ' ' + str(tmp_left_adjacent) + ' ' + str(left_margin) + ' ' + str(right_margin) + '\n' ))
+                    if buffer2[1] is not None:
+                        right_adj.write((buffer2[1] + ' ' + str(tmp_right_adjacent) + ' ' + buffer2[0]  + ' ' + str(left_margin) + ' ' + str(right_margin) + '\n' ))
                 else:
                     #print('shortpred id:', boundary[2], '  domain_info id:', domain_line.split()[0])
                     continue
@@ -61,8 +72,9 @@ if __name__ == "__main__":
         input_domain_info_file = sys.argv[1]
         input_phobius_shortpred = sys.argv[2]
         input_field = sys.argv[3]
+        prefix_output_name = sys.argv[4]
     except Exception:
-        print('Program usage: text.py <a domain_info file that has on each line a protein annotation in a special format,\nlike:\nUPI00068AA065 [IPR036514;sgnh hydrolase superfamily;471;634] [IPR002656;acyltransferase 3 domain;5;321] [IPR043968;sgnh domain;400;626]\nwhere the first field is the protein id and then there are as many lists as there have been found annotations for this entry in uniprot, there is the keyword associted with each feature a word descriptive feature and the extremities of the feature, there can be more of them\nto generate this file the script   uniprot_rest_query.py     or the pipeline     kingdom_freq_computer.nf      look into those for more details> <the second file is the short output of phobius, where on each line is present the prediction and position of the latter on the sequence, with this info the neighbouring annotations are found,\n####  WARNING  #####\n the ids are suppurted only in uniref and uniprot format, in the sense that they are split on _ > <a mandatory field letter for knowing which feature predicted to look at in short pred if you do not know what to put take alook at      phobius_short_prediction_field_retriever.py    eror messages>', file=sys.stderr)
+        print('Program usage: text.py <a domain_info file that has on each line a protein annotation in a special format,\nlike:\nUPI00068AA065 [IPR036514;sgnh hydrolase superfamily;471;634] [IPR002656;acyltransferase 3 domain;5;321] [IPR043968;sgnh domain;400;626]\nwhere the first field is the protein id and then there are as many lists as there have been found annotations for this entry in uniprot, there is the keyword associted with each feature a word descriptive feature and the extremities of the feature, there can be more of them\nto generate this file the script   uniprot_rest_query.py     or the pipeline     kingdom_freq_computer.nf      look into those for more details> <the second file is the short output of phobius, where on each line is present the prediction and position of the latter on the sequence, with this info the neighbouring annotations are found,\n####  WARNING  #####\n the ids are suppurted only in uniref and uniprot format, in the sense that they are split on _ > <a mandatory field letter for knowing which feature predicted to look at in short pred if you do not know what to put take alook at      phobius_short_prediction_field_retriever.py    eror messages> < a prefix for the three output files that are going to be written each one representing a type of adjacent annotation, mainly closest to left, incorporating, closest to the right they can not be present in a pgiven pro>', file=sys.stderr)
         raise SystemExit
     else:
-        adjacent_annot_finder(input_domain_info_file, input_phobius_shortpred, input_field)
+        adjacent_annot_finder(input_domain_info_file, input_phobius_shortpred, input_field, prefix_output_name)
