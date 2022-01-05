@@ -29,7 +29,7 @@ def  adjacent_annot_finder(in_domain_info, in_shortpred, input_field, prefix):
                 single_boundary.append(seq_id.split('_')[-1])       ## done so that Uniref50_A0A6L2KD28 gives only the real id part
                 list_of_range.append(single_boundary)
     #print(list_of_range)
-    output_filenames = [(prefix + '.left_adj'), (prefix + '.center_adj'), (prefix + '.right_adj')]
+    output_filenames = [(prefix + '_left.adj'), (prefix + '_center.adj'), (prefix + '_right.adj')]
     with open(in_domain_info, 'r') as in_domain, open(output_filenames[0], 'w') as left_adj, open(output_filenames[1], 'w') as center_adj, open(output_filenames[2], 'w') as right_adj:
         for domain_line in in_domain:
             for boundary in list_of_range:
