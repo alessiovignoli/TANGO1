@@ -1,3 +1,7 @@
 # to ectract the TaxId from uniref50 headers oneliner
 
 cat uniref50-splt6.fasta | grep '>' | sed 's/TaxID=/</gi;s/ RepID=/</gi' | cut -d '<' -f 2 
+
+# to cut from a defined column till end of line in the example is column 5
+
+cat ${all_one_type_annotations} | cut -d ' ' -f5-
