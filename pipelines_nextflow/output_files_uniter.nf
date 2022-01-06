@@ -1,5 +1,11 @@
 #!/usr/bin/env nextflow
 
+####    ALERT    ####
+#
+# you might want to check collecFile() operator it does what is done here
+#  there is an example in the script adjacent_annotation_computer.nf
+
+
 /*
 *  This module is created for solving the issue with uniting into one single file the full content of 
 *  many other files coming from the same process, it is usefull when a process is executed x times generating one file
