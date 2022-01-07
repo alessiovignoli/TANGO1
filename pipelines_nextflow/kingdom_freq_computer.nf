@@ -81,8 +81,7 @@ process ncbi_searcher {
     path "${outname_404}", emit: not_found_taxids
 
     script:
-    outname_404 = "not_found_in_species-" + "${in_fasta}".split('\\.')[0] + ".headers"
-t_found =
+    outname_404 = "not_found_in_species-" + "${in_fasta}".split('\\.')[0] + ".headers" 		// DO NOT CHANGE THIS USED LATER AS ID
     """
     ./${pyscript} ${in_fasta} ${in_ncbi} ${outname_404}
     """
@@ -105,8 +104,8 @@ process ncbi_nodes_searcher {
 
     script:
     tmp = "${in_fastalike}".split('-').size()
-    out_404 = "not_found_in_nodes-"
-    for(int i = 1;i<tmp;i++) {
+    out_404 = "not_found_in_nodes-"					// DO NOT CHANGE THIS
+    for(int i = 1;i<tmp;i++) {						// IT iIS uSED LATER AS IDENTIFIER
         out_404 += "${in_fastalike}".split('-')[i]
     }
     """
@@ -146,29 +145,56 @@ process ena_rest_api_xml {
        Unclassified=\$((\$Unclassified + 1))
     fi; done
     echo  "${not_found_ids}"
-    echo ['B', \$Bacteria, 'A', \$Archaea, 'E', \$Eukaryota, 'V', \$Virus, 'U', \$Unclassified, 'O', 0]
-    echo total taxid found =   `expr \$Bacteria + \$Archaea + \$Eukaryota + \$Virus`
+    echo ["'B'", \$Bacteria, "'A'", \$Archaea, "'E'", \$Eukaryota, "'V'", \$Virus, "'U'", \$Unclassified, "'O'", 0]
+    echo 'total taxid found =   '`expr \$Bacteria + \$Archaea + \$Eukaryota + \$Virus`
     """
 
 }
 
 process stdout_collecter {
     //publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
-    container 'alessiovignoli3/tango-project:bash_curl@sha256:82126097c7ed5f374a7e0c0ca4dcd92f7a7678bfac35aa60aa52abcfd9443401'
-    tag { "${not_found_ids}" }
+    container params.CONTAINER
+    tag { "${suffix_outname}" }
 
     input:
-    val in_stdout
+    val all_stdout
+    val suffix_outname
 
     output:
-    path "${resume_tmp.txt}", emit: final_out
+    path "${suffix_outname}_kingdom_percentages.txt", emit: final_out
+    //stdout emit: final_out
 
     script:
     """
-    echo in_stdout > resume_tmp.txt
+    #!/usr/bin/env python3 
+
+    tmp_list = "${all_stdout}".split('], [')
+    #print(tmp_list[0:2])
+    l1 = ['B', 0, 'A', 0, 'E', 0, 'V', 0, 'U', 0, 'O', 0]
+    l2 = ['B', 0, 'A', 0, 'E', 0, 'V', 0, 'U', 0, 'O', 0]
+    l3 = ['B', 0, 'A', 0, 'E', 0, 'V', 0, 'U', 0, 'O', 0]
+    overall = ['B', 0, 'A', 0, 'E', 0, 'V', 0, 'U', 0, 'O', 0]
+    tot = 0
+    for elem in tmp_list:
+        actual_list = (elem.split(', [')[1].split('], ')[0]).split(', ')
+        id = elem.split(', [')[0]
+        tot += int(elem.split('=  ')[1].split(']')[0])
+        if 'not_found_in_species' in id:
+            for n in range(1, len(actual_list), 2):
+                l2[n] += int(actual_list[n])
+                overall[n] += int(actual_list[n])
+        elif 'not_found_in_nodes' in id:
+            for n in range(1, len(actual_list), 2):
+                l3[n] += int(actual_list[n])
+                overall[n] += int(actual_list[n])
+        else:
+            for n in range(1, len(actual_list), 2):
+                l1[n] += int(actual_list[n])
+                overall[n] += int(actual_list[n])
+    with open("${suffix_outname}_kingdom_percentages.txt", 'w') as outfile:
+        outfile.write('ncbi species search results :\\n' + str(l1) + '\\nncbi nodes search results :\\n' + str(l2) + '\\neni rest api search results :\\n' + str(l3) + '\\noverall results :\\n' + str(overall) + '\\ntotal sequences found :' + str(tot))
     """
 }
-
 
 workflow ncbi_taxa_parser {
 
@@ -182,30 +208,45 @@ workflow ncbi_taxa_parser {
     in_db = Channel.fromPath(pattern_to_db)
     fastalike_ncbi_search = params.SCRIPTS + "ncbi_file_querier.py"
     ncbi_searcher(in_id, in_db.first(), fastalike_ncbi_search)
-    stout = false
+    tmp = ncbi_searcher.out.standardout.collect{ it.split('\\n') }
+    stout = false 								
     not_found = false
     final_out = false
     if ( pattern_nodes_db != false ) {
-         in_nodes_db = Channel.fromPath(pattern_nodes_db)
-         ncbi_nodes_searcher(ncbi_searcher.out.not_found_taxids, in_nodes_db.first(), fastalike_ncbi_search)
-         //stout = ncbi_nodes_searcher.out.standardout
-         not_found = ncbi_nodes_searcher.out.not_found_taxids2
-         ena_rest_api_xml(not_found)
-         //stout = ena_rest_api_xml.out.standardout
-         stdout_collecter(ncbi_searcher.out.standardout, ncbi_nodes_searcher.out.standardout, )
+        in_nodes_db = Channel.fromPath(pattern_nodes_db)
+        ncbi_nodes_searcher(ncbi_searcher.out.not_found_taxids, in_nodes_db.first(), fastalike_ncbi_search)
+        tmp1 = ncbi_nodes_searcher.out.standardout.collect{ it.split('\\n') }
+        //tmp1.view()
+        not_found = ncbi_nodes_searcher.out.not_found_taxids2
+        //ena_rest_api_xml(ncbi_nodes_searcher.out.not_found_taxids2)
+        //tmp2 = ena_rest_api_xml.out.standardout.collect{ it.split('\\n') }
+        //tmp2.view()
+        stout = tmp.concat( tmp1 ).collect()
+        //stout.view()
     } else {
-         stout = ncbi_searcher.out.standardout
-         not_found = ncbi_searcher.out.not_found_taxids
+        stout = tmp
+        not_found = ncbi_searcher.out.not_found_taxids
     }
+    prefix = pattern_to_input.split('/').size()
+    suffix = 'bubba'
+    if ( prefix == 1) {
+        suffix = pattern_to_input.split('\\*')[0]
+    } else {
+        suffix = pattern_to_input.split('/')[-1].split('\\*')[0]
+    }
+    stdout_collecter(stout, suffix)
+    final_out = stdout_collecter.out.final_out
 
     emit:
-    stout
+    //stout
     not_found
+    final_out
 }
 
 workflow {
     ncbi_taxa_parser(params.INPUT, params.NCBI_DB, params.NCBI_FULL_DB)
-    ncbi_taxa_parser.out.stout.view()
+    //ncbi_taxa_parser.out.stout.view()
     ncbi_taxa_parser.out.not_found.view()
+    ncbi_taxa_parser.out.final_out.view()
 }
 
