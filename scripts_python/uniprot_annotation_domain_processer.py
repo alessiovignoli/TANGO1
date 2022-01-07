@@ -38,7 +38,7 @@ if __name__ == "__main__":
         input_file = sys.argv[1]
         output_file_name =  sys.argv[2]
     except:
-        print('Program usage: text.py <', file=sys.stderr)
+        print('Program usage: text.py a domain_info file that has on each line a protein annotation in a special format,\nlike:\nUPI00068AA065 [IPR036514;sgnh hydrolase superfamily;471;634] [IPR002656;acyltransferase 3 domain;5;321] [IPR043968;sgnh domain;400;626]\nwhere the first field is the protein id and then there are as many lists as there have been found annotations for this entry in uniprot, there is the keyword associted with each feature a word descriptive feature and the extremities of the feature, there can be more of them\nto generate this file the script   uniprot_rest_query.py     look into thoat for more details> < the outputfilename that will have for each unique (exact string match more or less)  name of domain bor annotation  the times that such string was found in the file , basically the scripts run through each line (protein annotations) and updates a counter for each time a unique string is found, the final number will be the times the annotation "gfp" has been found in the file > ', file=sys.stderr)
         raise SystemExit
     else:
         all_annotation_freq_computer(input_file, output_file_name)
