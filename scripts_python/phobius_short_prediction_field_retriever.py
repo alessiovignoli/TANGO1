@@ -19,8 +19,9 @@ def phobius_short_pred_field_selecter(short_pred_line, keyword, verbose=False):
     pre_section = short_pred_line.strip().split(' ')[-1]
     list_extr = []
     #print(seqid, pre_section)
-    if keyword not in pre_section and verbose is True:
-        print(seqid, " does not have the requested field present in it's prediction,   requested fieldkeyword =", keyword,  file=sys.stderr)
+    if keyword not in pre_section:
+        if verbose is True:
+            print(seqid, " does not have the requested field present in it's prediction,   requested fieldkeyword =", keyword,  file=sys.stderr)
         return seqid, list_extr
         #raise SystemExit
     if keyword == '-' and '-n-' in pre_section:
