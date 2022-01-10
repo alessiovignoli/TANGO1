@@ -6,7 +6,7 @@
 
 import sys
 
-def phobius_short_pred_field_selecter(short_pred_line, keyword):
+def phobius_short_pred_field_selecter(short_pred_line, keyword, verbose=False):
     #check_keyword = {"i":2, "o":3, "-":4, "n":4, "c":5, "s":6, "l":7}
     check_keyword = {"i":"i", "o":"o", "-":"-", "n":"-n-", "c":"c", "s":"-s-", "l":"-l-"}
     #print(keyword)
@@ -19,7 +19,7 @@ def phobius_short_pred_field_selecter(short_pred_line, keyword):
     pre_section = short_pred_line.strip().split(' ')[-1]
     list_extr = []
     #print(seqid, pre_section)
-    if keyword not in pre_section:
+    if keyword not in pre_section and verbose is True:
         print(seqid, " does not have the requested field present in it's prediction,   requested fieldkeyword =", keyword,  file=sys.stderr)
         return seqid, list_extr
         #raise SystemExit
@@ -96,8 +96,9 @@ if __name__ == "__main__":
     try:
         phobius_short_pred_line = sys.argv[1]
         field_keyword = sys.argv[2]
+	verbose_flag = sys.argv[3]
     except:
-        print('Program usage: text.py <a phobius short output line> <the field keyword that hastobe used to retrieve the extremes of the phobius prediction forsuch label>', file=sys.stderr)
+        print('Program usage: text.py <a phobius short output line> <the field keyword that hastobe used to retrieve the extremes of the phobius prediction forsuch label> < atrue or fals evariable to set how verbose the script should be with possible errors check the code above>', file=sys.stderr)
         raise SystemExit
     else:
         phobius_short_pred_field_selecter(phobius_short_pred_line, field_keyword)
