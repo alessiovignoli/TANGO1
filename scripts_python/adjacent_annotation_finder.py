@@ -44,7 +44,7 @@ def  adjacent_annot_finder(in_domain_info, in_shortpred, input_field, prefix):
                     for annotation in domain_line.split('[')[1:]:
                         for i, left_extr in enumerate(annotation.split(';')[2::2]):
                             #print('i:', i, ' left extremity:', left_extr)           ## i has to be multiplied by two to represent the index
-                            right_extr = int((annotation.split(';')[2:][(i+1)]).split(']')[0])  ## it can end with the closed square brachet
+                            right_extr = int((annotation.split(';')[2:][(i*2+1)]).split(']')[0])  ## it can end with the closed square brachet
                             if int(left_extr) <= left_margin and right_extr >= right_margin:
                                 #print('0: ', left_extr, right_extr,  annotation.split(';')[1], left_margin, right_margin)
                                 center_adj.write((left_extr + ' ' + str(right_extr) + ' ' + str(left_margin) + ' ' + str(right_margin) + ' ' + annotation.split(';')[1] + '\n' ))
