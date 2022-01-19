@@ -9,7 +9,7 @@ def all_annotation_freq_computer(inputfile, outputfile):
             #print(line.split('[')[0])
             for annotation in line.split(' [')[1:]:
                 try:                                                #taking care of open sqare brachets in annotation names
-                    description = annotation.split(';')[1]
+                    description = annotation.split(';')[1].rstrip()
                     #print('description=', description)
                 except Exception:
                     continue
