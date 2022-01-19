@@ -60,7 +60,7 @@ def  adjacent_annot_finder(in_domain_info, in_shortpred, input_field, prefix):
                                 pass
                             if int(left_extr) <= left_margin and right_extr >= right_margin:
                                 #print('0: ', left_extr, right_extr,  annotation.split(';')[1], left_margin, right_margin)
-                                center_adj.write((left_extr + ' ' + str(right_extr) + ' ' + str(left_margin) + ' ' + str(right_margin) + ' [:' + annotation.split(';')[1] + '\n' ))
+                                center_adj.write((left_extr + ' ' + str(right_extr) + ' ' + str(left_margin) + ' ' + str(right_margin) + ' [;' + annotation.split(';')[1] + '\n' ))
                             elif right_extr < (right_margin - range_uncertainty_value) and right_extr >= tmp_left_adjacent:
                                 tmp_left_adjacent = right_extr
                                 buffer1 = [left_extr, annotation.split(';')[1]]
