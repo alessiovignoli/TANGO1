@@ -85,6 +85,32 @@ process  adjacency_finder {
 
 process summarizer_of_files {
 	publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
+	container params.CONTAINER
+	tag { "${all_one_type_annotations}" }
+
+	input:
+	path all_one_type_annotations
+	path pyscript2
+
+	output:
+	path "${prefix}", emit: final_out
+	stdout emit: standardout
+
+	script:
+	prefix = "${params.INPUT_DOMAIN_INFO}".split('/')[-1].split('\\.')[0].split('\\*')[0] + "_" +"${all_one_type_annotations}".split('_')[1].split('\\.')[0] + ".domain_freq"
+	//              the above line creates the  output files based on the common part to the glob pattern that uses asterisc
+	"""
+	./${pyscript2} ${all_one_type_annotations} tmp
+	sort -k1 -nr tmp > ${prefix}
+	rm tmp
+	"""
+}
+
+
+
+/*
+process summarizer_of_files {
+	publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
         container params.CONTAINER
         tag { "${all_one_type_annotations}" }
 
@@ -119,7 +145,7 @@ process summarizer_of_files {
 			#print(str(list_of_freq[(n*2+1)]) + annotation, end='')
 	"""
 }
-
+*/
 
 
 workflow adjacent_domains_compiler {
@@ -136,7 +162,8 @@ workflow adjacent_domains_compiler {
 	adjacency_finder.out.intermidiate_center_tmp.collectFile(name: "sample_center.annot" ).set{ tmp_center }
 	adjacency_finder.out.intermidiate_right_tmp.collectFile(name: "sample_right.annot" ).set{ tmp_right }
 	tmp_left.concat( tmp_center, tmp_right ).set{ proper_tmp }
-	summarizer_of_files(proper_tmp)
+	adj_freq_compute_pyscript = params.SCRIPTS + "uniprot_annotation_domain_processer.py"
+	summarizer_of_files(proper_tmp, adj_freq_compute_pyscript)
 
 	emit:
 	intermidiate_exhaustive = proper_tmp
