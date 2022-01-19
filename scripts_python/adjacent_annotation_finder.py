@@ -60,7 +60,7 @@ def  adjacent_annot_finder(in_domain_info, in_shortpred, input_field, prefix):
                                 pass
                             if int(left_extr) <= left_margin and right_extr >= right_margin:
                                 #print('0: ', left_extr, right_extr,  annotation.split(';')[1], left_margin, right_margin)
-                                center_adj.write((left_extr + ' ' + str(right_extr) + ' ' + str(left_margin) + ' ' + str(right_margin) + ' [' + annotation.split(';')[1] + '\n' ))
+                                center_adj.write((left_extr + ' ' + str(right_extr) + ' ' + str(left_margin) + ' ' + str(right_margin) + ' [:' + annotation.split(';')[1] + '\n' ))
                             elif right_extr < (right_margin - range_uncertainty_value) and right_extr >= tmp_left_adjacent:
                                 tmp_left_adjacent = right_extr
                                 buffer1 = [left_extr, annotation.split(';')[1]]
@@ -71,9 +71,9 @@ def  adjacent_annot_finder(in_domain_info, in_shortpred, input_field, prefix):
                     #print('+1: ', tmp_right_adjacent, left_margin, right_margin)
                     #print(buffer1, buffer2)
                     if buffer1[1] is not None:
-                        left_adj.write((buffer1[0] + ' ' + str(tmp_left_adjacent) + ' ' + str(left_margin) + ' ' + str(right_margin) +  ' [' + buffer1[1] + '\n' ))
+                        left_adj.write((buffer1[0] + ' ' + str(tmp_left_adjacent) + ' ' + str(left_margin) + ' ' + str(right_margin) +  ' [;' + buffer1[1] + '\n' ))
                     if buffer2[1] is not None:
-                        right_adj.write((str(tmp_right_adjacent) + ' ' + buffer2[0]  + ' ' + str(left_margin) + ' ' + str(right_margin) + ' [' + buffer2[1] + '\n' ))
+                        right_adj.write((str(tmp_right_adjacent) + ' ' + buffer2[0]  + ' ' + str(left_margin) + ' ' + str(right_margin) + ' [;' + buffer2[1] + '\n' ))
                 else:
                     #print('shortpred id:', boundary[2], '  domain_info id:', domain_line.split()[0])
                     continue
