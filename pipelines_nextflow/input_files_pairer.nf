@@ -13,13 +13,6 @@
 *       that is basically the item that declares the relationship among the couples this is expected to be 
 *       inside an asterisc <*> argument, so glob patterns allowed are only tose using an asterisc
 *
-* WARNING  if the first file does not have an asteriscs, so is not intended to be a glob pattern
-*	the scripts associates such file with all those found in the second pattern in couples like:
-*	file1.txt with file2.txt,  file1.txt with file3.txt, ecc.. where file2.txt is the first element found in
-*	the second pattern.
-*	if by any chanche a . or a ? signs are used for glob patterns the outcome of this script is uncertain,
-*	probably all files are matched with all others or it could be some sort of error
-*	 
 */
 
 
@@ -44,13 +37,6 @@ if (params.help) {
 	log.info '              that is basically the item that declares the relationship among the couples this is expected to b'
 	log.info '              inside an asterisc <*> argument, so glob patterns allowed are only tose using an asterisc'
 	log.info '              '
-	log.info '	WARNING  if the first file does not have an asteriscs, so is not intended to be a glob pattern'
-	log.info '		the scripts associates such file with all those found in the second pattern in couples like:'
-        log.info '              file1.txt with file2.txt,  file1.txt with file3.txt, ecc.. where file2.txt is the first element found in'
-        log.info '              the second pattern.'
-        log.info '              if by any chanche a . or a ? signs are used for glob patterns the outcome of this script is uncertain,'
-        log.info '              probably all files are matched with all others or it could be some sort of error'
-        log.info '              '
 	exit 1
 }
 
@@ -70,11 +56,15 @@ workflow pairer {
 	if ( "${input_files1}".contains('*') ) {
 		prefix1 = "${input_files1}".split('\\*')[0]
 		suffix1 = "${input_files1}".split('\\*')[1]
+		//println(prefix1)
 		//println(suffix1)
-		Channel.fromPath(input_files1).map{ it -> [("${it}".split("${prefix1}")[1]).split("${suffix1}")[0], it]}.set{tupled_group1}
+		// the below line is a bit weird but it essentially retrieve what is inside the asterisc * and prevents it to fail when nothing is inside it
+		// using the join command that transform a list to a string and not forcing to assume the first element of the list while it is empty
+		// the getFileName is self explanatory but takes the file name with extention removing path through slash
+		Channel.fromPath(input_files1).map{ it -> [(("${it.getFileName()}".split("${prefix1}")[1]).split("${suffix1}")).join('_'), it]}.set{tupled_group1}
 		prefix2 = "${input_files2}".split('\\*')[0]
 		suffix2 = "${input_files2}".split('\\*')[1]
-		Channel.fromPath(input_files2).map{ it -> [("${it}".split("${prefix2}")[1]).split("${suffix2}")[0], it]}.set{tupled_group2}
+		Channel.fromPath(input_files2).map{ it -> [(("${it.getFileName()}".split("${prefix2}")[1]).split("${suffix2}")).join('_'), it]}.set{tupled_group2}
 		//tupled_group1.view()
 		//tupled_group2.view()
 		tupled_group1.combine(tupled_group2, by:0).set{right_pairs}
