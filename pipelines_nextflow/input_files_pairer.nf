@@ -54,16 +54,16 @@ workflow pairer {
 
 	main:
 	if ( "${input_files1}".contains('*') ) {
-		prefix1 = "${input_files1}".split('\\*')[0]
-		suffix1 = "${input_files1}".split('\\*')[1]
+		prefix1 = ("${input_files1}".split("/")[-1]).split('\\*')[0]
+		suffix1 = ("${input_files1}".split("/")[-1]).split('\\*')[1]
 		//println(prefix1)
 		//println(suffix1)
 		// the below line is a bit weird but it essentially retrieve what is inside the asterisc * and prevents it to fail when nothing is inside it
 		// using the join command that transform a list to a string and not forcing to assume the first element of the list while it is empty
 		// the getFileName is self explanatory but takes the file name with extention removing path through slash
 		Channel.fromPath(input_files1).map{ it -> [(("${it.getFileName()}".split("${prefix1}")[1]).split("${suffix1}")).join('_'), it]}.set{tupled_group1}
-		prefix2 = "${input_files2}".split('\\*')[0]
-		suffix2 = "${input_files2}".split('\\*')[1]
+		prefix2 = ("${input_files2}".split("/")[-1]).split('\\*')[0]
+		suffix2 = ("${input_files2}".split("/")[-1]).split('\\*')[1]
 		Channel.fromPath(input_files2).map{ it -> [(("${it.getFileName()}".split("${prefix2}")[1]).split("${suffix2}")).join('_'), it]}.set{tupled_group2}
 		//tupled_group1.view()
 		//tupled_group2.view()
