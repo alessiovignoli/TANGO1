@@ -57,7 +57,6 @@ params.SEC_KEYWORD = false	// used when we want to know average on n for predict
 params.MAX_ITER = false
 params.SWITCH = "multi"					// flag used for the switch from search on a multi plp file or regular single plp
 params.OUTPUT_DIR = "${params.TEST_DIR}"
-params.OUTPUT_NAME = "bubba"
 params.SUFFIX = "average"
 
 
