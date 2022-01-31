@@ -5,3 +5,7 @@ cat uniref50-splt6.fasta | grep '>' | sed 's/TaxID=/</gi;s/ RepID=/</gi' | cut -
 # to cut from a defined column till end of line in the example is column 5
 
 cat ${all_one_type_annotations} | cut -d ' ' -f5-
+
+# to rename many files at once
+
+rename phobius_output-M27_M27-hits_on_uniref50_1-6-uniref50 phobius_output-M27-hits_on_uniref50_1-6  phobius_output-M27_M27-hits_on_uniref50_1-6-uniref50-splt*
