@@ -34,6 +34,14 @@ if (params.help) {
         log.info '      it laounches a process for each input fasta file'
         log.info '      it has different options and is associated with some config profiles such as mark7_models.config, original_model.config, test.config'
 	log.info '	take a look at them in the conf dir (usually underthe test dir) the nextflow.config that launches such profiles is in the test dir'
+        log.info '      '
+        log.info '      The other two flags that can be passed to this pipeline are switches that rergulate the behaviour of the pipeline itself'
+        log.info '      skipping some process or choosing between different workflows. The ffirst one is --ONE_LINE that takes as values the boolean true and false'
+        log.info '      default false, and it means that the fasta files do not have the sequence on one line, the pipeline will put them on one line'
+        log.info '      if the file are already with the sequence on one line pass an argumrnt to --ONE_LINE'
+        log.info '      --PLP will prompt the pipeline to compute a plp file for each fasta sequence in the input'
+        log.info '      default false it means no plp will be made'
+        log.info '      '
         log.info '\n'
         exit 1
 }
@@ -46,7 +54,8 @@ params.infasta_paral = "bubba"
 params.CONTAINER = "alessiovignoli3/tango-project:phobius_image@${params.sha_code}"
 params.OUTPUT_DIR = "${params.TEST_DIR}"
 params.INPUT = "${params.TEST_DIR}${params.infasta_paral}"
-
+params.ONE_LINE = false
+params.PLP = false
 
 
 // Modules dependencies section
@@ -117,10 +126,15 @@ workflow phobius_short {
 	input_fasta
 
 	main:
-	suffix = "oneline"
-	fasta_oneline = oneliner(input_fasta, suffix)
-	//fasta_oneline.view()
-	phobius_short_parallelization(fasta_oneline)
+	if (params.ONE_LINE != false) {
+                in_fasta = Channel.fromPath(input_fasta)
+                phobius_short_parallelization(in_fasta)
+	} else {
+		suffix = "oneline"
+		fasta_oneline = oneliner(input_fasta, suffix)
+		//fasta_oneline.view()
+		phobius_short_parallelization(fasta_oneline)
+	}
 	
 	emit:
 	pred_file = phobius_short_parallelization.out.predfile
@@ -133,9 +147,14 @@ workflow phobius_short_plp {
 	input_fasta
 
 	main:
-	suffix = "oneline"
-        fasta_oneline = oneliner(input_fasta, suffix)
-	phobius_short_and_plp_parallelization(fasta_oneline)
+	if (params.ONE_LINE != false) {
+		in_fasta = Channel.fromPath(input_fasta)
+		phobius_short_and_plp_parallelization(in_fasta)
+	} else {
+		suffix = "oneline"
+        	fasta_oneline = oneliner(input_fasta, suffix)
+		phobius_short_and_plp_parallelization(fasta_oneline)
+	}
 
 	emit:
 	pred_file = phobius_short_and_plp_parallelization.out.predfile
@@ -144,11 +163,14 @@ workflow phobius_short_plp {
 
 
 workflow {
-	//phobius_short(params.INPUT)
-	//phobius_short.out.pred_file.view()
-	phobius_short_plp(params.INPUT)
-	phobius_short_plp.out.pred_file.view()
-	phobius_short_plp.out.plp_file.view()
+	if (params.PLP != false) {
+		phobius_short_plp(params.INPUT)
+        	phobius_short_plp.out.pred_file.view()
+	        phobius_short_plp.out.plp_file.view()
+	} else {
+		phobius_short(params.INPUT)
+		phobius_short.out.pred_file.view()
+	}
 }
 
 
