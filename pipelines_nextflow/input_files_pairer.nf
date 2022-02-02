@@ -32,10 +32,13 @@ if (params.help) {
 	log.info '      so file1.txt has to be processed only with myfile1.out and no th4e others'
 	log.info '      same goes for file2 and 3 ecc..'
 	log.info '      this modules basically creates the correct input cuple for other scripts that might need that'
-	log.info '      WARNING  the scripts will search for an asterisc to understand ifthe input is a glob patterm'
+	log.info '      WARNING  the scripts will search for an asterisc to understand if the inputs paths are a glob patterm'
 	log.info '      	if it does find it will use it to obtain the keyword matcher (in the example above are the numbers)'
-	log.info '              that is basically the item that declares the relationship among the couples this is expected to b'
+	log.info '              that is basically the item that declares the relationship among the couples, this is expected to be'
 	log.info '              inside an asterisc <*> argument, so glob patterns allowed are only tose using an asterisc'
+	log.info '              '
+	log.info '      WARNING when just one of the two paths ia a glob pattern with asterisc, the script treats the other path as a single file '
+	log.info '              and combine such file with all the one found in the glob pattern'
 	log.info '              '
 	exit 1
 }
@@ -53,7 +56,7 @@ workflow pairer {
 	input_files2
 
 	main:
-	if ( "${input_files1}".contains('*') ) {
+	if ( "${input_files1}".contains('*') && "${input_files2}".contains('*') ) {
 		prefix1 = ("${input_files1}".split("/")[-1]).split('\\*')[0]
 		suffix1 = ("${input_files1}".split("/")[-1]).split('\\*')[1]
 		//println(prefix1)
