@@ -9,3 +9,7 @@ cat ${all_one_type_annotations} | cut -d ' ' -f5-
 # to rename many files at once
 
 rename phobius_output-M27_M27-hits_on_uniref50_1-6-uniref50 phobius_output-M27-hits_on_uniref50_1-6  phobius_output-M27_M27-hits_on_uniref50_1-6-uniref50-splt*
+
+# filter lines on a field number bigger than threshold
+
+cat phobius_output-M27-hits_on_uniref50_1-6-splt*.average | awk '$4 >= 0.75' | cut -d ' ' -f 1,2,3 | sort -u >  phobius_output-M27-hits_on_uniref50_1-6_plp_major_75.ids
