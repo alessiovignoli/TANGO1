@@ -73,8 +73,8 @@ workflow pairer {
 		tupled_group1.combine(tupled_group2, by:0).set{right_pairs}
 		//right_pairs.view()
 	} else {
-		Channel.fromPath(input_files1).map{ it -> ["", it]}.set{tupled_1}
-		Channel.fromPath(input_files2).map{ it -> ["", it]}.set{tupled_2}
+		Channel.fromPath(input_files1).map{ it -> ["bubba", it]}.set{tupled_1}
+		Channel.fromPath(input_files2).map{ it -> ["bubba", it]}.set{tupled_2}
 		//tupled_1.view()
 		tupled_1.combine(tupled_2, by:0).set{right_pairs}
 		//right_pairs.view()
