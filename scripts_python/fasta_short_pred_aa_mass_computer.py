@@ -41,7 +41,7 @@ def mass_segment_computer(in_txt, in_fasta, field_keyword, number_max_iter=False
             else:
                 seq_id, list_boundaries = phobius_short_pred_field_selecter(txtline, field_keyword)
                 #print(seq_id, type(seq_id))
-                list_boundaries
+                #list_boundaries
                 #print(list_boundaries, type(list_boundaries))
                 header = infasta.readline()
                 if seq_id in header:
