@@ -27,11 +27,12 @@ def sum_kmers(infile, outfile):
                 k, v = line.split()
                 totals[k] += int(v)
     with open(outfile, 'w') as outfile:
+        S = sum(totals.values())
         outfile.write(f"# Aggregated k-mers from {seqs} sequences\n")
-        outfile.write(f"# Total kmers found: {sum(totals.values())}\n")
+        outfile.write(f"# Total kmers found: {S}\n")
         outfile.write(f"# Unique kmers found: {len(totals)}\n")
         for k, v in sorted(totals.items(), key = lambda i: i[1], reverse = True):
-            outfile.write(f"{k} {v}\n")
+            outfile.write(f"{k} {v} {'{:.3e}'.format(v/S)}\n")
 
 if __name__ == "__main__":
     try:
