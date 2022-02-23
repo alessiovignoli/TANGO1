@@ -51,7 +51,7 @@ if (params.help) {
 // params used in this script
 
 params.infasta_paral = "bubba"
-params.CONTAINER = "alessiovignoli3/tango-project:phobius_image@${params.sha_code}"
+params.CONTAINER = "alessiovignoli3/tango-project@${params.sha_code}" //"alessiovignoli3/tango-project:phobius_image@${params.sha_code}"
 params.OUTPUT_DIR = "${params.TEST_DIR}"
 params.INPUT = "${params.TEST_DIR}${params.infasta_paral}"
 params.ONE_LINE = false
@@ -81,7 +81,6 @@ process phobius_short_parallelization {
 	"""
 	export PATH="/home/phobius101_linux/tmp/tmpbyom7j/phobius:$PATH"
 	#tail -n 100 /home/phobius101_linux/tmp/tmpbyom7j/phobius/phobius.pl
-	cat /home/phobius101_linux/tmp/tmpbyom7j/phobius/phobius_model_versions/${params.model_version} > /home/phobius101_linux/tmp/tmpbyom7j/phobius/phobius.model
 	limit=`cat $fasta | wc -l`
 	i=2; while [ \$i -le \$limit ]; do 
 		SEQUENCE=`sed -n "\$i"p ${fasta}`; if echo "\$SEQUENCE" | grep -vq  "O"; then
@@ -93,7 +92,8 @@ process phobius_short_parallelization {
 
 process phobius_short_and_plp_parallelization {
 	publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
-	container "alessiovignoli3/tango-project:splp_phobius_image@sha256:f098f1511f37d461f3610884c8197814231eeaec3d09286a941292fa5f289dd5"
+	//container "alessiovignoli3/tango-project:splp_phobius_image@sha256:f098f1511f37d461f3610884c8197814231eeaec3d09286a941292fa5f289dd5"
+	container params.CONTAINER
 
 	input:
 	path fasta
@@ -108,7 +108,7 @@ process phobius_short_and_plp_parallelization {
 	"""
 	export PATH="/home/phobius101_linux/tmp/tmpbyom7j/phobius:$PATH"
 	#tail -n 100 /home/phobius101_linux/tmp/tmpbyom7j/phobius/phobius.pl
-	cat /home/phobius101_linux/tmp/tmpbyom7j/phobius/phobius_model_versions/${params.model_version} > /home/phobius101_linux/tmp/tmpbyom7j/phobius/phobius.model
+	#cat /home/phobius101_linux/tmp/tmpbyom7j/phobius/phobius_model_versions/${params.model_version} > /home/phobius101_linux/tmp/tmpbyom7j/phobius/phobius.model
 	limit=`cat $fasta | wc -l`
 	i=2; while [ \$i -le \$limit ]; do
 		SEQUENCE=`sed -n "\$i"p ${fasta}`; if echo "\$SEQUENCE" | grep -vq  "O"; then
