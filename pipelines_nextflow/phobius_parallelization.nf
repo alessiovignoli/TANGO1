@@ -51,7 +51,7 @@ if (params.help) {
 // params used in this script
 
 params.infasta_paral = "bubba"
-params.CONTAINER = "alessiovignoli3/tango-project@${params.sha_code}" //"alessiovignoli3/tango-project:phobius_image@${params.sha_code}"
+//params.CONTAINER = "alessiovignoli3/tango-project@${params.sha_code}" "alessiovignoli3/tango-project:phobius_image@${params.sha_code}"
 params.OUTPUT_DIR = "${params.TEST_DIR}"
 params.INPUT = "${params.TEST_DIR}${params.infasta_paral}"
 params.ONE_LINE = false
@@ -66,8 +66,8 @@ include { oneliner } from "${params.PIPES}fasta_oneliner" addParams(OUTPUT_DIR: 
 
 
 process phobius_short_parallelization {
+	label 'short'
 	publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
-	container params.CONTAINER
 
 	input:
 	path fasta
@@ -91,9 +91,9 @@ process phobius_short_parallelization {
 
 
 process phobius_short_and_plp_parallelization {
+	label 'short_and_plp'
 	publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
 	//container "alessiovignoli3/tango-project:splp_phobius_image@sha256:f098f1511f37d461f3610884c8197814231eeaec3d09286a941292fa5f289dd5"
-	container params.CONTAINER
 
 	input:
 	path fasta
