@@ -11,14 +11,16 @@ from matplotlib.colors import Normalize
 def from_input_to_numpy_array(txt_file, max_iter=1000000, x_field=None, y_field=None):
     with open(txt_file, 'r') as intxt:
         #print(intxt, x_field, y_field)
-        i = 0
+        i =  0
         x_array = np.empty([max_iter], dtype='U100')            # setting maximum length of dtring type to add to array otherwise str uses only first letter
         y_array = np.empty([max_iter], dtype=int)
+        total_annotations_found= None
         for txtline in intxt:
             if i == max_iter:
                 #print('if section')
-                return x_array, y_array
+                return x_array, y_array, total_annotations_found
             elif txtline[0] == '#':
+                total_annotations_found = float(txtline.split('=')[1])  ## ADDED JUST IN CASE
                 continue
             else:
                 #print('else section')
@@ -29,8 +31,7 @@ def from_input_to_numpy_array(txt_file, max_iter=1000000, x_field=None, y_field=
                 x_array[i] = tmp                                    # this will take the sting argument from field x till end of line
                 y_array[i] = int(txtline.split()[y_field])
             i += 1
-        #print(i)
-        return x_array[0:i], y_array[0:i]
+        return x_array[0:i], y_array[0:i], total_annotations_found
 
 def matcher_to_the_first(reference_numarray, label_numarray2, value_numarray2, label_numarray3, value_numarray3):
     dict_ref = {}
@@ -97,23 +98,34 @@ if __name__ == "__main__":
     except:
         raise SystemExit
     else:
-        x_ar_1, y_ar_1 = from_input_to_numpy_array(intxtfile1,  max_number_iterations, 1, 0)
+        x_ar_1, y_ar_1, tot1 = from_input_to_numpy_array(intxtfile1,  max_number_iterations, 1, 0)
         #print(x_ar_1)
         #print(y_ar_1)
-        x_ar_2, y_ar_2 = from_input_to_numpy_array(intxtfile2,  999999, 1, 0)
+        #print(tot1)
+        x_ar_2, y_ar_2, tot2 = from_input_to_numpy_array(intxtfile2,  999999, 1, 0)
         #print(x_ar_2)
         #print(len(y_ar_2), len(x_ar_2))
         #print(y_ar_2)
-        x_ar_3, y_ar_3 = from_input_to_numpy_array(intxtfile3,  999999, 1, 0)
+        x_ar_3, y_ar_3, tot3 = from_input_to_numpy_array(intxtfile3,  999999, 1, 0)
         #print(x_ar_3)
         #print(len(y_ar_3), len(x_ar_3))
         #print(y_ar_3)
 
         # Matching of the other to files to the first one necessary to create an order between the different fields of the three files
         correct_y2, correct_y3 = matcher_to_the_first(x_ar_1, x_ar_2, y_ar_2, x_ar_3, y_ar_3)
-        #print(correct_y2)
-        #print(correct_y3)
+        #print("ordered second file annotations\n", correct_y2)
+        #print("ordered third file annotations\n", correct_y3)
 
+        # used to create the percentages in a strange case scenario
+        #print("TANGO1-like adjacent annotation with respect of model confidence")
+        print("RIGHT")
+        print("plp < 50, 50 <= plp < 75, plp >= 75")
+        for n, label_all in enumerate(x_ar_1):
+            print(correct_y3[n], '    %.3f%% ,' %(correct_y3[n]/tot3*100), correct_y2[n], '    %.3f%% ,' %(correct_y2[n]/tot2*100),  y_ar_1[n], '     %.3f%% ,' %(y_ar_1[n]/tot1*100), label_all)
+        print("unique annotations found")
+        print("total annotation found\n", int(tot1), ",", int(tot2), ",", int(tot3))
+        """
+        
         # color list prepare this assigns a number to each unique string x argument
         #colist1, colist2, colist3, massimo = color_prepare(x_ar_1, x_ar_2, x_ar_3)
         #print('colist1:\n', colist1, '\ncolist2:\n', colist2, '\ncolist1:\n', colist3)
@@ -171,5 +183,5 @@ if __name__ == "__main__":
         #fig.tight_layout()
         plt.legend()
         #plt.savefig("M27-hits_normal_nonTM_55190_comparison_uniprot_annotation.png")
-        plt.show()
+        plt.show()"""
     
