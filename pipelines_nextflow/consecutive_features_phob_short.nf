@@ -11,31 +11,25 @@ params.help = false
 
 // this prints the help in case you use --help parameter in the command line and it stops the pipeline
 if (params.help) {
+        log.info "This pipeline retrieves the ids present in a phobius short output prediction based on a series ofreasoning"
+        log.info "in brief it checks if in a prediction of a protein there is n number of consecutive feature and extract the id"
+        log.info "the input is only a short phobius prediction redirected to a file --INPUT_TXT flag, it has the fllowing structure:"
+        log.info "	UniRef50_A0A3D5HTR8             7  Y n3-13c17/18o41-n-60i217-n-237o257-n-277i298-n-324o330-n-351i363-n-383o389-n-409i"
+        log.info "	UniRef50_UPI000CE2750B          3  0 i42-n-59o79-n-96i223-n-244o"
+        log.info "the prediction section and features ranges are extracted using     phobius_short_prediction_field_retriever.py"
+        log.info "then the distance between the requested feature is checked to be less than a threshold more later,"
+        log.info "if each segment is below the theshold at distance to its following it is considered consecutive and if all n segments"
+        log.info "respect this rule the id is selected and wrote to the output file"
+	log.info "--FIELD is used to specify wich is the feature of the prediction to look for"
+	log.info 'default is s for special helix, all the possible are: [c, i, o, -, n, s, l]  c = signal peptide, i = inside membrane(cytoplasm),'
+        log.info 'o = outside membrane, - = helix (in phobius originalmodel), (only in phobius-M7or later) => -n- = normal-helix'
+        log.info '-s- = special-helix and -l- = loop-inramembrane'
+        log.info 'they have to be given to the pipeline in one letter code'
+        log.info "the - has to be given like \\-"
         log.info ""
+        log.info "--NUMBER_CONSEC is used as option to specify how many feature (n) are to look for, if 2 only protein with 2 normal conseciìutive helices are selected"
         log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-	log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ''
-        log.info ''
-        log.info ''
+        log.info "--THRESHOLD this is the length to be less or equal to be considered consecutive, default 25"
         log.info ''
         exit 1
 }
