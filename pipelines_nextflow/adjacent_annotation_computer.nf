@@ -50,7 +50,7 @@ if (params.help) {
         exit 1
 }
 
-params.CONTAINER = "python:slim-buster@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43"
+params.CONTAINER = "python@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43" // slim buster
 params.INPUT_DOMAIN_INFO = "${params.TEST_DIR}bubbabubba.domain_info"
 params.INPUT_TXT = "${params.TEST_DIR}bubbabubba.txt"
 params.OUTPUT_DIR = "${params.TEST_DIR}"
@@ -62,7 +62,7 @@ include { pairer } from "${params.PIPES}input_files_pairer"
 
 process  adjacency_finder {
 	//publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
-	container params.CONTAINER
+	container "alessiovignoli3/tango-project@sha256:36cc270916232308969735637dba81b775916b2d221a811ec13dec597296fe0b" // field retriever
 	tag { "${in_pred}" }
 
 	input:
@@ -108,44 +108,6 @@ process summarizer_of_files {
 
 
 
-/*
-process summarizer_of_files {
-	publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
-        container params.CONTAINER
-        tag { "${all_one_type_annotations}" }
-
-	input:
-	path all_one_type_annotations
-	
-	output:
-	path "${prefix}", emit: final_out
-	stdout emit: standardout
-
-	script:
-	prefix = "${params.INPUT_DOMAIN_INFO}".split('/')[-1].split('\\.')[0].split('\\*')[0] + "_" +"${all_one_type_annotations}".split('_')[1].split('\\.')[0] + ".domain_freq"
-	//		the above line creates the  output files based on the common part to the glob pattern that uses asterisc
-	"""
-	#!/usr/bin/env python3
-	
-	list_of_freq = []
-	with open("${all_one_type_annotations}", 'r') as infile:
-		for line in infile:
-			domain_name = '' 	# annotation or domain string secription or name it needs the new linw character for the write
-			for wordz in line.split(' ')[4:]:
-				domain_name += (' ' + wordz)
-			if domain_name in list_of_freq:
-				i = list_of_freq.index(domain_name)
-				list_of_freq[(i+1)] += 1
-			else:
-				list_of_freq.append(domain_name)
-				list_of_freq.append(1)
-	with open("${prefix}", 'w') as freqfile:
-		for n, annotation in enumerate(list_of_freq[::2]):		# proceding two by two   n will not represent the real index of annotation
-			freqfile.write(( str(list_of_freq[(n*2+1)]) + annotation))
-			#print(str(list_of_freq[(n*2+1)]) + annotation, end='')
-	"""
-}
-*/
 
 
 workflow adjacent_domains_compiler {

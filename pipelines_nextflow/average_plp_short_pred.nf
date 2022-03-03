@@ -31,11 +31,6 @@ if (params.help) {
         log.info '      where the first comment line contains the id present in the line of the txt, remember the order has to be the same in the two files'
         log.info '      this module computes the average and the maximum plp value associated to what ever region of the prediciton is inputed'
         log.info '      this region can be selected simply giving in the command line the  --KEYWORD argument'
-        log.info '      allowed values are the allowed keywords are: [c, i, o, -, n, s, l]  c = signal peptide, i = inside membrane(cytoplasm),'
-        log.info '      o = outside membrane, - = helix (in phobius originalmodel), (only in phobius-M7or later) => -n- = normal-helix'
-        log.info '      -s- = special-helix and -l- = loop-inramembrane'
-        log.info '      they have to be given like this:'
-        log.info '              --KEYWORD s,n,c    or  i,l,\\-'
         log.info '	and it delimits the segment region to take into consideration it is in fct the main keyword label'
         log.info '	usefull when we want to know other averages for a given segment that are not the predicted label like,'
         log.info '	for example the selected main field keyword is s (special helix) but we want to compute also the average for'
@@ -49,7 +44,7 @@ if (params.help) {
 
 
 
-params.CONTAINER = "alessiovignoli3/tango-project:python_field_retr@sha256:36cc270916232308969735637dba81b775916b2d221a811ec13dec597296fe0b"
+params.CONTAINER = "alessiovignoli3/tango-project@sha256:36cc270916232308969735637dba81b775916b2d221a811ec13dec597296fe0b" // field retriever
 params.INPUT_TXT = "${params.TEST_DIR}bubbabubba"
 params.INPUT_PLP = "${params.TEST_DIR}bubbabubba"
 params.KEYWORD = false
@@ -110,7 +105,7 @@ process  average_unifier {
 	stdout emit: standardout
 	
 	script:
-	outname = "${params.INPUT_PLP}".split('/')[-1].split('\\.')[0].split('\\*')[0] + "-${prefix}.${params.MAX_ITER}tot_${params.SUFFIX}"
+	outname = "${params.INPUT_PLP}".split('\\.')[0].split('\\*')[0].split('/')[-1] + "-${prefix}.${params.MAX_ITER}tot_${params.SUFFIX}"
 	"""
 	for i in `echo ${list_of_averages}`; do cat `echo \$i | cut -d '[' -f 2 | cut -d ',' -f 1 | cut -d ']' -f 1` >> TMP ; done
 	sort TMP | head -n ${params.MAX_ITER} > ${outname}
@@ -146,6 +141,7 @@ workflow short_pred_average_plp {
 	finalaverage
 	stout1 = based_on_short_average_plp.out.standardout
 	//stout2 = average_unifier.out.standardout
+
 }
 
 
@@ -155,5 +151,5 @@ workflow {
 	short_pred_average_plp.out.stout1.view()
 	//short_pred_average_plp.out.stout2.view()
 	short_pred_average_plp.out.finalaverage.view()
-	//short_pred_average_plp.out.averageplp.view()	
+	short_pred_average_plp.out.averageplp.view()	
 }

@@ -46,53 +46,20 @@ params.feature = "s"
 params.pairing = "standard"
 params.fasta = "data/sequence.fa"
 params.pred = "data/prediction.txt"
-params.outdir = "results/"
-params.CONTAINER = "python:slim-buster@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43"
+params.outdir = "${params.TEST_DIR}"
+params.CONTAINER = "python@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43" // slim buster
 
 
 // include section
 
-include { ch_pairer } from "${params.PIPES}channel_pairer.nf"
+//include { ch_pairer } from "${params.PIPES}channel_pairer.nf"
 include { pairer } from "${params.PIPES}input_files_pairer.nf"
 
-/*
-process findSequences {
-    input:
-    path pyscript
-    path pred_file
-    val feature_id
-    
-    output:
-    path "seq_ranges_*.txt", emit: ranges
-	stdout emit: standardout                    // debug porpouses    
-    script:
-    suffix = "seq_ranges_${pred_file.getFileName()}".split('\\.')[0] + ".txt"
-    """
-    python3 ${pyscript} ${pred_file} ${suffix} ${feature_id}
-    """
-}
-process extractSequences {
-    input:
-    path pyscript
-    path ranges
-    path fasta
-    
-    output:
-    //path "seqs_*.txt"
-	stdout emit: standardout                    // debug porpouses
-    
-    script:
-    suffix = "${ranges.getFileName()}".split('\\.')[0] + "__" + "${fasta.getFileName()}".split('\\.')[0] + ".txt"
-    """
-	python3 ${pyscript} ${ranges} ${fasta} ${suffix}
-    """
-}
-*/
 
 process findAndExtractSeq {
-    container params.CONTAINER
+    container "alessiovignoli3/tango-project@sha256:36cc270916232308969735637dba81b775916b2d221a811ec13dec597296fe0b" // field retriever
     
-	input:
+    input:
     path findscript
     path extrscript
     tuple val(matcher), path(predFile), path(fastaFile)
@@ -100,15 +67,15 @@ process findAndExtractSeq {
 
     output:
     path "seqs_pair_*.fa", emit: sub_seqs
-	stdout emit: standardout
+    stdout emit: standardout
 
     script:
-	suffix = "seqs_${matcher}.txt"
-	prefix = "${predFile}".split("${matcher}")[0].split('\\.')[0]						// used later on at the final step for the output name
+    suffix = "seqs_${matcher}.txt"
+    prefix = "${predFile}".split("${matcher}")[0].split('\\.')[0]						// used later on at the final step for the output name
     """
     python3 ${findscript} ${predFile} ${suffix} ${featureID}
     python3 ${extrscript} ${suffix} ${fastaFile} "seqs_pair_${matcher}.fa"
-	echo ${prefix}
+    echo ${prefix}
     """
 }
 
@@ -126,7 +93,7 @@ process countKmers {
     stdout emit: standardout                    // debug porpouses
 
     script:
-	suffix = "${seqs.getFileName()}".split("seqs_pair_")[1].split('\\.')[0] + ".txt"
+    suffix = "${seqs.getFileName()}".split("seqs_pair_")[1].split('\\.')[0] + ".txt"
     """
     python3 ${pyscript} ${seqs} "seq_kmers_${suffix}" ${kmer}
     """
@@ -140,14 +107,14 @@ process sumKmers {
     input:
     path pyscript
     path kmers
-	val suffix
+    val suffix
 
     output:
-    path "total_kmers_*", emit: tot_kemers
+    path "total_${params.kmer}mers_*", emit: tot_kemers
     stdout emit: standardout
 
     script:
-	final_name =  "total_kmers_" + "${suffix}_".replaceAll("\n", "") + "${kmers}".split("seq_kmers_")[1].replaceAll("bubba","")
+    final_name =  "total_${params.kmer}mers_" + "${suffix}_".replaceAll("\n", "") + "${kmers}".split("seq_kmers_")[1].replaceAll("bubba","")
     """
     for i in `echo ${kmers}`; do cat \$i >> TMP; done
     python3 ${pyscript} TMP ${final_name}
@@ -171,22 +138,22 @@ workflow countHelixKmers {
     // channel definitions
     pairedInputs = ""
     if(params.pairing == "standard"){
-		pairedInputs = Channel.fromFilePairs( prediction + ".{txt,fa}").map{ [it[0], it[1][1], it[1][0]] }	// not to have list of lists and fa comes before txt
+        pairedInputs = Channel.fromFilePairs( prediction + ".{txt,fa}").map{ [it[0], it[1][1], it[1][0]] }	// not to have list of lists and fa comes before txt
     } else {
-		pairer(prediction, fasta)
+        pairer(prediction, fasta)
         pairedInputs = pairer.out.right_pairs
     }
-	findAndExtractSeq(findscript, extrscript, pairedInputs, featName)
+    findAndExtractSeq(findscript, extrscript, pairedInputs, featName)
     countKmers(countscript, findAndExtractSeq.out.sub_seqs, kmer)
-	sumKmers(sumscript, countKmers.out.kmers_counts.collect(), findAndExtractSeq.out.standardout.last())
+    sumKmers(sumscript, countKmers.out.kmers_counts.collect(), findAndExtractSeq.out.standardout.last())
     
-	emit:
+    emit:
     final_out = sumKmers.out.tot_kemers
-	//stdout = sumKmers.out.standardout // for debug porpouses
+    //stdout = findAndExtractSeq.out.standardout // for debug porpouses
 }
 
 workflow {
     countHelixKmers(params.kmer, params.feature, params.pred, params.fasta)
-	countHelixKmers.out.final_out.view()
-	//countHelixKmers.out.stdout.view()		// for debug porpouses
+    countHelixKmers.out.final_out.view()
+    //countHelixKmers.out.stdout.view()		// for debug porpouses
 }
