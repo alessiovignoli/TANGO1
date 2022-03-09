@@ -51,7 +51,7 @@ if (params.help) {
 }
 
 
-params.CONTAINER = "python:slim-buster@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43"
+params.CONTAINER = "python@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43" // slim buster
 params.INPUT = "${params.TEST_DIR}bubbabubba"
 params.OUTPUT_DIR = "${params.TEST_DIR}"
 params.TRIMM = false
@@ -142,7 +142,7 @@ process trimm_seqs {
 
 process align_generation {
 	publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
-	container "cbcrg/tcoffee:Version_13.45.47.aba98c5@sha256:36c526915a898d5c15ede89bbc3854c0a66cef22db86285c244b89cad40fb855" 
+	container "cbcrg/tcoffee@sha256:36c526915a898d5c15ede89bbc3854c0a66cef22db86285c244b89cad40fb855" 
 	tag { "${tcoffee_outfilepath}" }
 	afterScript "rm ${tcoffee_otfilepath}.html"
 
