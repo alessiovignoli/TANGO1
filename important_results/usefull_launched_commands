@@ -23,3 +23,10 @@ cat phobius_output-M27-hits_on_uniref50_1-6-splt*.average | awk '$4 >= 0.75' | c
 
 awk '$1 ~ /^[0-9]+$/ {printf "%.3f ", $1/8790*100}{for (i=2; i<NF; i++) printf "%s", $i " "; print $NF}' //
     M27-hits_on_uniref50_1-6_plp_major_75_all_center.domain_freq > M27-hits_on_uniref50_1-6_plp_major_75_all_center.domain_percent
+   
+   
+## Counting if the special helix is the first/second ecc.. helix in a sequence
+### first helix appearence below:
+tail ../backups/phobius_output-M27-hits_on_uniref50_1-6-splt1.txt |  sed 's/-s-/</gi' | cut -d '<' -f 1 | awk '{print gsub(/-n-/, "&") + 1}'
+### second helix appearance below:
+cat test_grep.txt  |  sed 's/-s-/</2gi' | cut -d '<' -f 1 | awk '{print gsub(/-n-/, "&") + 2}'
