@@ -200,11 +200,14 @@ process rename_gen {
 				new_name = ''
 				if '1_1' in old_name:
 					splitted = old_name.split('_')
-					new_name = splitted[0] + '-' + splitted[1] + '..............................'
+					#new_name = splitted[0] + '-' + splitted[1] +  '_'  + old_name.split('1_1_')[1].split('-')[0] + '                       '
+					new_name = old_name.split('-')[-1] + '.'  + old_name.split('1_1_')[1].split('-')[0] + '                       '
 				elif '!' in old_name:
-					new_name = (old_name.split('_')[0]).split('!')[1] +'_'+ old_name.split('-')[3] +'-'+ old_name.split('-')[4] +'..............................'
+					#new_name = old_name.split('-')[3] +'-'+ old_name.split('-')[4] + '_' + (old_name.split('_')[0]).split('!')[1] + '                    '
+					new_name = old_name.split('-')[-3] + '.' + (old_name.split('_')[0]).split('!')[1] + '                    '
 				else:
-					new_name = old_name.split('-')[0] +'_'+ old_name.split('-')[3] +'-'+ old_name.split('-')[4] +'..............................'
+					#new_name = old_name.split('-')[3] +'-'+ old_name.split('-')[4] +'_'+ old_name.split('-')[0] + '                  '
+					new_name = old_name.split('-')[-3] +'.'+ old_name.split('-')[0] + '                  '
 				actual_rule = old_name + ' ' + new_name[0:15] + '\\n'		# where the length of title is set
 				#print(actual_rule)
 				print(old_name)
