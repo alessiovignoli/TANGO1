@@ -41,13 +41,10 @@ params.INPUT = "${params.TEST_DIR}bubbabu"
 params.OUTPUT_DIR = "${params.TEST_DIR}"
 params.MODE = "two-sided"
 
-// Modules dependencie section
-
-//include { pairer } from "${params.PIPES}input_files_pairer"
 
 
 process fisher_exact_test  {
-	//publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
+	publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
 	container params.CONTAINER
 	tag { "${input_table_file} + ${modes}" }
 	//scratch true
