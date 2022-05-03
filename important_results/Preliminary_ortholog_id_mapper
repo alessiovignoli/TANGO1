@@ -1,6 +1,10 @@
 #Preliminary table of spiecies sequences ids in various databases and their relationship/categorization in orthologs paralogs isoforms and so on.
+#  , means that the id preciding and following are identical in the Transmembrane region
+#  ; means that the preciding following ids refer to the same exact sequence
+#  | means that preciding ids and folling ones (even more than one) are different in the  TM region but still not clear what is what, so first choiche is what is on the left and the rest is omitted by the following analysis untill the first choiche gives problems
 
 Species                     SpeciesID       MIA3-Gene             MIA3-Long                                             MIA3-Intermediate         MIA3-Short          MIA2-Gene          MIA2          CTAGE5
 
-Ailuropoda melanoleuca      9646            ENSAMEG00000006877    A0A7N5JUE6,G1LJY8,A0A7N5JCP6,A0A7N5KMK6,AILME17900                              G1LJX9             
-Anas platyrhynchos          8839            ENSAPLG00000006319    A0A493TAN7,A0A493U0A7|R0K3R7                                                    A0A493U1R3
+Ailuropoda melanoleuca      9646            ENSAMEG00000006877    A0A7N5JUE6,G1LJY8,A0A7N5JCP6,A0A7N5KMK6,AILME17900    NA                        G1LJX9             
+Anas platyrhynchos          8839            ENSAPLG00000006319    A0A493TAN7,A0A493U0A7|R0K3R7                          NA                        A0A493U1R3
+Anguilla anguilla           7936            NC_049206.1           ANGAN25237;XP_035279377                               NA                        NA
