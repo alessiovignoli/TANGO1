@@ -3,4 +3,4 @@
 Species                     SpeciesID       MIA3-Gene             MIA3-Long                                             MIA3-Intermediate         MIA3-Short          MIA2-Gene          MIA2          CTAGE5
 
 Ailuropoda melanoleuca      9646            ENSAMEG00000006877    A0A7N5JUE6,G1LJY8,A0A7N5JCP6,A0A7N5KMK6,AILME17900                              G1LJX9             
-Anas platyrhynchos          8839            ENSAPLG00000006319    A0A493TAN7,A0A493U0A7                                                           A0A493U1R3
+Anas platyrhynchos          8839            ENSAPLG00000006319    A0A493TAN7,A0A493U0A7|R0K3R7                                                    A0A493U1R3
