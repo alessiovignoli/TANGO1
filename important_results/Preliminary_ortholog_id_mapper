@@ -4,10 +4,12 @@
 #  | means that preciding ids and folling ones (even more than one) are different in the  TM region but still not clear what is what, so first choiche is what is on the left and the rest is omitted by the following analysis untill the first choiche gives problems
 #  a field preceededbuy ?  means it has still to be checked properly
 
-Species                     SpeciesID       MIA3-Gene             MIA3-Long                                             MIA3-Intermediate         MIA3-Short          MIA2-Gene           MIA2          CTAGE5
+Species                     SpeciesID       MIA3-Gene             MIA3-Long                                             MIA3-Intermediate         MIA3-Short          MIA2-Gene           MIA2                    CTAGE5
 
 Ailuropoda melanoleuca      9646            ENSAMEG00000006877    A0A7N5JUE6,G1LJY8,A0A7N5JCP6,A0A7N5KMK6,AILME17900    NA                        G1LJX9             
 Anas platyrhynchos          8839            ENSAPLG00000006319    A0A493TAN7,A0A493U0A7|R0K3R7                          NA                        A0A493U1R3
 Anguilla anguilla           7936            NC_049206.1           ANGAN25237;XP_035279377                               NA                        NA
 Anolis carolinensis         28377           ENSACAG00000002254    G1KAI6,A0A803SQC3,A0A803SWC3|ANOCA01827               NA                        NA                  ENSACAG00000015954  ?G1KS42,M!07686495
 Aotus nancymaae             37293           ENSANAG00000032600    AOTNA01059;A0A2K5E8Z1,A0A2K5E957,A0A2K5E972           NA                        A0A2K5E943          
+Astatotilapia calliptera    8154            NA                    NA                                                    NA                        NA                  ENSACLG00000024508  ASTCA17577;A0A3P8R3W1   A0A3P8R345
+Astyanax mexicanus          7994            ENSAMXG00000013444    ASTMX10237,A0A3B1KIT4|W5L1X1                          NA                        NA                  
