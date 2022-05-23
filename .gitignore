@@ -1,0 +1,20 @@
+#stuff not needed for commits
+
+.nextflow.log*
+.nextflow/
+/results*/
+/test*
+/data/
+/work*/
+/*.png
+/*.csv
+/*.pdf
+/MIA2_Metaphor/
+/MIA2_OMA/
+/Metaphor/
+/OMA/
+/all_phobius_results/
+/articles/
+/backups/
+/images/
+/jupyter/
