@@ -1,5 +1,6 @@
 #stuff not needed for commits
 
+.DS_Store
 .nextflow.log*
 .nextflow/
 /results*/
