@@ -101,7 +101,9 @@ process summarizer_of_files {
 	//              the above line creates the  output files based on the common part to the glob pattern that uses asterisc
 	"""
 	./${pyscript2} ${all_one_type_annotations} tmp
-	sort -k1 -nr tmp > ${prefix}
+	echo "# unique annotations found = "`wc -l tmp | cut -d ' ' -f 1` > ${prefix}
+	echo "# total annotation found = "`wc -l ${all_one_type_annotations} | cut -d ' ' -f 1` >> ${prefix}
+	sort -k1 -nr tmp >> ${prefix}
 	rm tmp
 	"""
 }

@@ -7,10 +7,10 @@ import sys
 def hydro_colist_prep(trimmflnm, renameflnm, outfilepath,  scale, maskrange=None):
     #print(trimmflnm, renameflnm, outfile, maskrange)
     #print(outfilepath)
-    majority_hydro_dict = {'A':6, 'C':7, 'D':1, 'E':0, 'F':8, 'G':5, 'H':3, 'I':9, 'K':1, 'L':7, 'M':6, 'N':2, 'P':3, 'Q':2, 'R':0, 'S':4, 'T':4, 'V':8, 'W':9, 'Y':5}
-    kyte_doolittle_hydro_dict = {'A':6, 'C':7, 'D':2, 'E':2, 'F':8, 'G':6, 'H':3, 'I':9, 'K':0, 'L':8, 'M':7, 'N':1, 'P':3, 'Q':1, 'R':0, 'S':5, 'T':5, 'V':9, 'W':4, 'Y':4}
-    GES_hydro_dict = {'A':6, 'C':7, 'D':0, 'E':1, 'F':9, 'G':5, 'H':3, 'I':8, 'K':1, 'L':8, 'M':9, 'N':2, 'P':4, 'Q':2, 'R':0, 'S':4, 'T':5, 'V':7, 'W':6, 'Y':3}
-    UHS_hydro_dict = {'A':6, 'C':4, 'D':0, 'E':1, 'F':9, 'G':7, 'H':3, 'I':9, 'K':0, 'L':8, 'M':7, 'N':2, 'P':2, 'Q':3, 'R':1, 'S':4, 'T':5, 'V':8, 'W':5, 'Y':6}
+    majority_hydro_dict = {'A':6, 'C':7, 'D':1, 'E':0, 'F':8, 'G':5, 'H':3, 'I':9, 'K':1, 'L':7, 'M':6, 'N':2, 'P':3, 'Q':2, 'R':0, 'S':4, 'T':4, 'V':8, 'W':9, 'Y':5, 'X':'', 'B':'10', 'U':'10', 'Z':'10'}
+    kyte_doolittle_hydro_dict = {'A':6, 'C':7, 'D':2, 'E':2, 'F':8, 'G':6, 'H':3, 'I':9, 'K':0, 'L':8, 'M':7, 'N':1, 'P':3, 'Q':1, 'R':0, 'S':5, 'T':5, 'V':9, 'W':4, 'Y':4, 'X':'10', 'B':'10', 'U':'10', 'Z':'10'}
+    GES_hydro_dict = {'A':6, 'C':7, 'D':0, 'E':1, 'F':9, 'G':5, 'H':3, 'I':8, 'K':1, 'L':8, 'M':9, 'N':2, 'P':4, 'Q':2, 'R':0, 'S':4, 'T':5, 'V':7, 'W':6, 'Y':3, 'X':'10', 'B':'10', 'U':'10', 'Z':'10'}
+    UHS_hydro_dict = {'A':6, 'C':4, 'D':0, 'E':1, 'F':9, 'G':7, 'H':3, 'I':9, 'K':0, 'L':8, 'M':7, 'N':2, 'P':2, 'Q':3, 'R':1, 'S':4, 'T':5, 'V':8, 'W':5, 'Y':6, 'X':'10', 'B':'10', 'U':'10', 'Z':'10'}
     to_be_used_dict = None
     if scale == "kyte":
         to_be_used_dict = kyte_doolittle_hydro_dict
@@ -47,18 +47,15 @@ def hydro_colist_prep(trimmflnm, renameflnm, outfilepath,  scale, maskrange=None
                             #print(old_header + '\n' + seq_line[:r_ext])
                             for aa_pos in range(l_ext, r_ext):
                                 aa = seq_line[aa_pos]
-                                if aa in to_be_used_dict:
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + str(to_be_used_dict[aa]) + '\n'
-                                    outfile.write(to_write_line)
+                                to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + str(to_be_used_dict[aa]) + '\n'
+                                outfile.write(to_write_line)
                         else:
                             l_ext = int(maskrange.split(',')[0]) - 1
                             r_ext = int(maskrange.split(',')[1]) 
                             #print(l_ext, r_ext)
                             for aa_pos in range(l_ext, r_ext):
                                 aa = seq_line[aa_pos]
-                                if aa in to_be_used_dict:
-                                    to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + str(to_be_used_dict[aa]) + '\n'
-                                    outfile.write(to_write_line)
+                                to_write_line = new_header + ' ' + str((aa_pos+1)) + ' ' + str(to_be_used_dict[aa]) + '\n'
                         i = 0
 
 

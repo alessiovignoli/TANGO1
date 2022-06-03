@@ -33,7 +33,7 @@ params.NUMBER = 2
 
 // Modules dependencie section
 
-include { oneliner } from "${params.PIPES}fasta_oneliner" addParams(OUTPUT_DIR: "/dev/null")
+include { oneliner } from "${params.PIPES}fasta_oneliner" addParams(PUBLISH: "false")
 include { counter } from "${params.PIPES}fasta_counter"
 
 

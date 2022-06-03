@@ -46,7 +46,7 @@ if (params.help) {
 params.OUTPUT_DIR = "${params.TEST_DIR}"
 params.INHEADER = "${params.OUTPUT_DIR}test19_1.txt"
 params.INFASTA =  "${params.OUTPUT_DIR}test18_1.fasta"
-params.CONTAINER = "python:slim-buster@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43"
+params.CONTAINER = "python@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43"	// slim buster
 
 
 

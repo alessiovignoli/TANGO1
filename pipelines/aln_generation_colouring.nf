@@ -66,7 +66,7 @@ params.HYDRO_SCALE = "kyte"
 
 // Modules dependencie section
 
-include { oneliner_ch } from "${params.PIPES}fasta_oneliner" addParams(OUTPUT_DIR: "/dev/null")
+include { oneliner_ch } from "${params.PIPES}fasta_oneliner" addParams(PUBLISH: "false")
 include { converger } from "${params.PIPES}output_files_uniter" 
 
 /*
@@ -205,9 +205,11 @@ process rename_gen {
 				elif '!' in old_name:
 					#new_name = old_name.split('-')[3] +'-'+ old_name.split('-')[4] + '_' + (old_name.split('_')[0]).split('!')[1] + '                    '
 					new_name = old_name.split('-')[-3] + '.' + (old_name.split('_')[0]).split('!')[1] + '                    '
-				else:
+				elif len(old_name.split('-')) >= 3:
 					#new_name = old_name.split('-')[3] +'-'+ old_name.split('-')[4] +'_'+ old_name.split('-')[0] + '                  '
 					new_name = old_name.split('-')[-3] +'.'+ old_name.split('-')[0] + '                  '
+				else:
+					new_name = old_name + '                  '
 				actual_rule = old_name + ' ' + new_name[0:15] + '\\n'		# where the length of title is set
 				#print(actual_rule)
 				print(old_name)
@@ -277,11 +279,8 @@ process residues_colors {
 
 
 
-// This process will create a color file based on a majority vote Hydrophobicity scale.
-// this scale is deduced from a series of different scales such as Eisenberg and weisss, Engelman, Kyte Doolyttle, Hoop and Woods, Janin, Whimly White.
-// this scale is arbitrary and deduced from the previously mentioned ones, the aa are coupled in pairs since there can be only 10 colors.
-// the couples can be found inside the below script.
-
+// Couloring the residues in the allignment based on the Hydrophobicity scale, default Kyte-Doolittle
+// take a look at hydrophobicity_color_list_tcoffee_prepare.py  for the list of possible scales
 
 process residues_hydrophobicity_colors {
 	//publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
@@ -310,20 +309,47 @@ process residues_hydrophobicity_colors {
 }
 
 
+// The following processisalater update of the pipeline to handle also when it isfeda phobius -short prediction file 
+
+
+process phob_mode_checker {
+	//publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
+        container params.CONTAINER
+        tag { "phob_mode_checker" }
+
+	input:
+        path phob_stdout_file
+
+	output:
+	stdout emit: standardout
+
+	script:
+	"""
+	if grep -q 'FT   DOMAIN' ${phob_stdout_file}; then
+		echo 'long'
+	else
+		echo 'short'
+	fi
+	"""
+}
+
+
 // The following process creates another identical coloured alignment based on phobius stdoutput default format (-long).
 // It simply Highlights the coloured segment predicted.
 
 
 process phob_stout_colours {
 	//publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
-	container params.CONTAINER
+	container "alessiovignoli3/tango-project@sha256:36cc270916232308969735637dba81b775916b2d221a811ec13dec597296fe0b" // field retriever
 	tag { "${phob_stout_colourlist}" }
+	
 
 	input:
 	path plp_folder
         path rename_filepath 
 	path phobius_stdout_filepath
 	path pyscript
+	val mode_phobius
 
 	output:
 	stdout emit: standardout            // used only for check during debugging
@@ -331,23 +357,24 @@ process phob_stout_colours {
 
 	script:
 	phob_stout_colourlist = "${rename_filepath}".split('\\.')[0] + '.tmcolor'
+	mode_phob = "${mode_phobius}".trim()
 	if(params.TRIMM == false)
 		if(params.SPECIAL_HELIX == false)
 			"""
-			./${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath}
+			./${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob}
 			"""
 		else
 			"""
-			./${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${params.SPECIAL_HELIX} 
+			./${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob} ${params.SPECIAL_HELIX} 
 			"""
 	else
 		if(params.SPECIAL_HELIX == false)
 			"""
-			./${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${plp_folder} ${params.TRIMM} ${params.SIGNALPEPT}
+			./${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob} ${plp_folder} ${params.TRIMM} ${params.SIGNALPEPT}
 			"""
 		else
         	        """
-			./${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${plp_folder} ${params.TRIMM} ${params.SIGNALPEPT} ${params.SPECIAL_HELIX}
+			./${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob} ${plp_folder} ${params.TRIMM} ${params.SIGNALPEPT} ${params.SPECIAL_HELIX}
 			"""
 }
 
@@ -361,7 +388,7 @@ process couloring_aln  {
 										else if (filename.endsWith("-specialH_pp.html")) null
 										else filename
 										})
-	container "cbcrg/tcoffee:Version_13.45.47.aba98c5@sha256:36c526915a898d5c15ede89bbc3854c0a66cef22db86285c244b89cad40fb855"
+	container "cbcrg/tcoffee@sha256:36c526915a898d5c15ede89bbc3854c0a66cef22db86285c244b89cad40fb855" //Version_13.45.47.aba98c5
 	tag { "${html_outfile}" }
 	
 	input:
@@ -592,7 +619,8 @@ workflow allignment_couloring {
 	residues_hydrophobicity_colors(in_fastas, rename_out, hydro_color_aa_pyscript)
 	phob_stout_colour_pyscript = params.SCRIPTS + "phobiuos_stdout_color_list_tcoffee_prepare.py"
 	Channel.fromPath(params.PHOB_STDOUT).set{phob_stdout}
-	phob_stout_colours(plp_folder, rename_out, phob_stdout, phob_stout_colour_pyscript)
+	phob_mode_checker(phob_stdout)
+	phob_stout_colours(plp_folder, rename_out, phob_stdout, phob_stout_colour_pyscript, phob_mode_checker.out.standardout)
 	couloring_aln(aln_outfile, rename_out, pp_color_file, pp_shcolor_file, residues_hydrophobicity_colors.out.hydrocolor_list_file, phob_stout_colours.out.phob_stout_colourfile)
 
 	emit:

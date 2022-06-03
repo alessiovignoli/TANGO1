@@ -28,10 +28,13 @@ params.CONTAINER = "python:slim-buster@sha256:fe2971bedd019d952d4458afb1fe4e222d
 params.INPUT = "${params.TEST_DIR}bubbabubba"
 params.OUTPUT_DIR = "${params.TEST_DIR}"
 params.OUTPUT_NAME = "bubba"
+params.PUBLISH = true
 
 
 process fasta_oneliner {
-	publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
+	publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false, saveAs: { filename -> if (params.PUBLISH == true) filename
+										else null
+										})
 	tag { "${fasta}" }
 	container params.CONTAINER
 

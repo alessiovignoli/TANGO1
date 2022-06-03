@@ -5,9 +5,12 @@
 
 import sys
 import os
+sys.path.append(os.path.abspath("/home/alessio/Desktop/erasmus-internship/scripts"))
+from phobius_short_prediction_field_retriever import phobius_short_pred_field_selecter
+
 
 def phobstout_colist_prep(phobstdout, output_f, renameflnm, plp_dir=False, trimm_val=False, signalpept_val=False, switch_col=False):
-    #print(phobstdout, renameflnm, plp_dir, trimm_val)
+    #print(phobstdout, output_f, renameflnm, plp_dir, trimm_val)
     cut_site = 0
     if plp_dir != False:
                 list_of_plps = os.listdir(plp_dir)
@@ -94,8 +97,26 @@ def phobstout_colist_prep(phobstdout, output_f, renameflnm, plp_dir=False, trimm
 
 
 
+
+def phobstout_short_colist_prep(phobstdout, output_f, renameflnm, plp_dir=False, trimm_val=False, signalpept_val=False, switch_col=False):
+    print(phobstdout, output_f, renameflnm, plp_dir, trimm_val, signalpept_val, switch_col)
+
+
+
+
+def main(phob_stdout, out_put_f, rename_flnm, phobius_mode, plpdir=False, trimmval=False, signal_pept_val=False, switchcol=False):
+    print(phob_stdout, out_put_f, rename_flnm, phobius_mode, plpdir, trimmval, signal_pept_val, switchcol)
+    if phobius_mode == 'long':
+        phobstout_colist_prep(phob_stdout, out_put_f, rename_flnm, plpdir, trimmval, signal_pept_val, switchcol)
+    elif phobius_mode == 'short':
+        phobstout_colist_prep(phob_stdout, out_put_f, rename_flnm, plpdir, trimmval, signal_pept_val, switchcol)
+    else:
+        print('the argument of phobius_mode has to be either long or short, it was given :   ', phobius_mode, file=sys.stderr)
+
+
+
 if __name__ == "__main__":
-    rename_filename = None
+    phobius_mode = None
     input_plp_dir = None
     trimm_value = None
     signalpept_value = None
@@ -103,18 +124,19 @@ if __name__ == "__main__":
     try:
         phob_stout_filename = sys.argv[1]
         output_file = sys.argv[2]
-        rename_filename = sys.argv[3]
-        input_plp_dir = sys.argv[4]
-        trimm_value = sys.argv[5].split(',')
-        signalpept_value = int(sys.argv[6])
-        special_tm = sys.argv[7]
+       	rename_filename = sys.argv[3]
+        phobius_mode = str(sys.argv[4])
+        input_plp_dir = sys.argv[5]
+        trimm_value = sys.argv[6].split(',')
+        signalpept_value = int(sys.argv[7])
+        special_tm = sys.argv[8]
     except:
-        if trimm_value is not None and input_plp_dir is not None and rename_filename is not None and signalpept_value is not None:
-            phobstout_colist_prep(phob_stout_filename, output_file, rename_filename, input_plp_dir, trimm_value, signalpept_value)
-        elif trimm_value is None and input_plp_dir is None and rename_filename is not None:
-            phobstout_colist_prep(phob_stout_filename, output_file, rename_filename)
+        if trimm_value is not None and input_plp_dir is not None and phobius_mode is not None and signalpept_value is not None:
+            main(phob_stout_filename, output_file, rename_filename, phobius_mode, input_plp_dir, trimm_value, signalpept_value)
+        elif trimm_value is None and input_plp_dir is None and phobius_mode is not None:
+            main(phob_stout_filename, output_file, rename_filename, phobius_mode)
         else:
-            print('Program usage: text.py <a phobius default (-long flag) standard output redirected into a file, if the trimm value option is given, the ID lines must contain a name that is a keyword to identify a .plp file of that specific sequence> <two column file, space separeted, having the final ids in the second row. the sequence name found after ID has to be a substring of the old name found in the rename file and the new name the actual name we want t-coffee to recognize> <if the trimm value option is given, The directory in which search all .plp files of the sequences present in the phobius standard output input file for this script> <trimm_value used to cut the sequences, this enebles all previous options, the sequences have been cutted from another script trimm_multifasta.py, go check it to see how the cut is performed, trimm_value has to be the same number used for that script> < A signal peptide value used when trimming good pp values will be ignored if their position on the sequence is lower than the value specified it must be an integer> <a boolean parameter used to switch to a different (two colouring) coloration mostly used when there aree two different types of transmembranes>', file=sys.stderr)
+            print('Program usage: text.py <a phobius default (-long flag) standard output redirected into a file, if the trimm value option is given, the ID lines must contain a name that is a keyword to identify a .plp file of that specific sequence> <two column file, space separeted, having the final ids in the second row. the sequence name found after ID has to be a substring of the old name found in the rename file and the new name the actual name we want t-coffee to recognize> < a string stating the type of phobius output, either long or short, referring to the two types of output of phobius> <if the trimm value option is given, The directory in which search all .plp files of the sequences present in the phobius standard output input file for this script> <trimm_value used to cut the sequences, this enebles all previous options, the sequences have been cutted from another script trimm_multifasta.py, go check it to see how the cut is performed, trimm_value has to be the same number used for that script> < A signal peptide value used when trimming good pp values will be ignored if their position on the sequence is lower than the value specified it must be an integer> <a boolean parameter used to switch to a different (two colouring) coloration mostly used when there aree two different types of transmembranes>', file=sys.stderr)
             raise SystemExit
     else:
-        phobstout_colist_prep(phob_stout_filename, output_file, rename_filename, input_plp_dir, trimm_value, signalpept_value, special_tm)
+        main(phob_stout_filename, output_file, rename_filename, phobius_mode, input_plp_dir, trimm_value, signalpept_value, special_tm)

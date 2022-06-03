@@ -62,8 +62,8 @@ process blocking_aln {
 	tuple val(id), path(in_aln)
 
 	output:
-	tuple val("${id}_trimmal_aln_auto"), path("*_auto.ph"), emit:  auto_trim
-	tuple val("${id}_trimmal_aln_gappy"), path("*_gappy.ph"), emit: gappy_trim
+	//tuple val("${id}_trimmal_aln_auto"), path("*_auto.ph"), emit:  auto_trim
+	//tuple val("${id}_trimmal_aln_gappy"), path("*_gappy.ph"), emit: gappy_trim
 	path "*.fa", emit: blocked_fasta
 	stdout emit: standardout
 

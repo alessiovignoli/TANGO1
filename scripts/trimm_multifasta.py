@@ -20,7 +20,7 @@ def trimmer(in_multifasta, in_plp_dir, out_trimmedfilename, cutoff_vals, signpep
                         if seq_id in line:
                             #print(line, end='')
                             #print(seq_id)
-                            plp_filepath = in_plp_dir + filename.rstrip()
+                            plp_filepath = in_plp_dir + '/' + filename.rstrip()
                             with open(plp_filepath, 'r') as plp:
                                 #print(plp)
                                 for res_line in plp:

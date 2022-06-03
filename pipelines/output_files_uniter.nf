@@ -45,7 +45,7 @@ params.INPUT2 = "${params.TEST_DIR}bubbabubba"
 
 process deepest_common_parentdir {
 	//tag { "${outpath}" }
-	container "python:slim-buster@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43"
+	container "python@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43" // slim buster
 
 	input:
 	val list_of_paths
@@ -80,7 +80,7 @@ process single_channel_converger {
 										else filename
 										})
 	tag { "${outname}" }
-	container "ubuntu:latest@sha256:86ac87f73641c920fb42cc9612d4fb57b5626b56ea2a19b894d0673fd5b4f2e9"
+	container "ubuntu@sha256:86ac87f73641c920fb42cc9612d4fb57b5626b56ea2a19b894d0673fd5b4f2e9"
 	
 	input:
 	val list_in_files
