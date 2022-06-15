@@ -3,7 +3,7 @@
 import os
 import sys
 
-def trimmer(in_multifasta, in_plp_dir, out_trimmedfilename, cutoff_vals, signpept_cutoff):
+def trimmer(in_multifasta, in_plp_dir, out_trimmedfilename, cutoff_vals, signpept_cutoff, threshold=0.90):
     #print(in_multifasta, in_plp_dir, out_trimmedfilename, cutoff_val)
     plp_lstfile = os.listdir(in_plp_dir)
     #print(plp_lstfile)
@@ -32,7 +32,7 @@ def trimmer(in_multifasta, in_plp_dir, out_trimmedfilename, cutoff_vals, signpep
                                         posterior_prob = float(res_line.split()[4])
                                         res_index = int(res_line.split()[0])
                                         #print(posterior_prob)
-                                        if posterior_prob >= 0.90 and res_index >= signpept_cutoff:
+                                        if posterior_prob >= threshold and res_index >= signpept_cutoff:
                                             left_and_right_cuts = cutoff_vals.split(',')
                                             left_cut_val = int(left_and_right_cuts[0])
                                             left_cut_site = max((res_index - left_cut_val), 0)
@@ -53,14 +53,19 @@ def trimmer(in_multifasta, in_plp_dir, out_trimmedfilename, cutoff_vals, signpep
                     out_fasta.write(new_seq)
 
 if __name__ == "__main__":
+    signal_pept_cutoff = None
     try:
         in_multifastapath = sys.argv[1]
         in_plp_dirpath = sys.argv[2]
         out_trimmedpath = sys.argv[3]
         cut_off_values = sys.argv[4]
         signal_pept_cutoff = int(sys.argv[5])
-    except:
-        print('Program usage: text.py <multifasta file that we want to trim the sequences> <plp folder, that means posterior probablity, so the folder where all plp files outputed from phobius are stored> <path to the output filename> <cut off values needed for the trim, must be 2 integers divided by a comma (left cut off value,right cut off value) right cut off value can be missing, all residues before (last residue with posterior prob >= 0.9 - left cut off value) are not present in the output, this is done for each sequence in the input, also all residues after (last residue with posterior prob >= 0.9 + right cut off value) are not present if right cut off value is specified> <signal peptide threshold, the residue index below which posterior prob values are not considered, to avoid including signal peptides>', file=sys.stderr)
-        raise SystemExit
+        threshold_for_cut_reference = float(sys.argv[6])
+    except Exception:
+        if signal_pept_cutoff is not None:
+            trimmer(in_multifastapath, in_plp_dirpath, out_trimmedpath, cut_off_values, signal_pept_cutoff)
+        else:
+            print('Program usage: text.py <multifasta file that we want to trim the sequences> <plp folder, that means posterior probablity, so the folder where all plp files outputed from phobius are stored> <path to the output filename> <cut off values needed for the trim, must be 2 integers divided by a comma (left cut off value,right cut off value) right cut off value can be missing, all residues before (last residue with posterior prob >= 0.9 - left cut off value) are not present in the output, this is done for each sequence in the input, also all residues after (last residue with posterior prob >= 0.9 + right cut off value) are not present if right cut off value is specified> <signal peptide threshold, the residue index below which posterior prob values are not considered, to avoid including signal peptides>', file=sys.stderr)
+            raise SystemExit
     else:
-        trimmer(in_multifastapath, in_plp_dirpath, out_trimmedpath, cut_off_values, signal_pept_cutoff)
+        trimmer(in_multifastapath, in_plp_dirpath, out_trimmedpath, cut_off_values, signal_pept_cutoff, threshold_for_cut_reference)

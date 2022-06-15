@@ -5,7 +5,7 @@
 
 import sys
 
-def pp_colist_prep(ppflnm, renameflnm, trimm_val=False, signpept_val=False, switch_col=False, threshold=0.01):
+def pp_colist_prep(ppflnm, renameflnm, trimm_val=False, signpept_val=False, switch_col=False, threshold=0.9):
     #print('bubba')
     #print(ppflnm, renameflnm, trimm_val, signpept_val, threshold)
     cut_site = None
@@ -24,7 +24,7 @@ def pp_colist_prep(ppflnm, renameflnm, trimm_val=False, signpept_val=False, swit
                 posterior_prob = float(res_line.split()[4])
                 res_index = int(res_line.split()[0])
                 #print(posterior_prob)
-                if posterior_prob >= 0.90 and res_index >= int(signpept_val):
+                if posterior_prob >= threshold and res_index >= int(signpept_val):
                     cut_site = max((res_index - left_trimm_val), 0)
     else:
         cut_site = 0
@@ -48,11 +48,11 @@ def pp_colist_prep(ppflnm, renameflnm, trimm_val=False, signpept_val=False, swit
         #print(new_header)
         classes_pp_file = pp_file.readline()
         for line in pp_file:
-            #print(line)
+            print(line)
             signal_pept_pp = float(line.split()[5])
             #print(signal_pept_pp)
             tm_pp = 0.0
-            if switch_col == False:
+            if switch_col is  False or switch_col == 'false' or switch_col == 'False':
                 tm_pp = float(line.split()[4])
             else:
                 tm_pp = float(line.split()[6])
@@ -65,7 +65,7 @@ def pp_colist_prep(ppflnm, renameflnm, trimm_val=False, signpept_val=False, swit
             elif tm_pp > 0.9:
                 #print(line, end='')
                 print(new_header, aa_number, '9')
-            elif tm_pp <= 0.1 and tm_pp >= threshold:         # here the lower threshold is used
+            elif tm_pp <= 0.1 and tm_pp >= 0.01:         # here the lower threshold is used
                 print(new_header, aa_number, '0')
             elif tm_pp > 0.1 and tm_pp <= 0.2:
                 print(new_header, aa_number, '1')
@@ -98,7 +98,7 @@ if __name__ == "__main__":
         signal_pept_cutoff = sys.argv[4]
         special_tm_switch = sys.argv[5]
         possible_threshold = float(sys.argv[6])
-    except:
+    except Exception:
         if posterior_prob_filename is not None and rename_filename is not None:
             if trimm_value is None:
                 pp_colist_prep(posterior_prob_filename, rename_filename)
@@ -109,7 +109,7 @@ if __name__ == "__main__":
             else:
                 pp_colist_prep(posterior_prob_filename, rename_filename, trimm_value, signal_pept_cutoff, special_tm_switch)
         else:
-            print('Program usage: text.py <a postirior probability file, phobius -plp option output file> <two column file, space separeted, having the final ids in the second row> < <trimm_value used to cut the sequences, the sequences have been cutted from another script trimm_multifasta.py, go check it to see how the cut is performed, trimm_value has to be the same number used for that script> <a boolean parameter used to switch to a different set of aa to color, mostly used when there are two different types of transmembranes> optional field to set the threshold, give the number as 0.001 no comma, by default set to 0.01>', file=sys.stderr)
+            print('Program usage: text.py <a postirior probability file, phobius -plp option output file> <two column file, space separeted, having the final ids in the second row> < <trimm_value used to cut the sequences, the sequences have been cutted from another script trimm_multifasta.py, go check it to see how the cut is performed, trimm_value has to be the same number used for that script> <a boolean parameter used to switch to a different set of aa to color, mostly used when there are two different types of transmembranes> <optional field to set the threshold, give the number as 0.70 no comma, by default set to 0.9, this is used to consider where the sequence has found the reference for the cut, the last aa wuth plp value bigger than threshold>', file=sys.stderr)
             raise SystemExit
     else:
         pp_colist_prep(posterior_prob_filename, rename_filename, trimm_value, signal_pept_cutoff, special_tm_switch, possible_threshold)
