@@ -24,7 +24,7 @@ if (params.help) {
 
 
 
-params.CONTAINER = "python:slim-buster@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43"
+params.CONTAINER = "python@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43" // slim buster
 params.INPUT = "${params.TEST_DIR}bubbabubba"
 params.OUTPUT_DIR = "${params.TEST_DIR}"
 params.OUTPUT_NAME = "bubba"
