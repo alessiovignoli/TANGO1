@@ -85,6 +85,9 @@ process phobius_short_parallelization {
 	export PATH="/home/phobius101_linux/tmp/tmpbyom7j/phobius:$PATH"
 	#tail -n 100 /home/phobius101_linux/tmp/tmpbyom7j/phobius/phobius.pl
 	limit=`cat $fasta | wc -l`
+	if ! [ \$((\$limit%2)) -eq 0 ]; then
+                limit=\$((\$limit + 1))
+        fi
 	i=2; while [ \$i -le \$limit ]; do 
 		SEQUENCE=`sed -n "\$i"p ${fasta}`; if echo "\$SEQUENCE" | grep -vq  "O"; then
     				sed -n  `expr \$i - 1`,"\$i"p ${fasta} | ${params.exec_version} -short
@@ -113,6 +116,9 @@ process phobius_short_and_plp_parallelization {
 	#tail -n 100 /home/phobius101_linux/tmp/tmpbyom7j/phobius/phobius.pl
 	#cat /home/phobius101_linux/tmp/tmpbyom7j/phobius/phobius_model_versions/${params.model_version} > /home/phobius101_linux/tmp/tmpbyom7j/phobius/phobius.model
 	limit=`cat $fasta | wc -l`
+	if ! [ \$((\$limit%2)) -eq 0 ]; then
+                limit=\$((\$limit + 1))
+        fi
 	i=2; while [ \$i -le \$limit ]; do
 		SEQUENCE=`sed -n "\$i"p ${fasta}`; if echo "\$SEQUENCE" | grep -vq  "O"; then
 				sed -n  `expr \$i - 1`,"\$i"p ${fasta} | ${params.exec_version} -short -plp "${prefix}tmpplp"
@@ -150,6 +156,9 @@ process phobius_short_many_plp {
         """
         export PATH="/home/phobius101_linux/tmp/tmpbyom7j/phobius:$PATH"
         limit=`cat $fasta | wc -l`
+	if ! [ \$((\$limit%2)) -eq 0 ]; then
+                limit=\$((\$limit + 1))
+        fi
         i=2; while [ \$i -le \$limit ]; do
                 SEQUENCE=`sed -n "\$i"p ${fasta}`; HEADERNAME=\$(sed -n  \$(expr \$i - 1)p ${fasta} | cut -d '>' -f 2); if echo "\$SEQUENCE" | grep -vq  "O"; then
                                 sed -n  `expr \$i - 1`,"\$i"p ${fasta} | ${params.exec_version} -short -plp "\$HEADERNAME.plp"
