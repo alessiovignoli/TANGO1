@@ -35,3 +35,8 @@ cat test_grep.txt  |  sed 's/-s-/</2gi' | cut -d '<' -f 1 | awk '{print gsub(/-n
 ## use awk to sum all numerical values in a column using a specific tab separator
 
 awk 'BEGIN{FS=";"; sum=0} {sum+=$2} END{print sum}' ../test/tmp 
+
+
+## While read in bash for file renaming with matching string
+
+ while read  line; do mv "$line" "$(echo $line | cut -d ' ' -f 1).plp" ; done < <(ls | grep '|')
