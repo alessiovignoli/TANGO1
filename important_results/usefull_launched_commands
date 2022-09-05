@@ -1,4 +1,4 @@
-## to ectract the TaxId from uniref50 headers oneliner
+# to ectract the TaxId from uniref50 headers oneliner
 
 cat uniref50-splt6.fasta | grep '>' | sed 's/TaxID=/</gi;s/ RepID=/</gi' | cut -d '<' -f 2 
 
@@ -40,3 +40,8 @@ awk 'BEGIN{FS=";"; sum=0} {sum+=$2} END{print sum}' ../test/tmp
 ## While read in bash for file renaming with matching string
 
  while read  line; do mv "$line" "$(echo $line | cut -d ' ' -f 1).plp" ; done < <(ls | grep '|')
+
+
+## Separate fields in awk that have more that 2 spaces
+
+awk 'BEGIN{FS=" {2,}"} {print $1}' test_ensmb_download
