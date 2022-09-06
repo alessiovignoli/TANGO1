@@ -16,7 +16,7 @@ if (params.help) {
         log.info "--TYPE_OUTPUT		optinal flag, specifies what ahs to be recovered from ENSEMBL, possible values: genomic, cds, cdna, protein"
         log.info "			default genomic (DNA not spliced, raw), for more detail take a look at the link at the bottom"
         log.info "#######     WARNING     #######"
-        log.info "not all the combination of the above flags have an output or are already implemented..."
+        log.info "not all the combination of the above flags have an output or are already implemented, read below"
         log.info ""
 	log.info "--FIELD_SEP		optional flag, tells the script which is the field/column separator used in the input file/s"
 	log.info "			default \\t <tab>, to give something different pass --FIELD_SEP ';\\t' , in this example the columns are"
@@ -42,6 +42,18 @@ if (params.help) {
 	log.info "so that the process is parallelized. The structure of the 'smaller' files have to be consistemt. If many ID input file have to be passed"
         log.info 'do like: --query_pdb "id_file*.tab" where there are id_file1.tab, id_file2.tab ecc..'
 	log.info ''
+        log.info ""
+        log.info ""
+        log.info "---- OUTPUT EXPLANATION ----"
+        log.info "Here is a brief description of the combination of the two optional flags TYPE_INPUT and TYPE_OUTPUT and the results they generate"
+        log.info "TYPE_INPUT		TYPE_OUTPUT"
+        log.info "G			genomic		input gene IDs, output is the whole unspliced genomic region, it can be masked for introns"
+        log.info "G			protein		as above, out are all the protein sequences (aa) associated whith such gene in xml format"
+        log.info "T			cds		in transcript ID, out  the spliced transcript sequence without UTR in fasta format"
+        log.info "T			cdna		as above, out spliced transcript sequence with UTR in fasta format"
+        log.info "P			protein		input protein ID, out protein sequence in json format"
+        log.info ""
+        log.info ""
 	log.info 'for nore details look at ->  https://rest.ensembl.org/documentation/info/sequence_id'
 	log.info ''
 	exit 1
@@ -135,6 +147,6 @@ workflow ensembl_types_request_handler {
 
 workflow {
 	ensembl_types_request_handler(params.INPUT_IDS, params.TYPE_INPUT, params.TYPE_OUTPUT)
-	ensembl_types_request_handler.out.stout.view()
+	ensembl_types_request_handler.out.stout.subscribe  onError: { println it }, onComplete: { println 'Done -> ${params.OUTPUT_DIR}' }
 }
 
