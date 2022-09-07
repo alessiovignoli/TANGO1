@@ -48,7 +48,7 @@ if (params.help) {
         log.info "Here is a brief description of the combination of the two optional flags TYPE_INPUT and TYPE_OUTPUT and the results they generate"
         log.info "TYPE_INPUT		TYPE_OUTPUT"
         log.info "G			genomic		input gene IDs, output is the whole unspliced genomic region, it can be masked for introns"
-        log.info "G			protein		as above, out are all the protein sequences (aa) associated whith such gene in xml format"
+        log.info "G			protein		as above, out are all the protein sequences (aa) associated whith such gene in fasta format"
         log.info "T			cds		in transcript ID, out  the spliced transcript sequence without UTR in fasta format"
         log.info "T			cdna		as above, out spliced transcript sequence with UTR in fasta format"
         log.info "P			protein		input protein ID, out protein sequence in json format"
@@ -72,9 +72,11 @@ params.OUTPUT_DIR = "${params.TEST_DIR}"
 
 process get_ensembl_emtry {
 	beforeScript "mkdir -p ${params.OUTPUT_DIR}"
-	publishDir(params.OUTPUT_DIR, mode: 'move', overwrite: false)
+	publishDir(params.OUTPUT_DIR, mode: 'move', overwrite: false, saveAs: { filename -> if (filename.endsWith(".fasta")) filename
+										else null
+										})
         tag { "${ID_file}" }
-        label 'pdb'
+        label 'ensembl'
 	container params.CONTAINER
 
         input:
@@ -83,7 +85,7 @@ process get_ensembl_emtry {
         val type_of_output
 
         output:
-        path "*.fasta*", emit: fasta
+        path "*.fasta*", emit: downloadedstuff
         stdout emit: standardout                //for debug
 
         script:
@@ -115,6 +117,28 @@ process get_ensembl_emtry {
 }
 
 
+process from_xml_tofasta {
+	publishDir(params.OUTPUT_DIR, mode: 'move', overwrite: false)
+        tag { "${xml_downloaded}" }
+        label 'ensembl'
+	container "python@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43" // slim buster
+
+	input:
+	path xml_downloaded
+	path pyscript
+	
+	output:
+	path "*.fasta", emit: actual_fasta
+	stdout emit: standardout                //for debug
+
+	script:
+	outname = "${xml_downloaded}".split('\\.')[0]
+	"""
+	python3 ${pyscript} --xml ${xml_downloaded} --out ${outname}_prots.fasta
+	"""
+}
+
+
 
 workflow ensembl_types_request_handler {
 
@@ -137,16 +161,25 @@ workflow ensembl_types_request_handler {
                 log.info "allowed : ${allowed_outypes}"
 	}
 	
+	
 	idfile = Channel.fromPath(pattern_idfile)
 	get_ensembl_emtry(idfile, type_in, type_out)
 
+	// special section for trasforming xml output to fasta and json to fasta
+
+	from_xml_fasta_pyscript = params.SCRIPTS + "from_ensembl_xml_to_fasta.py"
+	if ( params.TYPE_OUTPUT=='protein' && params.TYPE_INPUT=='G') {
+		get_ensembl_emtry.out.downloadedstuff.map{ (("${it}")[1..-2]).replaceAll(", ", "\n") }.set{tmp}
+		from_xml_tofasta(tmp.splitText(), from_xml_fasta_pyscript)
+	} // json section not implemented yet
+
 	emit:
-	stout = get_ensembl_emtry.out.standardout
+	stout = from_xml_tofasta.out.standardout
 }
 
 
 workflow {
 	ensembl_types_request_handler(params.INPUT_IDS, params.TYPE_INPUT, params.TYPE_OUTPUT)
-	ensembl_types_request_handler.out.stout.subscribe  onError: { println it }, onComplete: { println 'Done -> ${params.OUTPUT_DIR}' }
+	ensembl_types_request_handler.out.stout.subscribe  onComplete: { println "Done -> ${params.OUTPUT_DIR}" }
 }
 
