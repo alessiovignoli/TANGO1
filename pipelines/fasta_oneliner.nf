@@ -1,14 +1,5 @@
 #!/usr/bin/env nextflow
 
-/*
-*  this module takes as input a fasta-like file with sequens spread on more than one line and the output suffix to apend the input filename
-*  the only important thing is that the headers are on one line and starting with > symbol
-*  it basically outputs to the specified filename the same input fasta file but with each sequence on one line
-*/
-
-nextflow.enable.dsl=2
-
-params.help = false
 
 
 // this prints the help in case you use --help parameter in the command line and it stops the pipeline
@@ -34,13 +25,12 @@ params.PUBLISH = true
 process fasta_oneliner {
 	publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false, saveAs: { filename -> if (params.PUBLISH == true) filename
 										else null
-										})
+										})	
 	tag { "${fasta}" }
 	container params.CONTAINER
 
 	input:
-	path fasta
-	path outname
+	tuple path(fasta), val(outname)
 	path py_script1
 
 	output:
@@ -49,7 +39,7 @@ process fasta_oneliner {
 
 	script:
 	"""
-	./${py_script1} ${fasta} ${outname}
+	python3 ${py_script1} ${fasta} ${outname}
 	"""
 }
 
@@ -62,11 +52,9 @@ workflow oneliner {
 
 	main:
 	in_fasta = Channel.fromPath(pattern_to_fasta)
-	out_name = in_fasta.map { it + "${out_filename}" }
-	//in_fasta.view()
-	//out_name.view()
+	list_in_and_out_names = in_fasta.map { [it, (it + "${out_filename}")] }
 	one_line_py = params.SCRIPTS + "one_line_per_fasta.py"
-	fasta_oneliner(in_fasta, out_name, one_line_py)
+	fasta_oneliner(list_in_and_out_names, one_line_py)
 
 	emit:
 	onelinefasta = fasta_oneliner.out.oneline_fasta
@@ -80,9 +68,9 @@ workflow oneliner_ch {
 	out_filename
 
 	main:
-	out_name = channel_fasta.map { "${params.TEST_DIR}" + "${it}".split('\\.')[0].split('/')[-1] + ".${out_filename}" }
+	list_in_and_out_names = channel_fasta.map { [it, ("${it}".split('\\.')[0].split('/')[-1] + ".${out_filename}")] }
 	one_line_py = params.SCRIPTS + "one_line_per_fasta.py"
-	fasta_oneliner(channel_fasta, out_name, one_line_py)
+	fasta_oneliner(list_in_and_out_names, one_line_py)
 
 	emit:
 	onelinefasta = fasta_oneliner.out.oneline_fasta
