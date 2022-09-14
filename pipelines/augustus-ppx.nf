@@ -46,6 +46,7 @@ params.PREP_ALN = false
 
 include { oneliner_ch } from "${params.PIPES}fasta_oneliner" addParams(PUBLISH: "false", CONTAINER: "python@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43")	// the same used in this module
 include { align_generation } from "${params.PIPES}aln_generation_colouring" addParams(OUTPUT_DIR: params.OUT_DIR) 
+include { clustal_converter } from "${params.PIPES}from_clustal_to_fasta_aln" addParams(PUBLISH: "false", CONTAINER: "cbcrg/tcoffee@sha256:36c526915a898d5c15ede89bbc3854c0a66cef22db86285c244b89cad40fb855")  // what is necessary for such module
 
 
 process  aug_prep_aln {
@@ -97,14 +98,18 @@ workflow  augustus_ppx {
 	} else {
 		in_ref = channel.fromPath(pattern_to_msa)
 	}
+
 	// change from clustal to fasta allign, implement it in other file
+	
+	prepped_aln = in_ref
 	if ( params.PREP_ALN ) {
-		aug_prep_aln(in_ref)
+		clustal_converter(in_ref, '.alnfasta')
+		prepped_aln = aug_prep_aln(clustal_converter.out.fasta_aln)
 	}
 
 
 	emit:
-	stout = aug_prep_aln.out.standardout //preppedaln()
+	stout = prepped_aln
 }
 
 workflow {
