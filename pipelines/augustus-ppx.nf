@@ -59,7 +59,8 @@ if (params.help) {
         exit 1
 }
 
-params.CONTAINER = "alessiovignoli3/tango-project@sha256:9a351679d2f41c54b2baabb44feb415c870344406f11bde627854d97f810aaf9" // augustus 3.4.0
+//params.CONTAINER = "alessiovignoli3/tango-project@sha256:9a351679d2f41c54b2baabb44feb415c870344406f11bde627854d97f810aaf9" // augustus 3.4.0
+params.CONTAINER = "alessiovignoli3/tango-project@sha256:395fa9beba7245e5786a7250d151bab72faf3eef5d9e543827aa291a881aa94f" // augustus 3.4.0
 params.IN = false
 params.HS = ' '
 params.ID_POS = 1
@@ -134,11 +135,14 @@ process aug_ppx {
 	script:
 	outname = "${dna}".split('\\.')[0] + '.'
 	"""
-	echo ${aug_species_list}
-	#ID_HEADER_GENOME=\$(grep '>' ${dna} | head -n 1 | cut -d '>' -f 2| awk 'BEGIN{FS="${params.HS}"} {print \$${params.ID_POS}}') 
-	#SPECIES_NAME=\$(grep "\$ID_HEADER_GENOME" ${species_file} | awk 'BEGIN{FS="${params.FS}"} {print \$${params.POS}}')
-	#grep "\$SPECIES_NAME" tmp
-	#augustus --proteinprofile=${profile} --species=\$SPECIES_NAME ${dna}
+	ID_HEADER_GENOME=\$(grep '>' ${dna} | head -n 1 | cut -d '>' -f 2| awk 'BEGIN{FS="${params.HS}"} {print \$${params.ID_POS}}') 
+	SPECIES_NAME=\$(grep "\$ID_HEADER_GENOME" ${species_file} | awk 'BEGIN{FS="${params.FS}"} {print \$${params.POS}}')
+	SPECIES_NAME_USED_BY_AUG=\$(echo "\$SPECIES_NAME" | sed 's/ /_/') 
+	if [ \$(cat /opt/augustus/aug_species_list.txt | grep  "\$SPECIES_NAME" | wc -l) -eq 1 ]; then
+		SPECIES_NAME_USED_BY_AUG=\$(cat /opt/augustus/aug_species_list.txt | grep  "\$SPECIES_NAME" | cut -d ' ' -f 1)
+	fi
+	#echo "\$SPECIES_NAME_USED_BY_AUG"
+	augustus --proteinprofile=${profile} --species=\$SPECIES_NAME_USED_BY_AUG ${dna}
 	"""
 }
 
