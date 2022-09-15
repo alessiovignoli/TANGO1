@@ -19,23 +19,6 @@ if (params.help) {
         log.info "		usually set to false in case of module import in other pipelines."
         log.info ""
         log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-	log.info ""
-        log.info ""
-        log.info ""
         exit 1
 }
 
@@ -83,6 +66,7 @@ workflow clustal_to_fasta {
 
 	if ( !pattern_to_aln ) {
 		log.info "ERROR: the --ALN argument has not been given, type --help for more details"	
+		exit 1
 	}
 
 	alns = channel.fromPath(pattern_to_aln)
