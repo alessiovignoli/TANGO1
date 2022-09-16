@@ -121,28 +121,30 @@ process aug_msa_to_profile {
 process aug_ppx {
 	publishDir(params.OUT_DIR, mode: 'move', overwrite: false)
 	container params.CONTAINER
+	errorStrategy 'ignore'
         tag { "${dna}" }
 
 	input:
-	path dna
+	each path(dna)
 	path profile
 	path species_file
 
 	output:
-	//path "*", emit: 
+	path "*.gff", emit: augustus_pred
         stdout emit: standardout        // for debug
 
 	script:
-	outname = "${dna}".split('\\.')[0] + '.'
+	outname = "${dna}".split('\\.')[0] + '.gff'
 	"""
-	ID_HEADER_GENOME=\$(grep '>' ${dna} | head -n 1 | cut -d '>' -f 2| awk 'BEGIN{FS="${params.HS}"} {print \$${params.ID_POS}}') 
-	SPECIES_NAME=\$(grep "\$ID_HEADER_GENOME" ${species_file} | awk 'BEGIN{FS="${params.FS}"} {print \$${params.POS}}')
-	SPECIES_NAME_USED_BY_AUG=\$(echo "\$SPECIES_NAME" | sed 's/ /_/') 
-	if [ \$(cat /opt/augustus/aug_species_list.txt | grep  "\$SPECIES_NAME" | wc -l) -eq 1 ]; then
-		SPECIES_NAME_USED_BY_AUG=\$(cat /opt/augustus/aug_species_list.txt | grep  "\$SPECIES_NAME" | cut -d ' ' -f 1)
-	fi
+	#ID_HEADER_GENOME=\$(grep '>' ${dna} | head -n 1 | cut -d '>' -f 2| awk 'BEGIN{FS="${params.HS}"} {print \$${params.ID_POS}}') 
+	#SPECIES_NAME=\$(grep "\$ID_HEADER_GENOME" ${species_file} | awk 'BEGIN{FS="${params.FS}"} {print \$${params.POS}}')
+	#SPECIES_NAME_USED_BY_AUG=\$(echo "\$SPECIES_NAME" | sed 's/ /_/') 
+	#if [ \$(cat /opt/augustus/aug_species_list.txt | grep  "\$SPECIES_NAME" | wc -l) -eq 1 ]; then
+	#	SPECIES_NAME_USED_BY_AUG=\$(cat /opt/augustus/aug_species_list.txt | grep  "\$SPECIES_NAME" | cut -d ' ' -f 1)
+	#fi
 	#echo "\$SPECIES_NAME_USED_BY_AUG"
-	augustus --proteinprofile=${profile} --species=\$SPECIES_NAME_USED_BY_AUG ${dna}
+	#augustus --proteinprofile=${profile} --species=\$SPECIES_NAME_USED_BY_AUG ${dna} --outfile=${outname}
+	augustus --proteinprofile=${profile} --species=human ${dna} --outfile=${outname}
 	"""
 }
 
@@ -199,10 +201,12 @@ workflow  augustus_ppx {
 
 	emit:
 	stout = aug_ppx.out.standardout
+	final_pred =  aug_ppx.out.augustus_pred
 }
 
 workflow {
 	augustus_ppx(params.IN, params.SPECIES, params.REF_FA, params.REF_ALN)
 	augustus_ppx.out.stout.view()
+	augustus_ppx.out.final_pred.view()
 }
 

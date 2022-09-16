@@ -134,7 +134,7 @@ process from_xml_tofasta {
 	script:
 	outname = "${xml_downloaded}".split('\\.')[0]
 	"""
-	python3 ${pyscript} --xml ${xml_downloaded} --out ${outname}_prots.fasta
+	python3 ${pyscript} --xml ${xml_downloaded} --out ${outname}_prots.fa
 	"""
 }
 
