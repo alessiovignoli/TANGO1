@@ -97,7 +97,7 @@ if __name__ == "__main__":
     try:
         phobius_short_pred_line = sys.argv[1]
         field_keyword = sys.argv[2]
-	verbose_flag = sys.argv[3]
+        verbose_flag = sys.argv[3]
     except:
         print('Program usage: text.py <a phobius short output line> <the field keyword that hastobe used to retrieve the extremes of the phobius prediction forsuch label> < atrue or fals evariable to set how verbose the script should be with possible errors check the code above>', file=sys.stderr)
         raise SystemExit
