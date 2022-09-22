@@ -12,18 +12,6 @@
 // pred = prediction
 
 
-nextflow.enable.dsl=2
-
-params.help = false
-
-
-/*
-*  This module takes as input fasta files either single fasta or multifasta files and lauch phobius in a parallel manner
-*  a it laounches a process for each input fasta file 
-*  it has different options and is associated with some config profiles such as mark7_models.config, original_model.config, test.config
-*  take a look at them in the conf dir (usually underthe test dir) the nextflow.config that launches such profiles is in the test dir
-*/
-
 
 // this prints the help in case you use --help parameter in the command line and it stops the pipeline
 if (params.help) {
@@ -42,10 +30,15 @@ if (params.help) {
         log.info '      --PLP will prompt the pipeline to compute a plp file for each fasta sequence in the input'
         log.info '      default false it means no plp will be made'
         log.info '      '
-        log.info '      if --PLP flag have been passed it is also possible to specify another variable to tell where all the plp files'
+        log.info '      --PLP_DIR optional flag, if --PLP flag have been passed it is also possible to specify through this flag where all the plp files'
         log.info '      have to be stored, in this case there will be as many plp files as many sequences, if this flag is not specified'
-        log.info '      there will be just one big plp file containing all sequences in the samedirecory of .txt , flag --OUTPUT_DIR'
-        log.info '\n'
+        log.info '      there will be just one big plp file containing all sequences in the samedirecory of .txt -> flag --OUTPUT_DIR'
+	log.info '      --OUTPUT_DIR specifies where .txt file with the actual standard out prediction of phobius is located. As mentioned above .plp'
+	log.info '      destination is also regulated by this flag only when --PLP_DIR is not given.'
+        log.info ''
+	log.info ''
+	log.info ''
+	log.info ''
         exit 1
 }
 
