@@ -43,8 +43,8 @@ if (params.help) {
         log.info '	--MASK is an optional field that tells the script from which position on the sequence has to start the colouring'
         log.info '	 and where to finish, specified extemity are coloured, this is a range made of two integers separated from a comma'
         log.info '	--HYDRO_SCALE to specify which hydrophobicity scale to use in the colouring step'
-        log.info '	the supported arguments are kyte for Kyte-Doolittle (default), GES for GES scale, '
-        log.info '	UHS for Unified Hydrophobicity Scale and <majority> for the majority scale that i invented ;) '
+        log.info '	the supported arguments are kyte for Kyte-Doolittle, GES for GES scale, '
+        log.info '	UHS for Unified Hydrophobicity Scale (default),  and <majority> for the majority scale that i invented ;) '
         log.info '	--PHOB_STDOUT this flag is mandatory since the script has to know where to look for the colouring of'
         log.info '	alignment based on phobius stdoutput default format (-long).'
         exit 1
@@ -62,7 +62,7 @@ params.CREATE_SH_REF = false
 params.SEARCHFILES = false
 params.PLP_DIR = false
 params.PHOB_STDOUT = false
-params.HYDRO_SCALE = "kyte"
+params.HYDRO_SCALE = "UHS"
 
 // Modules dependencie section
 
@@ -101,7 +101,7 @@ process nfiles_search {
 	script:
 	outpath = "${inheader}".split('\\.')[0] + ".fasta"
 	"""
-	./${py_script1} ${inheader} ${files_to_search} ${outpath}
+	python3 ${py_script1} ${inheader} ${files_to_search} ${outpath}
 	"""
 }
 
@@ -130,7 +130,7 @@ process trimm_seqs {
 	script:
 	trimmed_file = "${in_multifasta}".split('\\.')[0] + "-trimm.fasta"
 	"""
-	./${py_script2} ${in_multifasta} ${params.TRIMM_PLP_DIR} ${trimmed_file} ${trimm_val} ${params.SIGNALPEPT}
+	python3 ${py_script2} ${in_multifasta} ${params.TRIMM_PLP_DIR} ${trimmed_file} ${trimm_val} ${params.SIGNALPEPT}
 	"""
 }
 
@@ -249,25 +249,25 @@ process residues_colors {
 	if(params.TRIMM == false) {
 		if(params.SPECIAL_HELIX == false) {
 			"""
-			./${color_aa_pyscript} ${plp_file} ${rename_out_file} > ${aacolor_list}
+			python3 ${color_aa_pyscript} ${plp_file} ${rename_out_file} > ${aacolor_list}
 			touch ${specialH_aacolor_list}
 			"""
 		} else {
 			"""
-			./${color_aa_pyscript} ${plp_file} ${rename_out_file} > ${aacolor_list}
-			./${color_aa_pyscript} ${plp_file} ${rename_out_file} ${params.SPECIAL_HELIX} > ${specialH_aacolor_list}
+			python3 ${color_aa_pyscript} ${plp_file} ${rename_out_file} > ${aacolor_list}
+			python3 ${color_aa_pyscript} ${plp_file} ${rename_out_file} ${params.SPECIAL_HELIX} > ${specialH_aacolor_list}
 			"""
 		}
 	} else if( "$check2"=="true" ) {
 		if(params.SPECIAL_HELIX == false) {
 			"""
-			./${color_aa_pyscript} ${plp_file} ${rename_out_file} ${params.TRIMM} ${params.SIGNALPEPT} > ${aacolor_list}
+			python3 ${color_aa_pyscript} ${plp_file} ${rename_out_file} ${params.TRIMM} ${params.SIGNALPEPT} > ${aacolor_list}
 			touch ${specialH_aacolor_list}
 			"""
 		} else {
 			"""
-			./${color_aa_pyscript} ${plp_file} ${rename_out_file} ${params.TRIMM} ${params.SIGNALPEPT} > ${aacolor_list}
-			./${color_aa_pyscript} ${plp_file} ${rename_out_file} ${params.TRIMM} ${params.SIGNALPEPT} ${params.SPECIAL_HELIX} > ${specialH_aacolor_list}
+			python3 ${color_aa_pyscript} ${plp_file} ${rename_out_file} ${params.TRIMM} ${params.SIGNALPEPT} > ${aacolor_list}
+			python3 ${color_aa_pyscript} ${plp_file} ${rename_out_file} ${params.TRIMM} ${params.SIGNALPEPT} ${params.SPECIAL_HELIX} > ${specialH_aacolor_list}
 			"""
 		}
 	} else {
@@ -300,11 +300,11 @@ process residues_hydrophobicity_colors {
 	hydrocolor_list_outfilepath = "${rename_outfile}".split('\\.')[0] + "-${params.HYDRO_SCALE}.hydrocolor" 
 	if(params.MASK == false)
 		"""
-		./${hydro_color_aa_pyscript} ${in_fasta} ${rename_outfile} ${hydrocolor_list_outfilepath} ${params.HYDRO_SCALE}
+		python3 ${hydro_color_aa_pyscript} ${in_fasta} ${rename_outfile} ${hydrocolor_list_outfilepath} ${params.HYDRO_SCALE}
 		"""
 	else
 		"""
-		./${hydro_color_aa_pyscript} ${in_fasta} ${rename_outfile} ${hydrocolor_list_outfilepath} ${params.HYDRO_SCALE} ${params.MASK}
+		python3 ${hydro_color_aa_pyscript} ${in_fasta} ${rename_outfile} ${hydrocolor_list_outfilepath} ${params.HYDRO_SCALE} ${params.MASK}
 		"""
 }
 
@@ -361,20 +361,20 @@ process phob_stout_colours {
 	if(params.TRIMM == false)
 		if(params.SPECIAL_HELIX == false)
 			"""
-			./${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob}
+			python3 ${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob}
 			"""
 		else
 			"""
-			./${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob} ${params.SPECIAL_HELIX} 
+			python3 ${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob} ${params.SPECIAL_HELIX} 
 			"""
 	else
 		if(params.SPECIAL_HELIX == false)
 			"""
-			./${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob} ${plp_folder} ${params.TRIMM} ${params.SIGNALPEPT}
+			python3 ${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob} ${plp_folder} ${params.TRIMM} ${params.SIGNALPEPT}
 			"""
 		else
         	        """
-			./${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob} ${plp_folder} ${params.TRIMM} ${params.SIGNALPEPT} ${params.SPECIAL_HELIX}
+			python3 ${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob} ${plp_folder} ${params.TRIMM} ${params.SIGNALPEPT} ${params.SPECIAL_HELIX}
 			"""
 }
 
@@ -402,7 +402,7 @@ process couloring_aln  {
 	output:
 	stdout emit: standardout
 	path "*.html", emit: coulor_out_files
-	//path ascii_scorefile, emit: ascii_score
+	path ascii_scorefile, emit: ascii_score
 	
 	script:
 	html_outfile = "${rename_file}".split('\\.')[0] + '-pp.html'
@@ -522,12 +522,12 @@ process tranfer_sh_annotation {
 		"""
 	else if(params.trimm == false)
 		"""
-		./!{tranfer_sh_annotation_pyscript} !{aln_f} !{phobius_stdout_filepath} > $transfered_phobtm_pred
+		python3 !{tranfer_sh_annotation_pyscript} !{aln_f} !{phobius_stdout_filepath} > $transfered_phobtm_pred
 		rm -f !{aln_f}
 		"""
 	else
 		"""
-		./!{tranfer_sh_annotation_pyscript} !{aln_f} !{phobius_stdout_filepath} !{plp_folder} !{params.trimm} !{params.signalpept} > $transfered_phobtm_pred
+		python3 !{tranfer_sh_annotation_pyscript} !{aln_f} !{phobius_stdout_filepath} !{plp_folder} !{params.trimm} !{params.signalpept} > $transfered_phobtm_pred
 		rm -f !{aln_f}
 		"""
 }
