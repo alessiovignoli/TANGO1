@@ -100,7 +100,7 @@ def phobstout_colist_prep(phobstdout, output_f, renameflnm, plp_dir=False, trimm
 
 def phobstout_short_colist_prep(phobstdout, output_f, renameflnm, plp_dir=False, trimm_val=False, signalpept_val=False, switch_col=False):
     print(phobstdout, output_f, renameflnm, plp_dir, trimm_val, signalpept_val, switch_col)
-
+    
 
 
 
@@ -109,7 +109,7 @@ def main(phob_stdout, out_put_f, rename_flnm, phobius_mode, plpdir=False, trimmv
     if phobius_mode == 'long':
         phobstout_colist_prep(phob_stdout, out_put_f, rename_flnm, plpdir, trimmval, signal_pept_val, switchcol)
     elif phobius_mode == 'short':
-        phobstout_colist_prep(phob_stdout, out_put_f, rename_flnm, plpdir, trimmval, signal_pept_val, switchcol)
+        phobstout_short_colist_prep(phob_stdout, out_put_f, rename_flnm, plpdir, trimmval, signal_pept_val, switchcol)
     else:
         print('the argument of phobius_mode has to be either long or short, it was given :   ', phobius_mode, file=sys.stderr)
 
