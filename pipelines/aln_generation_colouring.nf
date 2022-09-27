@@ -1,12 +1,13 @@
 #!/usr/bin/env nextflow
 
-/*
-*
-*/
+//##
+//#
+//#
+//#			This script is a mess and should be re-written from scratch some day
+//#
+//##
 
-nextflow.enable.dsl=2
 
-params.help = false
 
 
 // this prints the help in case you use --help parameter in the command line and it stops the pipeline

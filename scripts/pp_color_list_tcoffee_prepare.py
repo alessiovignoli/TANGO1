@@ -8,7 +8,7 @@ import sys
 def pp_colist_prep(ppflnm, renameflnm, trimm_val=False, signpept_val=False, switch_col=False, threshold=0.9):
     #print('bubba')
     #print(ppflnm, renameflnm, trimm_val, signpept_val, threshold)
-    cut_site = None
+    cut_site = 0
     pp_file = open(ppflnm, 'r')
     left_trimm_val = 0
     right_trimm_val = 5000000               # just to set a very high number since after it could be sumed to an integer
@@ -26,8 +26,8 @@ def pp_colist_prep(ppflnm, renameflnm, trimm_val=False, signpept_val=False, swit
                 #print(posterior_prob)
                 if posterior_prob >= threshold and res_index >= int(signpept_val):
                     cut_site = max((res_index - left_trimm_val), 0)
-    else:
-        cut_site = 0
+    #else:
+    #    cut_site = 0
     pp_file.close()
     #print(right_cut_site)
     with open(ppflnm, 'r') as pp_file, open(renameflnm, 'r') as rename_file:

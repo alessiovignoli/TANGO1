@@ -1,5 +1,18 @@
 #!/usr/bin/env python3
 
+
+##
+#
+#
+#                       This script is a mess and should be re-written from scratch some day
+#
+##
+
+
+
+
+
+
 # pp = posterior probability     always
 # tm = trans membrane            always
 
@@ -99,8 +112,78 @@ def phobstout_colist_prep(phobstdout, output_f, renameflnm, plp_dir=False, trimm
 
 
 def phobstout_short_colist_prep(phobstdout, output_f, renameflnm, plp_dir=False, trimm_val=False, signalpept_val=False, switch_col=False):
-    print(phobstdout, output_f, renameflnm, plp_dir, trimm_val, signalpept_val, switch_col)
-    
+    #print(phobstdout, output_f, renameflnm, plp_dir, trimm_val, signalpept_val, switch_col)
+    if plp_dir:
+        list_of_plps = os.listdir(plp_dir)
+        with open(phobstdout, 'r') as phob_out, open(output_f, 'w') as out_file:
+            print('this is a mess')
+            """
+            for line in phob_out:
+                seq_id = None
+                list_boundaries_normal = None
+                list_boundaries_special = []                                                            #to not throw error afterwards
+                if switch_col:
+                    seq_id, list_boundaries_normal = phobius_short_pred_field_selecter(line, 'n')
+                    tmp, list_boundaries_special = phobius_short_pred_field_selecter(line, 's')
+                else:
+                    seq_id, list_boundaries_normal = phobius_short_pred_field_selecter(line, '-')
+                cut_site = 0
+                counter = 0    # used as a check for the presence of a plp file with keyword inside it
+                for plp_filename in list_of_plps:
+                    if seq_id in plp_filename and plp_filename.endswith(".plp"):
+                        counter = 1
+                        #print(plp_filename)
+                        plp_filepath = plp_dir + '/' + plp_filename
+                        with open(plp_filepath, 'r') as plp_file:
+                            for res_line in plp_file:
+                                if res_line[0] == '#':
+                                    continue
+                                else:
+                                    posterior_prob = float(res_line.split()[4])
+                                    res_index = int(res_line.split()[0])
+                                    #print(posterior_prob)
+                                    if posterior_prob >= 0.90 and res_index >= signalpept_val:   # the threshold for signal peptides
+                                        left_cut = int(trimm_val[0])
+                                        cut_site = max((res_index - left_cut), 0)
+                        break
+                if counter == 0:
+                    print('This sequence has not been found in the specified plp directory: ', seq_id, file=sys.stderr)
+                with open(renameflnm, 'r') as rename_file:
+                    for renem_line in rename_file:
+                        if seq_id in renem_line:
+                            new_name = renem_line.split(' ')[1].rstrip()
+                            #print(new_name, list_boundaries_normal, list_boundaries_special)
+                            for tm in list_boundaries_normal:
+                                for tm_res in range(tm[0], (tm[1]+1)):
+                                    out_file.write( new_name + ' ' + str(tm_res) + ' 0\n' )
+                            for sp_tm in list_boundaries_special:
+                                for sp_tm_res in range(sp_tm[0], (sp_tm[1]+1)):
+                                    out_file.write( new_name + ' ' + str(sp_tm_res) + ' 1\n' )
+                            break
+            """
+    else:
+        with open(phobstdout, 'r') as phob_out, open(output_f, 'w') as out_file:
+            for line in phob_out:
+                seq_id = None
+                list_boundaries_normal = None
+                list_boundaries_special = []								#to not throw error afterwards
+                if switch_col:
+                    seq_id, list_boundaries_normal = phobius_short_pred_field_selecter(line, 'n')
+                    tmp, list_boundaries_special = phobius_short_pred_field_selecter(line, 's')
+                else:
+                    seq_id, list_boundaries_normal = phobius_short_pred_field_selecter(line, '-')
+                with open(renameflnm, 'r') as rename_file:
+                    for renem_line in rename_file:
+                        if seq_id in renem_line:
+                            new_name = renem_line.split(' ')[1].rstrip()
+                            #print(new_name, list_boundaries_normal, list_boundaries_special)
+                            for tm in list_boundaries_normal:
+                                for tm_res in range(tm[0], (tm[1]+1)):
+                                    out_file.write( new_name + ' ' + str(tm_res) + ' 0\n' )
+                            for sp_tm in list_boundaries_special:
+                                for sp_tm_res in range(sp_tm[0], (sp_tm[1]+1)):
+                                    out_file.write( new_name + ' ' + str(sp_tm_res) + ' 1\n' )
+                            break
 
 
 
