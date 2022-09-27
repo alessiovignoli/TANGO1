@@ -48,11 +48,11 @@ if (params.help) {
         log.info "		basically if the input MSA or the one generated is a bit too gappy or messy or big"
 	log.info "		then is better to give this flag and use such module specifically made for circumventing the problem."
         log.info "		More info can be found at    https://github.com/Gaius-Augustus/Augustus/blob/master/docs/RUNNING-AUGUSTUS.md"
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
-        log.info ""
+        log.info "--OUT_DIR	optional flag, default ${params.TEST_DIR}augustus_results/, the directory where predicted sequence"
+        log.info "		files are stored."
+        log.info "--SPECIE_REF	optional field, default human, specifies augustus what species to use as reference for internal parameters"
+        log.info "		like codon usage splicing pattern ecc.. read augustus github manual page on --species flag for more details"
+        log.info "		and full list of possible pre-trained species names"
         log.info ""
         log.info ""
         log.info ""
@@ -71,6 +71,7 @@ params.REF_FA = false
 params.REF_ALN = false
 params.OUT_DIR = "${params.TEST_DIR}augustus_results/"
 params.PREP_ALN = false
+params.SPECIE_REF = 'human'
 
 // Modules dependencie section
 
@@ -128,6 +129,7 @@ process aug_ppx {
 	each path(dna)
 	path profile
 	path species_file
+	val species_ref
 
 	output:
 	path "*.gff", emit: augustus_pred
@@ -144,7 +146,7 @@ process aug_ppx {
 	#fi
 	#echo "\$SPECIES_NAME_USED_BY_AUG"
 	#augustus --proteinprofile=${profile} --species=\$SPECIES_NAME_USED_BY_AUG ${dna} --outfile=${outname}
-	augustus --proteinprofile=${profile} --species=human ${dna} --outfile=${outname}
+	augustus --proteinprofile=${profile} --species=${species_ref} ${dna} --outfile=${outname}
 	"""
 }
 
@@ -197,7 +199,7 @@ workflow  augustus_ppx {
 	aug_msa_to_profile(prepped_aln)
 	genome = channel.fromPath(pattern_to_genomes)
 	species_id_match = channel.fromPath(pattern_to_species)
-	aug_ppx(genome, aug_msa_to_profile.out.profile_file, species_id_match)
+	aug_ppx(genome, aug_msa_to_profile.out.profile_file, species_id_match, params.SPECIE_REF)
 
 	emit:
 	stout = aug_ppx.out.standardout
