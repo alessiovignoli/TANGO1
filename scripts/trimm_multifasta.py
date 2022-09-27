@@ -10,8 +10,11 @@ def trimmer(in_multifasta, in_plp_dir, out_trimmedfilename, cutoff_vals, signpep
     with open(in_multifasta, 'r') as in_fasta, open(out_trimmedfilename, 'w') as out_fasta:
         left_cut_site = False
         right_cut_site = False
+        header_buffer = ''
         for line in in_fasta:
             if line[0] == '>':
+                left_cut_site = False
+                right_cut_site = False
                 #print(line, end='')
                 for filename in plp_lstfile:
                     if filename.endswith(".plp"):
@@ -42,14 +45,21 @@ def trimmer(in_multifasta, in_plp_dir, out_trimmedfilename, cutoff_vals, signpep
                                             #print(cut_site)
                                 #print(cut_site)
                             break
-                out_fasta.write(line)
+                header_buffer = line
             else:
                 aa_line = line.rstrip()
-                if right_cut_site == False:
+                #print(left_cut_site, right_cut_site, header_buffer)
+                if left_cut_site == False:
+                    print('the sequence:', header_buffer, 'has not a vaiable ancor for the trimm, it may due for lack of phobius prdiction of TM, or no residue higher than the threshold and the signal peptide cut off values. Or final hypothesis the plp file corresponding to the sequencewas not found.')
+                    #out_fasta.write(header_buffer)
+                    #out_fasta.write(line)
+                elif right_cut_site == False:
                     new_seq = aa_line[left_cut_site:] + '\n'
+                    out_fasta.write(header_buffer)
                     out_fasta.write(new_seq)
                 else:
                     new_seq = aa_line[left_cut_site:right_cut_site] + '\n'
+                    out_fasta.write(header_buffer)
                     out_fasta.write(new_seq)
 
 if __name__ == "__main__":
@@ -65,7 +75,7 @@ if __name__ == "__main__":
         if signal_pept_cutoff is not None:
             trimmer(in_multifastapath, in_plp_dirpath, out_trimmedpath, cut_off_values, signal_pept_cutoff)
         else:
-            print('Program usage: text.py <multifasta file that we want to trim the sequences> <plp folder, that means posterior probablity, so the folder where all plp files outputed from phobius are stored> <path to the output filename> <cut off values needed for the trim, must be 2 integers divided by a comma (left cut off value,right cut off value) right cut off value can be missing, all residues before (last residue with posterior prob >= 0.9 - left cut off value) are not present in the output, this is done for each sequence in the input, also all residues after (last residue with posterior prob >= 0.9 + right cut off value) are not present if right cut off value is specified> <signal peptide threshold, the residue index below which posterior prob values are not considered, to avoid including signal peptides>', file=sys.stderr)
+            print('Program usage: text.py <multifasta file that we want to trim the sequences> <plp folder, that means posterior probablity, so the folder where all plp files outputed from phobius are stored> <path to the output filename> <cut off values needed for the trim, must be 2 integers divided by a comma (left cut off value,right cut off value) right cut off value can be missing, all residues before (last residue with posterior prob >= 0.9 - left cut off value) are not present in the output, this is done for each sequence in the input, also all residues after (last residue with posterior prob >= 0.9 + right cut off value) are not present if right cut off value is specified> <signal peptide threshold, the residue index below which posterior prob values are not considered, to avoid including signal peptides>\n###WARNING###\nif no residue is found to respect the conditions for being the position to anchor the trimm the resulting fasta will not contain such ID and sequence.', file=sys.stderr)
             raise SystemExit
     else:
         trimmer(in_multifastapath, in_plp_dirpath, out_trimmedpath, cut_off_values, signal_pept_cutoff, threshold_for_cut_reference)
