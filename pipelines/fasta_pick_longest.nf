@@ -57,7 +57,7 @@ workflow  fasta_longest {
 
 	// error section of missing or wrong inputs
 
-	if ( !params.OUT ) {
+	if ( !pattern_to_out ) {
 		log.info "no --OUT flag specified please give a vild path, or type --help for description of pipeline"
 	}
 
