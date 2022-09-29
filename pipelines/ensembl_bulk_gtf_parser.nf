@@ -4,7 +4,7 @@
 
 // this prints the help in case you use --help parameter in the command line and it stops the pipeline
 if (params.help) {
-        log.info "This pipeline ecxtract the lines presenting the queried gene ids for a bulk download of ensembl gtf info."
+        log.info "This pipeline extracts the lines presenting the queried gene ids for a bulk download of ensembl gtf info."
         log.info ""
         log.info "Here is the list of flags accepted by the pipeline:"
         log.info '--IN		a file with consistent field separator, where on each line there are at least two column/field'
@@ -42,14 +42,18 @@ if (params.help) {
         exit 1
 }
 
-params.CONTAINER = "alessiovignoli3/tango-project@sha256:57013bf372b519245608c95fd60a38f9e5d65775aaf18c2d711031818c1a145e" // awk and wget
+params.CONTAINER =  "ubuntu@sha256:2d7ecc9c5e08953d586a6e50c29b91479a48f69ac1ba1f9dc0420d18a728dfc5" // Ubuntu 22.04.1 mawk 1.3.4
 params.IN = false
 params.FS = '\t'
-params.SPECIE_COL = 0
-params.GENEID_COL = 1
+params.SPECIE_COL = 1
+params.GENEID_COL = 2
 params.GTF = false
 params.OUT_DIR = "${launchDir}/GTF/"
 params.OUT_NAME = 'gene'
+
+
+// Include section
+include { awk_pairs } from "${params.PIPES}awk_field_extractor" addParams(CONTAINER: "ubuntu@sha256:2d7ecc9c5e08953d586a6e50c29b91479a48f69ac1ba1f9dc0420d18a728dfc5" ) // the same used in this module
 
 /*
 
@@ -83,13 +87,23 @@ workflow ensembl_gtf_parser  {
 	// error section of missing or wrong inputs
 
 	if ( !pattern_to_in ) {
-		log.info "no  --help for description of pipeline"
+		log.info "ERROR: no valid input given, pass --IN argument from command line or type --help for description of pipeline"
+		exit 1
+	} else if ( !pattern_to_gtf ) {
+		log.info "ERROR: no valid gtf given, pass --GTF argument from command line or type --help for description of pipeline"
+		exit 1
 	}
 
+	// Actual pipeline section
 
-	//emit:
+	in_files = Channel.fromPath(pattern_to_in)
+	awk_pairs(in_files, params.FS, ';', params.SPECIE_COL, params.GENEID_COL, 'bubba')
+
+	emit:
+	stout = awk_pairs.out.stout
 }
 
 workflow {
 	ensembl_gtf_parser(params.IN, params.GTF)
+	ensembl_gtf_parser.out.stout.view()
 }
