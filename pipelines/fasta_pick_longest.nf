@@ -59,6 +59,7 @@ workflow  fasta_longest {
 
 	if ( !pattern_to_out ) {
 		log.info "no --OUT flag specified please give a vild path, or type --help for description of pipeline"
+		exit 1
 	}
 
 	fastas = channel.fromPath(pattern_to_fastas)
