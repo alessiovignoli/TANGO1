@@ -27,6 +27,8 @@ if (params.help) {
 	log.info "		when more than one file is found to start with species name the hierachy is the following:"
 	log.info "		without the optional field -> with abinitio as optional field -> all other optional fields in sorting order."
 	log.info "              Once a geneID is found in a file the search is stopped for that gene, aka the other files in lower hirerchy are not searched."
+	log.info "              on top of that, the requirement for the filenames is also to have the Species_name <- like this at the beginning of the file"
+	log.info "              or like Species_name_name and that <optional> does not have a number at the end, this is used to impose the order explained before"
         log.info "--OUT_DIR	optional field, default launchDir/GTF, launchDir is a nextflow variable representing where the pipeline has been launched from."
         log.info "--OUT_NAME	optional field, default gene, accepted values: <gene> <specie>  "
 	log.info "		tells the script if the name of the output files has tio ge the geneID.gtf or Species_name.gtf"
@@ -55,26 +57,44 @@ params.OUT_NAME = 'gene'
 // Include section
 include { awk_pairs } from "${params.PIPES}awk_field_extractor" addParams(CONTAINER: "ubuntu@sha256:2d7ecc9c5e08953d586a6e50c29b91479a48f69ac1ba1f9dc0420d18a728dfc5" ) // the same used in this module
 
-/*
 
-process fasta_longest_picker  {
+
+
+process gtf_lines_extracter  {
 	container params.CONTAINER
-	tag { "${fasta}" }
+	tag { "${specie}_${geneID}" }
 
 	input:
-	path fasta
-	path pyscript
+	tuple val(specie), val(geneID), path('*')
+	val flag_out
 
 	output:
-	path "*.tmp", emit: tmp_files
-	//stdout emit: standardout	for debug
+	path "*.gtf", emit: gtf_files
+	stdout emit: standardout	//for debug
 
 	script:
+	outname = "${geneID}.gtf"
+	if ( flag_out=='specie' ) {
+		outname = "${specie}.gtf"
+	}
 	"""
-	python3 ${pyscript} --fasta ${fasta} > ${fasta}.tmp
+	## forcing to start with species_name.assembly.version.gtf.gz file
+	gzip -cd \$(ls *[0-9].gtf.gz) | grep ${geneID} > ${outname} || [[ \$? == 1 ]]		## preventing grep from sending error on not found match 
+	if [ -s "${outname}" ]
+	then
+		exit 0											## exiting with no error
+	else
+		## listing other remaining files abinitio optional field should be the first lexographically
+		for i in \$(ls *.*.*.*.gtf.gz); do gzip -cd \$i | grep 'bubba' > "${geneID}.gtf" || [[ \$? == 1 ]]; done
+	fi
+	if ! [ -s "${outname}" ]
+	then
+		rm "${outname}"
+		echo "${geneID} has not been found"
+	fi
 	"""
 }
-*/
+
 
 workflow ensembl_gtf_parser  {
 
@@ -97,13 +117,19 @@ workflow ensembl_gtf_parser  {
 	// Actual pipeline section
 
 	in_files = Channel.fromPath(pattern_to_in)
-	awk_pairs(in_files, params.FS, ';', params.SPECIE_COL, params.GENEID_COL, 'bubba')
+	awk_pairs(in_files, params.FS, ';', params.SPECIE_COL, params.GENEID_COL, false)
+	awk_pairs.out.stout.map{ it -> [(it.split(';')[0]).trim().replace(" ", "_").replace("-", "_"), (it.split(';')[1]).trim()] }.set{ tupled_specie_gene }
+	Channel.fromPath(pattern_to_gtf).map{ it -> ["${it.getSimpleName()}", it]}.groupTuple().set{ gtf_files_tuple }
+	tupled_specie_gene.join(gtf_files_tuple).set{ correct_matches }
+	gtf_lines_extracter(correct_matches, params.OUT_NAME)
 
 	emit:
-	stout = awk_pairs.out.stout
+	stout = gtf_lines_extracter.out.standardout 
+	final_out = gtf_lines_extracter.out.gtf_files
 }
 
 workflow {
 	ensembl_gtf_parser(params.IN, params.GTF)
 	ensembl_gtf_parser.out.stout.view()
+	ensembl_gtf_parser.out.final_out.view()
 }
