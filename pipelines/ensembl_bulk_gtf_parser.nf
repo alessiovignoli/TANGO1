@@ -61,6 +61,9 @@ include { awk_pairs } from "${params.PIPES}awk_field_extractor" addParams(CONTAI
 
 
 process gtf_lines_extracter  {
+	publishDir(params.OUT_DIR, mode: 'move', overwrite: false, saveAs: { filename -> if ( filename.startsWith("TMP")) null
+										else filename 
+										})
 	container params.CONTAINER
 	tag { "${specie}_${geneID}" }
 
@@ -85,12 +88,19 @@ process gtf_lines_extracter  {
 		exit 0											## exiting with no error
 	else
 		## listing other remaining files abinitio optional field should be the first lexographically
-		for i in \$(ls *.*.*.*.gtf.gz); do gzip -cd \$i | grep 'bubba' > "${geneID}.gtf" || [[ \$? == 1 ]]; done
+		for i in \$(ls *.*.*.*.gtf.gz)
+		do 
+			gzip -cd \$i | grep ${geneID} > ${outname} || [[ \$? == 1 ]]
+			if [ -s "${outname}" ]
+			then
+				exit 0
+			fi
+		done
 	fi
 	if ! [ -s "${outname}" ]
 	then
-		rm "${outname}"
-		echo "${geneID} has not been found"
+		mv ${outname} TMP.gtf
+		echo "GENE NOT PRESENT: ${geneID} , in ${specie}.* files"
 	fi
 	"""
 }
@@ -120,16 +130,21 @@ workflow ensembl_gtf_parser  {
 	awk_pairs(in_files, params.FS, ';', params.SPECIE_COL, params.GENEID_COL, false)
 	awk_pairs.out.stout.map{ it -> [(it.split(';')[0]).trim().replace(" ", "_").replace("-", "_"), (it.split(';')[1]).trim()] }.set{ tupled_specie_gene }
 	Channel.fromPath(pattern_to_gtf).map{ it -> ["${it.getSimpleName()}", it]}.groupTuple().set{ gtf_files_tuple }
-	tupled_specie_gene.join(gtf_files_tuple).set{ correct_matches }
+	tupled_specie_gene.join(gtf_files_tuple, remainder: true).set{ all_matches } 
+	all_matches.filter{ it[1]!=null && it[2]!=null }.set{ correct_matches }
+	all_matches.filter{ it[2]==null }.set{ not_found_species }
+	//correct_matches.view()
+	//not_found_species.view()
 	gtf_lines_extracter(correct_matches, params.OUT_NAME)
 
 	emit:
 	stout = gtf_lines_extracter.out.standardout 
 	final_out = gtf_lines_extracter.out.gtf_files
+	not_found_species
 }
 
 workflow {
 	ensembl_gtf_parser(params.IN, params.GTF)
 	ensembl_gtf_parser.out.stout.view()
-	ensembl_gtf_parser.out.final_out.view()
+	ensembl_gtf_parser.out.not_found_species.subscribe onNext: { println "NOT FOUND SPECIES: ${it[0]} , no file was in the format  ${it[0]}.*" }
 }
