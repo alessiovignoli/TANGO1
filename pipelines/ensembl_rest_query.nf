@@ -71,7 +71,6 @@ params.OUTPUT_DIR = "${params.TEST_DIR}"
 
 
 process get_ensembl_emtry {
-	beforeScript "mkdir -p ${params.OUTPUT_DIR}"
 	publishDir(params.OUTPUT_DIR, mode: 'move', overwrite: false, saveAs: { filename -> if (filename.endsWith(".fasta")) filename
 										else null
 										})
@@ -164,6 +163,7 @@ workflow ensembl_types_request_handler {
 	
 	idfile = Channel.fromPath(pattern_idfile)
 	get_ensembl_emtry(idfile, type_in, type_out)
+	stout = get_ensembl_emtry.out.downloadedstuff
 
 	// special section for trasforming xml output to fasta and json to fasta
 
@@ -171,10 +171,11 @@ workflow ensembl_types_request_handler {
 	if ( params.TYPE_OUTPUT=='protein' && params.TYPE_INPUT=='G') {
 		get_ensembl_emtry.out.downloadedstuff.map{ (("${it}")[1..-2]).replaceAll(", ", "\n") }.set{tmp}
 		from_xml_tofasta(tmp.splitText(), from_xml_fasta_pyscript)
+		stout = from_xml_tofasta.out.standardout
 	} // json section not implemented yet
 
 	emit:
-	stout = from_xml_tofasta.out.standardout
+	stout
 }
 
 
