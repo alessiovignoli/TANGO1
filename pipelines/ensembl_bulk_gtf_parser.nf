@@ -30,16 +30,18 @@ if (params.help) {
 	log.info "              on top of that, the requirement for the filenames is also to have the Species_name <- like this at the beginning of the file"
 	log.info "              or like Species_name_name and that <optional> does not have a number at the end, this is used to impose the order explained before"
         log.info "--OUT_DIR	optional field, default launchDir/GTF, launchDir is a nextflow variable representing where the pipeline has been launched from."
-        log.info "--OUT_NAME	optional field, default gene, accepted values: <gene> <specie>  "
-	log.info "		tells the script if the name of the output files has tio ge the geneID.gtf or Species_name.gtf"
-        log.info "####   WARNING #####"
-        log.info "the output are as many files as there are queried species, and they're name is the following:"
-        log.info "<species>.<assembly>.<version>."
-	log.info ""
+        log.info "--OUT_NAME	optional field, default gene, accepted values: <gene> <specie> <specie_nosep> "
+	log.info "		tells the script if the name of the output files has to ge the geneID.gtf or Species_name.gtf or Speciesname.gtf (no _)"
+        log.info "--CHR		optional field, default false, the extracted lines from the gtf files are going to be only the ones associated with the"
+	log.info "		queried geneID. If a value is passed to this flag the extracted line will be instead the whole genes found on the chromosome"
+        log.info "		where the queried geneID lies. By Chromosome is also intented scaffold, basically whatever identifier fills the first field"
+        log.info "		of the gtf lines of the found queried geneID."
+        log.info "		Be aware if this falg is not false the output files will be compressed (gzip), since they tend to be heavy."
+	log.info "		And they're anme will change to accomodate the chromosome info, adding it to what is explained above example:"
+        log.info "		geneID_chr1.gtf.gz or Species_name_chr1.gtf.gz or Speciesname_chr1.gtf.gz"
         log.info ""
         log.info ""
         log.info ""
-	log.info ""
         log.info ""
         exit 1
 }
@@ -52,6 +54,7 @@ params.GENEID_COL = 2
 params.GTF = false
 params.OUT_DIR = "${launchDir}/GTF/"
 params.OUT_NAME = 'gene'
+params.CHR = false
 
 
 // Include section
@@ -70,39 +73,76 @@ process gtf_lines_extracter  {
 	input:
 	tuple val(specie), val(geneID), path('*')
 	val flag_out
+	val chr_switch
 
 	output:
-	path "*.gtf", emit: gtf_files
+	path "*.gtf*", emit: gtf_files, followLinks: false
 	stdout emit: standardout	//for debug
 
 	script:
-	outname = "${geneID}.gtf"
+	outname = "${geneID}"
 	if ( flag_out=='specie' ) {
-		outname = "${specie}.gtf"
+		outname = "${specie}"
+	} else if ( flag_out=='specie_nosep' ) {
+		outname = "${specie}".replace('_', '')
+	} else {
+		println("the --OUT_NAME value has not been recognized, given: $flag_out{}   allowed : gene, specie, specie_nosep   the output name will be the geneID")
 	}
-	"""
-	## forcing to start with species_name.assembly.version.gtf.gz file
-	gzip -cd \$(ls *[0-9].gtf.gz) | grep ${geneID} > ${outname} || [[ \$? == 1 ]]		## preventing grep from sending error on not found match 
-	if [ -s "${outname}" ]
-	then
-		exit 0											## exiting with no error
-	else
-		## listing other remaining files abinitio optional field should be the first lexographically
-		for i in \$(ls *.*.*.*.gtf.gz)
-		do 
-			gzip -cd \$i | grep ${geneID} > ${outname} || [[ \$? == 1 ]]
-			if [ -s "${outname}" ]
-			then
-				exit 0
-			fi
-		done
-	fi
-	if ! [ -s "${outname}" ]
-	then
-		mv ${outname} TMP.gtf
-		echo "GENE NOT PRESENT: ${geneID} , in ${specie}.* files"
-	fi
-	"""
+
+	if ( !chr_switch  ) {
+		"""
+		## forcing to start with species_name.assembly.version.gtf.gz file
+		gzip -cd \$(ls *[0-9].gtf.gz) | grep ${geneID} > ${outname}.gtf || [[ \$? == 1 ]]		## preventing grep from sending error on not found match 
+		if [ -s "${outname}.gtf" ]
+		then
+			exit 0											## exiting with no error
+		else
+			## listing other remaining files abinitio optional field should be the first lexographically
+			for i in \$(ls *.*.*.*.gtf.gz)
+			do 
+				gzip -cd \$i | grep ${geneID} > ${outname}.gtf || [[ \$? == 1 ]]
+				if [ -s "${outname}.gtf" ]
+				then
+					exit 0
+				fi
+			done
+		fi
+		if ! [ -s "${outname}.gtf" ]
+		then
+			mv ${outname} TMP.gtf
+			echo "GENE NOT PRESENT: ${geneID} , in ${specie}.* files"
+		fi
+		"""
+	} else {
+		"""
+		## First finding which is the first field associated to the geneID
+		## forcing to start with species_name.assembly.version.gtf.gz file
+		CHR_ID=\$(gzip -cd \$(ls *[0-9].gtf.gz) | grep ${geneID} | head -n 1 | cut -f 1)
+		if [ -z \$CHR_ID]								## checking if variable is empty
+		then
+			## the geneID has not been found in species_name.assembly.version.gtf.gz so the other files will be used for it
+			for i in \$(ls *.*.*.*.gtf.gz)
+			do
+				CHR_ID=\$(gzip -cd \$i | grep ${geneID} | head -n 1 | cut -f 1)
+				if ! [ -z \$CHR_ID]
+				then
+					gzip -cd \$i | grep "^\$CHR_ID" > ${outname}_\${CHR_ID}.gtf
+					gzip  ${outname}_\${CHR_ID}.gtf
+					exit 0
+				fi
+			done
+		else
+			## the geneID has been found in species_name.assembly.version.gtf.gz already 
+			gzip -cd \$(ls *[0-9].gtf.gz) | grep "^\$CHR_ID" > ${outname}_\${CHR_ID}.gtf
+			gzip  ${outname}_\${CHR_ID}.gtf 
+		fi
+		if [ -z \$CHR_ID]								## for error message when nothing is found
+		then
+			touch TMP.gtf								## to avoid error message on missing output
+			echo "GENE NOT PRESENT: ${geneID} , in ${specie}.* files"
+		fi
+		"""
+	}
 }
 
 
@@ -135,7 +175,7 @@ workflow ensembl_gtf_parser  {
 	all_matches.filter{ it[2]==null }.set{ not_found_species }
 	//correct_matches.view()
 	//not_found_species.view()
-	gtf_lines_extracter(correct_matches, params.OUT_NAME)
+	gtf_lines_extracter(correct_matches, params.OUT_NAME, params.CHR)
 
 	emit:
 	stout = gtf_lines_extracter.out.standardout 
