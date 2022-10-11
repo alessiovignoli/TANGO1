@@ -126,14 +126,14 @@ process gtf_lines_extracter  {
 				CHR_ID=\$(gzip -cd \$i | grep ${geneID} | head -n 1 | cut -f 1)
 				if ! [ -z \$CHR_ID]
 				then
-					gzip -cd \$i | grep "^\$CHR_ID" > ${outname}_\${CHR_ID}.gtf
+					gzip -cd \$i | grep -P "^\$CHR_ID""\t" > ${outname}_\${CHR_ID}.gtf
 					gzip  ${outname}_\${CHR_ID}.gtf
 					exit 0
 				fi
 			done
 		else
 			## the geneID has been found in species_name.assembly.version.gtf.gz already 
-			gzip -cd \$(ls *[0-9].gtf.gz) | grep "^\$CHR_ID" > ${outname}_\${CHR_ID}.gtf
+			gzip -cd \$(ls *[0-9].gtf.gz) | grep -P "^\$CHR_ID""\t" > ${outname}_\${CHR_ID}.gtf
 			gzip  ${outname}_\${CHR_ID}.gtf 
 		fi
 		if [ -z \$CHR_ID]								## for error message when nothing is found
