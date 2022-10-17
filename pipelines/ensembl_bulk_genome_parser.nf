@@ -10,9 +10,9 @@ if (params.help) {
         log.info '--IN		a file with consistent field separator, where on each line there are at least two column/field'
         log.info "		this two field contain one the species name in scentific format the other an ensemble fasta id code present in such specie"
 	log.info "		example:"
-        log.info "		first field;	Homo sapiens;	third_field;	1 ;	ecc"
+        log.info "		first field;	Homo sapiens;	third_field;	>1 d;	ecc"
 	log.info "              it does not need to be the whole fasta header line, it can be the really unique part of it, (subsequence), aka the fasta identifier"
-	log.info "              in the above case is chromosome 1, id -> <1 >, so that the program does not take also 11, 12, 13 ecc... ,it matches with a in python3 statement."
+	log.info "              in the above case is chromosome 1, id ->  >1 d, so that the program does not take also 11, 12, 21, 31 ecc... ,it matches with a    in    python3 statement."
         log.info "--FS		optional field, default <tab>, tells the script how the fields in --IN are separated, the extraction is done with awk"
         log.info "		through the use of FS='' function, look at awk documentation for more details on specifiable patterns."
         log.info "--SPECIE_COL	optional field, default 0 (first column), tells the script which is the column to be extracted as species name."
@@ -35,8 +35,8 @@ if (params.help) {
         log.info "--OUT_DIR	optional field, default launchDir/Genomes, launchDir is a nextflow variable representing where the pipeline has been launched from."
         log.info "--OUT_NAME	optional field, default specie, accepted values: <specie> <specie_nosep>  "
 	log.info "		tells the script if the name of the output files has to be the Species_name_<fastaID>.fa.gz or Speciesname_<fastaID>.fa.gz (no _)"
-        log.info ""
-        log.info ""
+        log.info "		keep in mind that only alphanumerical digits in <fastaID> will be used for the outname."
+        log.info "		Usage of groovy replaceAll()"
         log.info ""
         log.info ""
         exit 1
@@ -59,24 +59,33 @@ include { awk_pairs } from "${params.PIPES}awk_field_extractor" addParams(CONTAI
 process genome_lines_extracter {
 	publishDir(params.OUT_DIR, mode: 'move', overwrite: false)
 	container params.CONTAINER
+	scratch true
 	tag { "${specie}_${fastaID}" }
 	
 	input:
 	tuple val(specie), val(fastaID), path('*')
+	path pyscript1
 	val outname_flag
 	
 	output:
-	stdout emit: standardout        //for debug
+	path "${outname}.gz", emit: outfasta
+	stdout emit: standardout
 
 	script:
-	outniame = "${specie}"
+	outname = "${specie}_" + "${fastaID}".replaceAll("[^a-zA-Z0-9]", "") + ".fa"		// removing all non alphanumerical digits from name
 	if ( outname_flag=='specie_nosep' ) {
-		outname = "${specie}".replace('_', '')
+		outname = "${specie}".replace('_', '') + "_" + "${fastaID}".replaceAll("[^a-zA-Z0-9]", "") + ".fa"
 	}
 	"""
-	echo ${specie} ${fastaID}
-	ls
-	gzip --help
+	echo "${fastaID}" > TMP
+	python3 ${pyscript1}  TMP \$(ls ${specie}*.dna.fa.gz) ${outname}
+	wc -l ${outname}
+	if ! [ -s ${outname} ]
+	then
+		echo "FASTA ID NOT PRESENT: ${fastaID} , in ${specie}.*.dna.fa.gz files"
+	else
+		gzip ${outname}
+	fi
 	"""
 }
 
@@ -111,11 +120,12 @@ workflow ensembl_genome_parser  {
 	all_matches.filter{ it[2]==null }.set{ not_found_species }
 	//correct_matches.view()
 	//not_found_species.view()
-	genome_lines_extracter(correct_matches, params.OUT_NAME)
+	fasta_seq_extracter_pyscript = params.SCRIPTS + "from_keyword_to_fasta.py"
+	genome_lines_extracter(correct_matches, fasta_seq_extracter_pyscript, params.OUT_NAME)
 
 	emit:
 	stout = genome_lines_extracter.out.standardout 
-	//final_out = gtf_lines_extracter.out.gtf_files
+	gizipped_out = genome_lines_extracter.out.outfasta
 	not_found_species
 }
 
