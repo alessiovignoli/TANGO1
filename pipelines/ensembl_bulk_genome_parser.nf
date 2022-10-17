@@ -42,7 +42,7 @@ if (params.help) {
         exit 1
 }
 
-params.CONTAINER =  "ubuntu@sha256:2d7ecc9c5e08953d586a6e50c29b91479a48f69ac1ba1f9dc0420d18a728dfc5" // Ubuntu 22.04.1 mawk 1.3.4
+params.CONTAINER = "python@sha256:fe2971bedd019d952d4458afb1fe4e222ddb810150008c1dee5a068d38bb0e43" // slim buster python3.9.5 // "ubuntu@sha256:2d7ecc9c5e08953d586a6e50c29b91479a48f69ac1ba1f9dc0420d18a728dfc5" // Ubuntu 22.04.1 mawk 1.3.4
 params.IN = false
 params.FS = '\t'
 params.SPECIE_COL = 1
@@ -55,6 +55,30 @@ params.OUT_NAME = 'specie'
 // Include section
 include { awk_pairs } from "${params.PIPES}awk_field_extractor" addParams(CONTAINER: "ubuntu@sha256:2d7ecc9c5e08953d586a6e50c29b91479a48f69ac1ba1f9dc0420d18a728dfc5" ) // the same used in this module
 
+
+process genome_lines_extracter {
+	publishDir(params.OUT_DIR, mode: 'move', overwrite: false)
+	container params.CONTAINER
+	tag { "${specie}_${fastaID}" }
+	
+	input:
+	tuple val(specie), val(fastaID), path('*')
+	val outname_flag
+	
+	output:
+	stdout emit: standardout        //for debug
+
+	script:
+	outniame = "${specie}"
+	if ( outname_flag=='specie_nosep' ) {
+		outname = "${specie}".replace('_', '')
+	}
+	"""
+	echo ${specie} ${fastaID}
+	ls
+	gzip --help
+	"""
+}
 
 
 
@@ -85,12 +109,12 @@ workflow ensembl_genome_parser  {
 	tupled_specie_fastaID.join(fasta_files_tuple, remainder: true).set{ all_matches } 
 	all_matches.filter{ it[1]!=null && it[2]!=null }.set{ correct_matches }
 	all_matches.filter{ it[2]==null }.set{ not_found_species }
-	correct_matches.view()
+	//correct_matches.view()
 	//not_found_species.view()
-	//gtf_lines_extracter(correct_matches, params.OUT_NAME, params.CHR)
+	genome_lines_extracter(correct_matches, params.OUT_NAME)
 
 	emit:
-	stout = 'bubba' //gtf_lines_extracter.out.standardout 
+	stout = genome_lines_extracter.out.standardout 
 	//final_out = gtf_lines_extracter.out.gtf_files
 	not_found_species
 }
