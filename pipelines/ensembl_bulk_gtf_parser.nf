@@ -39,7 +39,8 @@ if (params.help) {
         log.info "		Be aware if this falg is not false the output files will be compressed (gzip), since they tend to be heavy."
 	log.info "		And they're anme will change to accomodate the chromosome info, adding it to what is explained above example:"
         log.info "		geneID_chr1.gtf.gz or Species_name_chr1.gtf.gz or Speciesname_chr1.gtf.gz"
-        log.info ""
+        log.info "		The pipeline also outputs a tab separated file with the correspondances species name chromosome of rewuested gen, "
+	log.info "		in the same out dir, called specie_chromosome.mapper"
         log.info ""
         log.info ""
         log.info ""
@@ -77,7 +78,7 @@ process gtf_lines_extracter  {
 
 	output:
 	path "*.gtf*", emit: gtf_files, followLinks: false
-	stdout emit: standardout	//for debug
+	stdout emit: standardout	// for error message and mapper specie chr iD info
 
 	script:
 	outname = "${geneID}"
@@ -128,6 +129,7 @@ process gtf_lines_extracter  {
 				then
 					gzip -cd \$i | grep -P "^\$CHR_ID""\t" > ${outname}_\${CHR_ID}.gtf
 					gzip  ${outname}_\${CHR_ID}.gtf
+					echo ${specie} \${CHR_ID}
 					exit 0
 				fi
 			done
@@ -135,6 +137,7 @@ process gtf_lines_extracter  {
 			## the geneID has been found in species_name.assembly.version.gtf.gz already 
 			gzip -cd \$(ls *[0-9].gtf.gz) | grep -P "^\$CHR_ID""\t" > ${outname}_\${CHR_ID}.gtf
 			gzip  ${outname}_\${CHR_ID}.gtf 
+			echo ${specie} \${CHR_ID}
 		fi
 		if [ -z \$CHR_ID]								## for error message when nothing is found
 		then
@@ -176,10 +179,12 @@ workflow ensembl_gtf_parser  {
 	//correct_matches.view()
 	//not_found_species.view()
 	gtf_lines_extracter(correct_matches, params.OUT_NAME, params.CHR)
+	gtf_lines_extracter.out.standardout.filter { it.toString().startsWith("GENE NOT PRESENT:") }.set{ stout }
+	gtf_lines_extracter.out.standardout.filter { !it.toString().startsWith("GENE NOT PRESENT:") }.collectFile(name: 'specie_chromosome.mapper', storeDir: params.OUT_DIR)
 
 	emit:
-	stout = gtf_lines_extracter.out.standardout 
-	final_out = gtf_lines_extracter.out.gtf_files
+	stout 
+	final_out  = gtf_lines_extracter.out.gtf_files
 	not_found_species
 }
 
