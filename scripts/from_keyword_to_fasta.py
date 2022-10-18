@@ -5,7 +5,7 @@ import gzip
 
 def fasta_searcher(keywords_file, file_to_search, output_filepath):
     list_of_headers = []
-    print(output_filepath)
+    #print(output_filepath)
     with open(output_filepath, 'w') as outfile, open(keywords_file, 'r') as infile: 
         #print(infile, outfile)
         for in_line in infile:
