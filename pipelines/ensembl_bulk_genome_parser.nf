@@ -4,13 +4,15 @@
 
 // this prints the help in case you use --help parameter in the command line and it stops the pipeline
 if (params.help) {
-        log.info "This pipeline extracts the lines presenting the queried gene ids for a bulk download of ensembl gtf info."
+        log.info "This pipeline extracts the sequences from a ensembl genome download, starting from a species name and fastaID identifier"
+	log.info "it also works with more than one fastaID identifier for the same sequence is given, just add a line as the input file describes"
         log.info ""
         log.info "Here is the list of flags accepted by the pipeline:"
         log.info '--IN		a file with consistent field separator, where on each line there are at least two column/field'
         log.info "		this two field contain one the species name in scentific format the other an ensemble fasta id code present in such specie"
 	log.info "		example:"
         log.info "		first field;	Homo sapiens;	third_field;	>1 d;	ecc"
+	log.info "              first field;    Homo sapiens;   third_field;    >3 d;   ecc"
 	log.info "              it does not need to be the whole fasta header line, it can be the really unique part of it, (subsequence), aka the fasta identifier"
 	log.info "              in the above case is chromosome 1, id ->  >1 d, so that the program does not take also 11, 12, 21, 31 ecc... ,it matches with a    in    python3 statement."
         log.info "--FS		optional field, default <tab>, tells the script how the fields in --IN are separated, the extraction is done with awk"
@@ -79,7 +81,6 @@ process genome_lines_extracter {
 	"""
 	echo "${fastaID}" > TMP
 	python3 ${pyscript1}  TMP \$(ls ${specie}*.dna.fa.gz) ${outname}
-	wc -l ${outname}
 	if ! [ -s ${outname} ]
 	then
 		echo "FASTA ID NOT PRESENT: ${fastaID} , in ${specie}.*.dna.fa.gz files"
@@ -109,25 +110,34 @@ workflow ensembl_genome_parser  {
 		exit 1
 	}
 
-	// Actual pipeline section
+	// Actual pipeline section, extracting species names and fastaID as well asmatching with input fasta filenames
 
 	in_files = Channel.fromPath(pattern_to_in)
 	awk_pairs(in_files, params.FS, ';', params.SPECIE_COL, params.FASTAID_COL, false)
-	awk_pairs.out.stout.map{ it -> [(it.split(';')[0]).trim().replace(" ", "_").replace("-", "_"), (it.split(';')[1]).replace("\n", "")] }.set{ tupled_specie_fastaID }
-	Channel.fromPath(pattern_to_fa).map{ it -> ["${it.getSimpleName()}", it]}.groupTuple().set{ fasta_files_tuple }
-	tupled_specie_fastaID.join(fasta_files_tuple, remainder: true).set{ all_matches } 
-	all_matches.filter{ it[1]!=null && it[2]!=null }.set{ correct_matches }
-	all_matches.filter{ it[2]==null }.set{ not_found_species }
-	//correct_matches.view()
-	//not_found_species.view()
+
+	awk_pairs.out.stout.map{ it -> [(it.split(';')[0]).trim().replace(" ", "_").replace("-", "_").toString(), (it.split(';')[1]).replace("\n", "")] }.set{ tupled_specie_fastaID }
+	Channel.fromPath(pattern_to_fa).map{ it -> ["${it.getSimpleName()}".toString(), it]}.groupTuple().set{ fasta_files_tuple }
+	fasta_files_tuple.cross( tupled_specie_fastaID ).map{ it -> [ it[1][0],  it[1][1],  it[0][1] ]  }.set{ correct_matches }
+
+	// Reporting not found species names
+
+	correct_matches.map{ it -> [ it[0], it[1] ] }.set{ found_ones }
+	tupled_specie_fastaID.join(found_ones, remainder: true).filter{ it[2]==null }.set{ not_found_species }
+	
+	// Genome extraction section
+
 	fasta_seq_extracter_pyscript = params.SCRIPTS + "from_keyword_to_fasta.py"
 	genome_lines_extracter(correct_matches, fasta_seq_extracter_pyscript, params.OUT_NAME)
+
+
 
 	emit:
 	stout = genome_lines_extracter.out.standardout 
 	gizipped_out = genome_lines_extracter.out.outfasta
 	not_found_species
 }
+
+
 
 workflow {
 	ensembl_genome_parser(params.IN, params.FASTA)
