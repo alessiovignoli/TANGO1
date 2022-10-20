@@ -74,9 +74,9 @@ process genome_lines_extracter {
 	stdout emit: standardout
 
 	script:
-	outname = "${specie}_" + "${fastaID}".replaceAll("[^a-zA-Z0-9]", "") + ".fa"		// removing all non alphanumerical digits from name
+	outname = "${specie}.fa" 	// + "{fastaID}".replaceAll("[^a-zA-Z0-9]", "") + ".fa"		// removing all non alphanumerical digits from name
 	if ( outname_flag=='specie_nosep' ) {
-		outname = "${specie}".replace('_', '') + "_" + "${fastaID}".replaceAll("[^a-zA-Z0-9]", "") + ".fa"
+		outname = "${specie}".replace('_', '') + ".fa" //+ "_" + "{fastaID}".replaceAll("[^a-zA-Z0-9]", "") + ".fa"
 	}
 	"""
 	echo "${fastaID}" > TMP
