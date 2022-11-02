@@ -39,7 +39,7 @@ def pp_colist_prep(ppflnm, renameflnm, trimm_val=False, signpept_val=False, swit
             old_header = tmp.split(':')[0] + '_' + tmp.split(':')[1]
         else:
             old_header = tmp
-        #priint(old_header)
+        #print(old_header)
         new_header = ''
         for line in rename_file:
             if old_header in line:
@@ -48,7 +48,7 @@ def pp_colist_prep(ppflnm, renameflnm, trimm_val=False, signpept_val=False, swit
         #print(new_header)
         classes_pp_file = pp_file.readline()
         for line in pp_file:
-            print(line)
+            #print(line)
             signal_pept_pp = float(line.split()[5])
             #print(signal_pept_pp)
             tm_pp = 0.0
@@ -59,7 +59,7 @@ def pp_colist_prep(ppflnm, renameflnm, trimm_val=False, signpept_val=False, swit
             #print(tm_pp)
             aa_number = str(int(line.split()[0]) - cut_site)
             #print(aa_number)
-            if signal_pept_pp != 0.0 or int(aa_number) < 0 or int(aa_number) >= (right_trimm_val + left_trimm_val):
+            if signal_pept_pp >= 0.001 or int(aa_number) < 0 or int(aa_number) >= (right_trimm_val + left_trimm_val):
                 continue
             #print(line, end='')
             elif tm_pp > 0.9:
