@@ -52,7 +52,7 @@ workflow oneliner {
 
 	main:
 	in_fasta = Channel.fromPath(pattern_to_fasta)
-	list_in_and_out_names = in_fasta.map { [it, (it + "${out_filename}")] }
+	list_in_and_out_names = in_fasta.map { [it, (it.baseName + ".${out_filename}")] }
 	one_line_py = params.SCRIPTS + "one_line_per_fasta.py"
 	fasta_oneliner(list_in_and_out_names, one_line_py)
 
@@ -68,7 +68,7 @@ workflow oneliner_ch {
 	out_filename
 
 	main:
-	list_in_and_out_names = channel_fasta.map { [it, ("${it}".split('\\.')[0].split('/')[-1] + ".${out_filename}")] }
+	list_in_and_out_names = channel_fasta.map { [it, (it.baseName + ".${out_filename}")] }
 	one_line_py = params.SCRIPTS + "one_line_per_fasta.py"
 	fasta_oneliner(list_in_and_out_names, one_line_py)
 

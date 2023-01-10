@@ -156,7 +156,7 @@ process align_generation {
 	script:
 	tcoffee_outfilepath = "${multifasta}".split('\\.')[0] + '.aln'
 	"""
-	export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/ncbi-blast/bin:/opt/tcoffee/bin:/opt/tcoffee/plugins/linux/ TEMP=/tmp PERL5LIB=/opt/tcoffee/perl/lib/perl5 DIR_4_TCOFFEE=/opt/tcoffee EMAIL_4_TCOFFEE=tcoffee.msa@gmail.com CACHE_4_TCOFFEE=/tmp/cache/ LOCKDIR_4_TCOFFEE=/tmp/lck/ TMP_4_TCOFFEE=/tmp/				# for singularity env variables
+	#export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/ncbi-blast/bin:/opt/tcoffee/bin:/opt/tcoffee/plugins/linux/ TEMP=/tmp PERL5LIB=/opt/tcoffee/perl/lib/perl5 DIR_4_TCOFFEE=/opt/tcoffee EMAIL_4_TCOFFEE=tcoffee.msa@gmail.com CACHE_4_TCOFFEE=/tmp/cache/ LOCKDIR_4_TCOFFEE=/tmp/lck/ TMP_4_TCOFFEE=/tmp/				# for singularity env variables
 	t_coffee -in ${multifasta} -outfile ${tcoffee_outfilepath}
 	"""
 }
@@ -385,7 +385,7 @@ process phob_stout_colours {
 
 
 process couloring_aln  {
-	publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false, saveAs: { filename -> if (params.SPECIAL_HELIX != false) filename
+	publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: true, saveAs: { filename -> if (params.SPECIAL_HELIX != false) filename
 										else if (filename.endsWith("-specialH_pp.html")) null
 										else filename
 										})
