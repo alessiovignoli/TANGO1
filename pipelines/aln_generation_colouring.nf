@@ -68,7 +68,6 @@ params.HYDRO_SCALE = "UHS"
 // Modules dependencie section
 
 include { oneliner_ch } from "${params.PIPES}fasta_oneliner" addParams(PUBLISH: "false")
-include { converger } from "${params.PIPES}output_files_uniter" 
 
 /*
 #phobiuos_results_folder = "${params.parent_ofall_dir}all_phobius_results/MIA2_vertebrate_orthologs_OM/"    // to change if needed remeber to put the slash at the end
@@ -239,8 +238,8 @@ process residues_colors {
 
 	output:
 	stdout emit: standardout		                             // used only for check during debugging
-	path aacolor_list, emit: aacolor_list_outfile
-	path specialH_aacolor_list, emit: specialH_aacolor_list_outfile     // used for the flag special_helix
+	path "*.color", emit: aacolor_list_outfile
+	path "*sHcolor", emit: specialH_aacolor_list_outfile     // used for the flag special_helix
 
 	script:
 	aacolor_list = "${plp_file}".split('\\.')[0].split('!')[-1] + '.color'
@@ -577,12 +576,12 @@ workflow alignment_generation {
 	plp_dir.combine(fasta_old_headers).flatMap{ "${it[0]}" + '/' + "${it[1]}" }.set{ plp_filepath }
 	color_aa_pyscript = params.SCRIPTS + "pp_color_list_tcoffee_prepare.py"
 	residues_colors(plp_filepath, rename_gen.out.rename_file, color_aa_pyscript)
-	converger(residues_colors.out.aacolor_list_outfile, prefix, "color")
+	residues_colors.out.aacolor_list_outfile.collectFile(name: "${prefix}.color" ).set{ converged_file }
 	
 	emit:
-	stout = converger.out.stout						//for debug
+	stout = residues_colors.out.standardout						//for debug
 	sh_color_list = residues_colors.out.specialH_aacolor_list_outfile
-	color_file = converger.out.converged_file
+	color_file = converged_file
 	prefix
 	in_aln
 	rename_file = rename_gen.out.rename_file
@@ -597,11 +596,10 @@ workflow sh_colouring {
 	prefix_name
 
 	main:
-	converger(color_files, prefix_name, "sHcolor")
+	color_files.collectFile(name: "${prefix_name}.sHcolor").set{shcolor_file}
 
 	emit:
-	shcolor_file = converger.out.converged_file
-	stout = converger.out.stout
+	shcolor_file
 	
 }
 
