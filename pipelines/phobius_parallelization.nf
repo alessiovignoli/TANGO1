@@ -153,7 +153,7 @@ process phobius_short_many_plp {
                 limit=\$((\$limit + 1))
         fi
         i=2; while [ \$i -le \$limit ]; do
-                SEQUENCE=`sed -n "\$i"p ${fasta}`; HEADERNAME=\$(sed -n  \$(expr \$i - 1)p ${fasta} | cut -d '>' -f 2); if echo "\$SEQUENCE" | grep -vq  "O"; then
+                SEQUENCE=`sed -n "\$i"p ${fasta}`; HEADERNAME=\$(sed -n  \$(expr \$i - 1)p ${fasta} | cut -d '>' -f 2 | cut -d ' ' -f 1); if echo "\$SEQUENCE" | grep -vq  "O"; then
                                 sed -n  `expr \$i - 1`,"\$i"p ${fasta} | ${params.exec_version} -short -plp "\$HEADERNAME.plp"
                         fi;i=\$((\$i + 2)); done 1>"phobius_output${suffix}_${prefix}txt"
         """
