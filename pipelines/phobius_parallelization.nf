@@ -134,7 +134,6 @@ process phobius_short_many_plp {
         publishDir(params.PLP_DIR, mode: 'copy', overwrite: false, saveAs: { filename -> if (filename.endsWith(".plp")) filename
                                                                                 else null
                                                                                 })
-        //container "alessiovignoli3/tango-project:splp_phobius_image@sha256:f098f1511f37d461f3610884c8197814231eeaec3d09286a941292fa5f289dd5"
 
         input:
         path fasta
