@@ -28,9 +28,9 @@ def fasta_retriever(headers_file, list_files_to_search, output_filepath):
             search_key = in_line.rstrip()
             for elem in list_lines_search:
                 if search_key in elem:
-                    new_header = elem.replace(' ', '_', 1) 
-                    outfile.write(new_header)
-                    #print(elem, end='')
+                    #new_header = elem.replace(' ', '_', 1)                         ## lost track of when this line was inserted and why
+                    #outfile.write(new_header)
+                    outfile.write(elem)
                     break
 
 
