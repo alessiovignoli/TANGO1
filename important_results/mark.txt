@@ -1769,7 +1769,7 @@ loop_intraM10 {
 
 
 
-hobius.model mark twentyseven id = M27
+phobius.model mark twentyseven id = M27
 
         changes to M23 : It is basicaly M23, but now the <loop_intraM> region can not point to the end. 
 			The protein can not finish in this region anymore. This is achieved by adding <end 0;> flag 
@@ -1866,3 +1866,37 @@ loop_intraM10 {
   tied_letter loop_intraM1;
 }
 
+
+
+
+phobius.model mark twentyeight id = M28
+
+        changes to M27 : To begin with the probabilities of the special helix emission states have been modified as follows. 
+			The values are taken from an alignment called refined_set_manually_github_MIA3_preliminary-mammalia-fish-trimm-pp.html
+			extracted a bit roughly. 
+
+sphelixLengthDist {
+  trans sphelix26: 0.00140932: 0.564
+        sphelix25: 0.00122239: 0.489
+        ...
+	...
+	sphelix8: 0.00285052: 1.140
+        sphelix7: 4.99366e-05: 0.020;
+  label m;
+  end 0;
+  fix_trans 1;
+  only   A:0.0790273:70.947 C:0.012158:14.578 D:0.0050658:3.985 E:0.0455927:4.050 F:0.073961:53.323
+         G:0.0243161:53.809 H:0.006079:4.147 I:0.073961:72.695 K:0.0385005:2.041 L:0.2228976:102.079
+         M:0.0303951:3.714 N:0.0354610:8.877 P:0.0466058:14.222 Q:0.0020263:4.892 R:0.007092:1.976
+         S:0.0628166:35.117 T:0.095238:32.719 V:0.0719351:73.829 W:0.007092:9.816 Y:0.0597771:13.185;
+}
+
+			Furthermore the loop_intraM section has been removed. so now state <sphelix2> points towards
+			the citoplasmic loop <inTube1> like follows:	
+
+sphelix2 {
+  trans inTube1: 1: 400.000;
+  label m;
+  end 0;
+  tied_letter sphelixLengthDist;
+}
