@@ -361,20 +361,20 @@ process phob_stout_colours {
 	if(params.TRIMM == false)
 		if(params.SPECIAL_HELIX == false)
 			"""
-			python3 ${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob}
+			python3 ${pyscript} --phob_stout ${phobius_stdout_filepath} --output_file  ${phob_stout_colourlist} --rename_file ${rename_filepath} --phobius_mode ${mode_phob}
 			"""
 		else
 			"""
-			python3 ${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob} ${params.SPECIAL_HELIX} 
+			python3 ${pyscript} --phob_stout ${phobius_stdout_filepath} --output_file ${phob_stout_colourlist} --rename_file ${rename_filepath} --phobius_mode ${mode_phob} --two_colors ${params.SPECIAL_HELIX} 
 			"""
 	else
 		if(params.SPECIAL_HELIX == false)
 			"""
-			python3 ${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob} ${plp_folder} ${params.TRIMM} ${params.SIGNALPEPT}
+			python3 ${pyscript} --phob_stout ${phobius_stdout_filepath} --output_file ${phob_stout_colourlist} --rename_file ${rename_filepath} --phobius_mode ${mode_phob} --plp_dir ${plp_folder} --trimm_value ${params.TRIMM} --two_colors ${params.SIGNALPEPT}
 			"""
 		else
         	        """
-			python3 ${pyscript} ${phobius_stdout_filepath} ${phob_stout_colourlist} ${rename_filepath} ${mode_phob} ${plp_folder} ${params.TRIMM} ${params.SIGNALPEPT} ${params.SPECIAL_HELIX}
+			python3 ${pyscript} --phob_stout ${phobius_stdout_filepath} --output_file ${phob_stout_colourlist} --rename_file ${rename_filepath} --phobius_mode ${mode_phob} --plp_dir  ${plp_folder} --trimm_value ${params.TRIMM} --signalpept ${params.SIGNALPEPT} --two_colors ${params.SPECIAL_HELIX}
 			"""
 }
 
