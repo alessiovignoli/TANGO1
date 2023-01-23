@@ -582,7 +582,7 @@ workflow alignment_generation {
 	stout = residues_colors.out.standardout						//for debug
 	sh_color_list = residues_colors.out.specialH_aacolor_list_outfile
 	color_file = converged_file
-	prefix
+	prefix = 'bubba'
 	in_aln
 	rename_file = rename_gen.out.rename_file
 	plp_dir
@@ -596,7 +596,7 @@ workflow sh_colouring {
 	prefix_name
 
 	main:
-	color_files.collectFile(name: "${prefix_name}.sHcolor").set{shcolor_file}
+	color_files.collectFile(name: "${prefix_name.value}.sHcolor").set{shcolor_file}
 
 	emit:
 	shcolor_file
