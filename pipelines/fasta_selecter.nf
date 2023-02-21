@@ -3,27 +3,6 @@
 // ### PLEASE CHECK THE COMMENTS AND COMMENTED LINES IN THE SCRIPTS or SHELLS BLOCKS ###
 
 
-// tm = tranmembrane
-// om = Original model
-// M3 = mark three third model created of the phobius model
-// ns = negatie set
-// ps = positive set TANGO1 proteins not used for the training of the model
-// fs = frequency setthe TANGO1 proteins used for the assestment of the frequency of aa this prot are excluded from the positive set
-// pred = prediction
-
-
-
-/*
-*  this module takes as input a one id-keyword per line file and the fasta file to search such id and retrieve 
-*  the respective header (that contains the id) and the sequence associated.
-*  the input can also be a glob pattern for many id files if so the flag for the search on one fasta or many 
-*/
-
-
-
-nextflow.enable.dsl=2
-
-params.help = false
 
 
 // this prints the help in case you use --help parameter in the command line and it stops the pipeline
@@ -73,7 +52,7 @@ process retriever {
 	script:
 	outname = ("${inheader}".split('\\.'))[0] + "-" + ("${fasta}".split('\\.'))[0] + ".fasta"
 	"""
-	./${py_script1} ${inheader} ${fasta} ${outname} 2>tmp.err
+	python3 ${py_script1} ${inheader} ${fasta} ${outname} 2>tmp.err
         cat tmp.err
 	"""
 
