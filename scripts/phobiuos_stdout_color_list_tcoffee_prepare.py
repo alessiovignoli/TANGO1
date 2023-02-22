@@ -186,7 +186,7 @@ def phobstout_short_colist_prep(phobstdout, renameflnm, output_f, trimm_val, plp
 
 
 def main(args):
-    print(args.phob_stout, args.rename_file, args.output_file, args.phobius_mode, args.trimm_value, args.plp_dir, args.signalpept, args.two_colors)
+    #print(args.phob_stout, args.rename_file, args.output_file, args.phobius_mode, args.trimm_value, args.plp_dir, args.signalpept, args.two_colors)
 
     trimm_value = args.trimm_value
     if args.trimm_value:
