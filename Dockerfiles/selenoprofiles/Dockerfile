@@ -59,6 +59,18 @@ RUN pip install \
     setuptools==61.2.0 \
     six==1.16.0
 
+# Make selenoprofiles command line executable
+# and fixing python imports of selenoprofiles 
+RUN chmod +x /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+	&& sed -i "s/from ._version import __version__/from _version import __version__/g"  /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+	&& sed -i "s/from .load_config import selenoprofiles_config_content/from load_config import selenoprofiles_config_content/g" /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+	&& sed -i "s/from .MMlib3 import \*/from MMlib3 import \*/g" /usr/local/lib/python3.9/site-packages/selenoprofiles4/*.py \
+	&& sed -i "s/from .selenoprofiles/from selenoprofiles/g" /usr/local/lib/python3.9/site-packages/selenoprofiles4/*.py \
+	&& ln -s /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py /usr/bin/selenoprofiles \
+	&& selenoprofiles -setup
+
+ENV PYTHONPATH "${PYTHONPATH}:/usr/local/lib/python3.9/site-packages/selenoprofiles4"
+
 
 # Very important line for installing genewise wise2 package from biocontainer
 COPY --from=0 /usr/local/bin/gene* /usr/bin
