@@ -67,7 +67,8 @@ RUN chmod +x /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofil
 	&& sed -i "s/from .MMlib3 import \*/from MMlib3 import \*/g" /usr/local/lib/python3.9/site-packages/selenoprofiles4/*.py \
 	&& sed -i "s/from .selenoprofiles/from selenoprofiles/g" /usr/local/lib/python3.9/site-packages/selenoprofiles4/*.py \
 	&& ln -s /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py /usr/bin/selenoprofiles \
-	&& selenoprofiles -setup
+	&& selenoprofiles -setup \
+	&& selenoprofiles -download
 
 ENV PYTHONPATH "${PYTHONPATH}:/usr/local/lib/python3.9/site-packages/selenoprofiles4"
 
