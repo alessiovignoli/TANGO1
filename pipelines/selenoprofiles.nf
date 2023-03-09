@@ -40,8 +40,8 @@ process seleno_runner {
 
 	script:
 	"""
-	selenoprofiles -download
-	selenoprofiles -o ${output_folder} -t ${infasta} -s ${species} -P SelT,SelN,SPS
+	selenoprofiles -download -y
+ 	selenoprofiles -o tmp -t ${infasta} -s ${species} -P SelT,SelN,SPS
 	"""
 }
 
