@@ -25,10 +25,14 @@ RUN apt-get update \
 #    && mv ncbi-blast-2.2.26+/bin/* /usr/bin/ \
 #    && rm -r ncbi-blast-2.2.26+
 
-RUN wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy.NOTSUPPORTED/2.2.26/blast-2.2.26-x64-linux.tar.gz  \
+RUN mkdir -p /usr/local/blast_tmp/ \
+    && cd /usr/local/blast_tmp/ \
+    && wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy.NOTSUPPORTED/2.2.26/blast-2.2.26-x64-linux.tar.gz  \
     && tar -xf blast-2.2.26-x64-linux.tar.gz \
     && mv blast-2.2.26/bin/* /usr/bin/ \
-    && rm -r blast-2.2.26 \
+    && echo '[NCBI]' > ~/.ncbirc \
+    && echo '' >> ~/.ncbirc \
+    && echo 'data=/usr/local/blast_tmp/blast-2.2.26/data' >> ~/.ncbirc \
     && rm blast-2.2.26-x64-linux.tar.gz
 
 
