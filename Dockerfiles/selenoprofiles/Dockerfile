@@ -20,11 +20,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* /tmp/*
 
 # Install blast 
-#RUN wget https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.26/ncbi-blast-2.2.26+-x64-linux.tar.gz \
-#    && tar -xf ncbi-blast-2.2.26+-x64-linux.tar.gz \
-#    && mv ncbi-blast-2.2.26+/bin/* /usr/bin/ \
-#    && rm -r ncbi-blast-2.2.26+
-
+# it also need a file in ~ called .ncbirc containig a pointer to the data directory of blast
 RUN mkdir -p /usr/local/blast_tmp/ \
     && cd /usr/local/blast_tmp/ \
     && wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy.NOTSUPPORTED/2.2.26/blast-2.2.26-x64-linux.tar.gz  \
@@ -87,11 +83,11 @@ RUN chmod +x /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofil
 	&& ln -s /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py /usr/bin/selenoprofiles \
 	&& selenoprofiles -setup \
 	&& sed -i 's/if not opt\["y"\]/if not sys.argv[2]=="-y"/' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
-	&& sed -i "s/selenoprofiles_data_dir = ~\/selenoprofiles_data/selenoprofiles_data_dir = selenoprofiles_data/" ~/.selenoprofiles_config.txt
-#	&& selenoprofiles -download -y 
+	&& sed -i "s/selenoprofiles_data_dir = ~\/selenoprofiles_data/selenoprofiles_data_dir = selenoprofiles_data/" ~/.selenoprofiles_config.txt \
+	&& cd ~ \
+	&& selenoprofiles -download -y 
 
 
-# & sed -i "s/selenoprofiles_data_dir = ~\/selenoprofiles_data/selenoprofiles_data_dir = selenoprofiles_data/" ~/.selenoprofiles_config.txt \
 
 ENV PYTHONPATH "${PYTHONPATH}:/usr/local/lib/python3.9/site-packages/selenoprofiles4"
 
