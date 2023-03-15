@@ -40,6 +40,11 @@ process seleno_runner {
 
 	script:
 	"""
+	#sed -i '25i print("home config dir :", home_config_filename)' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py
+	#sed -i '26i print("install dir ;", selenoprofiles_install_dir)' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py
+	#sed -i '27i print("dependencies :", os.path.abspath(obonet.__file__),  os.path.abspath(easyterm.__file__),  os.path.abspath(sys.__file__))' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py
+	#ls -alt /usr/local/selenoprofiles_workdir
+	selenoprofiles -setup
 	selenoprofiles -download -y
  	selenoprofiles -o tmp -t ${infasta} -s ${species} -P SelT,SelN,SPS
 	"""
