@@ -69,26 +69,45 @@ RUN pip install \
     setuptools==61.2.0 \
     six==1.16.0
 
-# Make selenoprofiles command line executable
-# and fixing python imports of selenoprofiles
-# fixing also -download option  
+# Make selenoprofiles command line executable and changing all lines neccessary to fix:
+# relative python imports of selenoprofiles 
+# opt.resolve_links problem of easyterm package 
+# -download -y option  
+# translatable to a singularity image.
+# however selenoprofiles -setup and selenoprofiles -download  has to be run by the user on execution
 RUN chmod +x /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
 	&& sed -i "s/from ._version import __version__/from _version import __version__/g"  /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
 	&& sed -i "s/from .load_config import selenoprofiles_config_content/from load_config import selenoprofiles_config_content/g" /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
 	&& sed -i "s/from .MMlib3 import \*/from MMlib3 import \*/g" /usr/local/lib/python3.9/site-packages/selenoprofiles4/*.py \
 	&& sed -i "s/from .selenoprofiles/from selenoprofiles/g" /usr/local/lib/python3.9/site-packages/selenoprofiles4/*.py \
-	&& sed -i '1314i BUBBAopt["selenoprofiles_install_dir"] = selenoprofiles_install_dir' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
-	&& sed -i "s/BUBBAopt/        opt/" /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
-	&& sed -i "s/selenoprofiles_data_dir = ~\/selenoprofiles_data\//selenoprofiles_data_dir = ~\/selenoprofiles_data/" /usr/local/lib/python3.9/site-packages/selenoprofiles4/load_config.py \
-	&& ln -s /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py /usr/bin/selenoprofiles \
-	&& selenoprofiles -setup \
+	&& sed -i 's/home_config_filename = os.path.expanduser(\"\~\") + \"\//home_config_filename = \"/' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+	&& sed -i 's/config_filename = os.path.expanduser(\"\~\") + \"\/.selenoprofiles_config.txt\"/config_filename = home_config_filename/' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+	&& sed -i "s/selenoprofiles_data_dir = ~\/selenoprofiles_data\//selenoprofiles_data_dir = selenoprofiles_data/" /usr/local/lib/python3.9/site-packages/selenoprofiles4/load_config.py \
 	&& sed -i 's/if not opt\["y"\]/if not sys.argv[2]=="-y"/' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
-	&& sed -i "s/selenoprofiles_data_dir = ~\/selenoprofiles_data/selenoprofiles_data_dir = selenoprofiles_data/" ~/.selenoprofiles_config.txt \
-	&& cd ~ \
-	&& selenoprofiles -download -y 
+	&& ln -s /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py /usr/bin/selenoprofiles 
+
+
+#&& sed -i '1281i BUBBAprint("inside if -setup config file location :", config_filename)' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+#&& sed -i '1317i BUBBAprint("after the resolve_link stuff" )' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+#&& sed -i "s/BUBBAprint/        print/" /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py 
+
+#&& sed -i 's/home_config_filename = os.path.expanduser(\"\~\") + \"\//home_config_filename = \"\/usr\/local\/selenoprofiles_workdir\//' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+# Here it is doing so that it also work for singularity where the ~ could create problems
+
+#&& selenoprofiles -setup \
+#&& sed -i 's/if not opt\["y"\]/if not sys.argv[2]=="-y"/' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+#&& sed -i "s/selenoprofiles_data_dir = ~\/selenoprofiles_data/selenoprofiles_data_dir = selenoprofiles_data/" ~/.selenoprofiles_config.txt \
+#&& cd ~ \
+#&& selenoprofiles -download -y \
+
+#&& sed -i "s/selenoprofiles_data_dir = ~\/selenoprofiles_data\//selenoprofiles_data_dir = ~\/selenoprofiles_data/" /usr/local/lib/python3.9/site-packages/selenoprofiles4/load_config.py \
+#&& sed -i '25i print("home config dir :", home_config_filename)' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+#&& sed -i '26i print("install dir ;", selenoprofiles_install_dir)' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+#&& sed -i '27i print("dependencies :", os.path.abspath(obonet.__file__),  os.path.abspath(easyterm.__file__),  os.path.abspath(gzip.__file__))' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py 
 
 
 
+# this is the last piece to fix relative import in python
 ENV PYTHONPATH "${PYTHONPATH}:/usr/local/lib/python3.9/site-packages/selenoprofiles4"
 
 
@@ -96,3 +115,11 @@ ENV PYTHONPATH "${PYTHONPATH}:/usr/local/lib/python3.9/site-packages/selenoprofi
 COPY --from=0 /usr/local/bin/gene* /usr/bin
 
 
+# Here it is doing so that it also work for singularity where the ~ could create problems
+# for this an artificial directory is created and set as entrypoint at executio
+#RUN mkdir -p /usr/local/selenoprofiles_workdir \
+#	&& cd /usr/local/selenoprofiles_workdir \
+#	&& selenoprofiles -setup \
+#	&& selenoprofiles -download -y
+ 
+#WORKDIR /usr/local/selenoprofiles_workdir
