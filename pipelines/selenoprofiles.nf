@@ -16,34 +16,57 @@ if (params.help) {
 
 params.CONTAINER = "alessiovignoli3/tango-project:selenoprofiles" // selenoprofiles 4.4.3
 params.INPUT = "${params.TEST_DIR}bubbabubba"
-params.OUTPUT_DIR = "${params.TEST_DIR}/seleno_out/"
+params.INPUT_ALN = null
+params.OUT_PROFILE = false
+params.OUTPUT_DIR = "${params.TEST_DIR}seleno_out/"
 params.PUBLISH = true
 params.SPECIES = "homo_sapiens"
 
 
+
+process seleno_build_profile {
+	publishDir(params.OUTPUT_DIR, mode: 'move', overwrite: true)
+        tag { "${inaln}" }
+        container params.CONTAINER
+
+	input:
+	path inaln
+	val out_profile_name
+
+	output:
+        //path "tmp/*", emit: out_dir_files
+        stdout emit: standardout
+
+	script:
+	if (out_profile_name == false) {
+		out_profile_name = "${inaln.BaseName}" + "_profile.fa"
+	}
+        """
+        selenoprofiles -setup
+        #selenoprofiles -download -y
+        selenoprofiles build -i ${inaln} -o ${out_profile_name} -y
+        """
+
+}
+
+
+
 process seleno_runner {
-	publishDir(params.OUTPUT_DIR, mode: 'move', overwrite: true, saveAs: { filename -> if (params.PUBLISH == true) filename
-										else null
-										})	
+	//publishDir(params.OUTPUT_DIR, mode: 'move', overwrite: true)
 	tag { "${infasta}" }
 	container params.CONTAINER
 
 	input:
-	path output_folder
 	path infasta
 	val species
 	
 
 	output:
-	//path "${output_folder}/*", emit: out_files
+	//path "tmp/**", emit: out_dir_files
 	stdout emit: standardout
 
 	script:
 	"""
-	#sed -i '25i print("home config dir :", home_config_filename)' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py
-	#sed -i '26i print("install dir ;", selenoprofiles_install_dir)' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py
-	#sed -i '27i print("dependencies :", os.path.abspath(obonet.__file__),  os.path.abspath(easyterm.__file__),  os.path.abspath(sys.__file__))' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py
-	#ls -alt /usr/local/selenoprofiles_workdir
 	selenoprofiles -setup
 	selenoprofiles -download -y
  	selenoprofiles -o tmp -t ${infasta} -s ${species} -P SelT,SelN,SPS
@@ -54,23 +77,31 @@ process seleno_runner {
 workflow seleno_louncher {
 	
 	take:
-	patter_to_outdir
+	pattern_to_outdir
 	pattern_to_fasta
+	pattern_to_aln
+	outprofile_name
 	spcies_name
 
 	main:
-	out_dir = Channel.fromPath(patter_to_outdir, type: 'dir')
+	//out_dir = Channel.fromPath(pattern_to_outdir, type: 'dir')
 	in_fasta = Channel.fromPath(pattern_to_fasta)
-	seleno_runner(out_dir, in_fasta, spcies_name)
+	
+	if (pattern_to_aln != null) {
+		in_aln = Channel.fromPath(pattern_to_aln)
+		seleno_build_profile(in_aln, outprofile_name)
+	}
+
+	//seleno_runner(in_fasta, spcies_name)
 
 	emit:
-	outfile = 'bubba'
-	stout = seleno_runner.out.standardout
+	outfile = 'bubba' //patter_to_outdir
+	stout = seleno_build_profile.out.standardout //seleno_runner.out.standardout
 }	
 
 
 workflow {
-	seleno_louncher(params.OUTPUT_DIR, params.INPUT, params.SPECIES)
+	seleno_louncher(params.OUTPUT_DIR, params.INPUT, params.INPUT_ALN, params.OUT_PROFILE, params.SPECIES)
 	seleno_louncher.out.outfile.view()
 	seleno_louncher.out.stout.view()
 }
