@@ -92,18 +92,21 @@ workflow seleno_louncher {
 		seleno_build_profile(in_aln, outprofile_name)
 	}
 
-	//seleno_runner(in_fasta, spcies_name)
+	seleno_runner(in_fasta, spcies_name)
 
 	emit:
 	outfile = 'bubba' //patter_to_outdir
-	stout = seleno_build_profile.out.standardout //seleno_runner.out.standardout
+	stout1 = seleno_build_profile.out.standardout 
+	stout2 = seleno_runner.out.standardout
 }	
 
 
 workflow {
 	seleno_louncher(params.OUTPUT_DIR, params.INPUT, params.INPUT_ALN, params.OUT_PROFILE, params.SPECIES)
 	seleno_louncher.out.outfile.view()
-	seleno_louncher.out.stout.view()
+	seleno_louncher.out.stout1.view()
+	seleno_louncher.out.outfile.view()
+	seleno_louncher.out.stout2.view()
 }
 
 

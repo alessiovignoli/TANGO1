@@ -75,17 +75,31 @@ RUN pip install \
 # -download -y option  
 # translatable to a singularity image.
 # however selenoprofiles -setup and selenoprofiles -download  has to be run by the user on execution
-RUN chmod +x /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
-	&& sed -i "s/from ._version import __version__/from _version import __version__/g"  /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
-	&& sed -i "s/from .load_config import selenoprofiles_config_content/from load_config import selenoprofiles_config_content/g" /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
-	&& sed -i "s/from .MMlib3 import \*/from MMlib3 import \*/g" /usr/local/lib/python3.9/site-packages/selenoprofiles4/*.py \
-	&& sed -i "s/from .selenoprofiles/from selenoprofiles/g" /usr/local/lib/python3.9/site-packages/selenoprofiles4/*.py \
-	&& sed -i 's/home_config_filename = os.path.expanduser(\"\~\") + \"\//home_config_filename = \"/' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
-	&& sed -i 's/config_filename = os.path.expanduser(\"\~\") + \"\/.selenoprofiles_config.txt\"/config_filename = home_config_filename/' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+RUN sed -i 's/config_filename = os.path.expanduser(\"\~\") + \"\/.selenoprofiles_config.txt\"/config_filename = os.path.abspath(".\/.selenoprofiles_config.txt")/g' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
 	&& sed -i "s/selenoprofiles_data_dir = ~\/selenoprofiles_data\//selenoprofiles_data_dir = selenoprofiles_data/" /usr/local/lib/python3.9/site-packages/selenoprofiles4/load_config.py \
-	&& sed -i 's/if not opt\["y"\]/if not sys.argv[2]=="-y"/' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
-	&& ln -s /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py /usr/bin/selenoprofiles 
+	&& sed -i 's/if not opt\["y"\]/if not sys.argv[2]=="-y"/' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py 
 
+
+RUN echo '#!/usr/local/bin/python3.9' > /usr/bin/selenoprofiles \
+	&& echo '# -*- coding: utf-8 -*-' >> /usr/bin/selenoprofiles \
+	&& echo 'import re' >> /usr/bin/selenoprofiles \
+	&& echo 'import sys' >> /usr/bin/selenoprofiles \
+	&& echo 'from selenoprofiles4.selenoprofiles4 import main' >> /usr/bin/selenoprofiles \
+	&& echo "if __name__ == '__main__':" >> /usr/bin/selenoprofiles \
+	&& echo "BUBBAsys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])" >> /usr/bin/selenoprofiles \
+	&& echo 'BUBBAsys.exit(main())' >> /usr/bin/selenoprofiles \
+	&& sed -i "s/BUBBA/    /g" /usr/bin/selenoprofiles \
+	&& chmod 775 /usr/bin/selenoprofiles
+	
+
+
+#chmod +x /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+#&& sed -i "s/from ._version import __version__/from _version import __version__/g"  /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+#        && sed -i "s/from .load_config import selenoprofiles_config_content/from load_config import selenoprofiles_config_content/g" /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+#        && sed -i "s/from .MMlib3 import \*/from MMlib3 import \*/g" /usr/local/lib/python3.9/site-packages/selenoprofiles4/*.py \
+#        && sed -i "s/from .selenoprofiles/from selenoprofiles/g" /usr/local/lib/python3.9/site-packages/selenoprofiles4/*.py \
+#	&& sed -i 's/config_filename = os.path.expanduser(\"\~\") + \"\/.selenoprofiles_config.txt\"/config_filename = home_config_filename/' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
+# && ln -s /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py /usr/bin/selenoprofiles
 
 #&& sed -i '1281i BUBBAprint("inside if -setup config file location :", config_filename)' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
 #&& sed -i '1317i BUBBAprint("after the resolve_link stuff" )' /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofiles4.py \
@@ -108,7 +122,7 @@ RUN chmod +x /usr/local/lib/python3.9/site-packages/selenoprofiles4/selenoprofil
 
 
 # this is the last piece to fix relative import in python
-ENV PYTHONPATH "${PYTHONPATH}:/usr/local/lib/python3.9/site-packages/selenoprofiles4"
+#ENV PYTHONPATH "${PYTHONPATH}:/usr/local/lib/python3.9/site-packages/selenoprofiles4"
 
 # Adding also to the path the directory where blast is so that is callable from command line
 # and it knows where the data/ dir is for the BLOSUM matrices and so on
