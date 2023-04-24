@@ -18,7 +18,7 @@ params.CONTAINER =  "cbcrg/tcoffee@sha256:36c526915a898d5c15ede89bbc3854c0a66cef
 params.INPUT = "${params.TEST_DIR}bubbabubba"
 params.OUTNAME = false
 params.FORMAT = "clustalw,fasta_aln"
-params.OUTPUT_DIR = "${params.TEST_DIR}seleno_out/"
+params.OUTPUT_DIR = "${params.TEST_DIR}"
 params.PUBLISH = true
 
 
