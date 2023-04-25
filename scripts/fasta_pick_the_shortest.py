@@ -12,8 +12,10 @@ def fasta_longest(in_fasta):
 		buffer_header = ''
 		for line in infasta:
 			if line[0] == '>':
-				if not sequence:
-					sequence = buffer_seq			## the first iteration will be empty byt in the second it will innclude the first sequence
+				if not sequence:			
+					## the first iteration will be empty, but in the second it will innclude the first sequence and header
+					sequence = buffer_seq
+					header = buffer_header
 				elif len( buffer_seq ) < len( sequence ):		## using the sequence saved itself as variable for the max length found
 					sequence = buffer_seq
 					header = buffer_header
