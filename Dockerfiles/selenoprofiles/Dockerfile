@@ -15,6 +15,7 @@ RUN apt-get update \
     && apt-get install gawk \
     && apt-get install gettext -y \
     && apt-get install sqlite3 \
+    && apt-get install rename \
     && apt-get clean \
     && apt-get purge \
     && rm -rf /var/lib/apt/lists/* /tmp/*

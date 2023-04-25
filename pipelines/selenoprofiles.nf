@@ -19,6 +19,7 @@ params.INPUT = "${params.TEST_DIR}bubbabubba"
 params.INPUT_ALN = null
 params.PROFILE = false
 params.OUTPUT_DIR = "${params.TEST_DIR}seleno_out/"
+params.OUTPUT_FORMAT = "p2g"
 params.PUBLISH = true
 params.SPECIES = "homo_sapiens"
 
@@ -58,13 +59,17 @@ process seleno_runner_custom {
 	val species
 	
 	output:
-	tuple path("tmp/*/output/*.p2g"), path("tmp/*/output/*.ali"), emit: out_files, optional: true
+	//tuple path("tmp/*/output/*.p2g"), path("tmp/*/output/*.ali"), emit: out_files, optional: true
+	path "${out_names}*", emit: out_files, optional: true
 	stdout emit: standardout
 
 	script:
+	out_names = "${infasta.simpleName}_" + "${profile.simpleName}"
 	"""
 	selenoprofiles -setup
- 	selenoprofiles -o tmp -t ${infasta} -s ${species} -P ${profile}
+ 	selenoprofiles -o tmp -t ${infasta} -s ${species} -P ${profile} -output_${params.OUTPUT_FORMAT}
+	mv tmp/*/output/* .
+	rename ${profile.simpleName} ${out_names} ${profile.simpleName}*
 	"""
 }
 
@@ -88,7 +93,7 @@ process seleno_runner {
         """
         selenoprofiles -setup
         selenoprofiles -download -y
-        selenoprofiles -o tmp -t ${infasta} -s ${species} -P ${profile}
+        selenoprofiles -o tmp -t ${infasta} -s ${species} -P ${profile} -output_${params.OUTPUT_FORMAT}
         """
 }
 
