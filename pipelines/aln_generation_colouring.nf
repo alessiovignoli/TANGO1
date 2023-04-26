@@ -547,7 +547,7 @@ workflow retrieve_fastas {
 	in_headers = Channel.fromPath(pattern_to_headers)
 	retrieval_pyscript = params.SCRIPTS + 'from_header_to_fasta.py'
 	nfiles_search(in_headers, pattern_to_searchfiles, retrieval_pyscript)
-	suffix = "fastaoneline"
+	suffix = ".fastaoneline"
 	retrieved_file = oneliner_ch(nfiles_search.out.retrieved_fasta, suffix)
 
 	emit:

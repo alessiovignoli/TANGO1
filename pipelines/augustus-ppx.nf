@@ -182,7 +182,7 @@ workflow  augustus_ppx {
 	in_ref = null
 	if ( pattern_to_fasta ) {
 		fastas = channel.fromPath(pattern_to_fasta)
-		oneliner_ch(fastas.first(), 'onelinefa')
+		oneliner_ch(fastas.first(), '.onelinefa')
 		align_generation(oneliner_ch.out.onelinefasta)
 		in_ref = align_generation.out.aln_file
 	} else {
