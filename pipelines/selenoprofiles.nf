@@ -1,13 +1,33 @@
 #!/usr/bin/env nextflow
 
 
+// If the --help parameter is used in the command line, the pipeline will print the following help section:
 
-// this prints the help in case you use --help parameter in the command line and it stops the pipeline
 if (params.help) {
-        log.info 'This is the help section of this pipeline'
-        log.info ''
-        log.info ''
-        log.info ''
+	log.info 'This is the help section of this pipeline'
+	log.info 'This pipeline performs a selenoprotein annotation of nucleotide sequences using selenoprofiles, which is a tool for predicting selenoprotein genes and their cognate SECIS elements. The pipeline can be run in two modes: (1) build a selenoprotein profile using multiple sequence alignments (MSA) as input, or (2) run the annotation using pre-built selenoprotein profiles.'
+	log.info 'It can however be used to annotate other gene families with the correct profile.'
+	log.info '\nFor more info about selenoprofiles4 functionig refer to the documentation page -> https://selenoprofiles4.readthedocs.io/en/latest/index.html\n'
+	log.info 'The input parameters that manage the functioning of the pipeline are:'
+	log.info '--CONTAINER		specifies the docker container image that contains the required dependencies and software versions for running the pipeline.'
+	log.info '--INPUT		mandatory flag, specifies the input path to the nucleotide sequence file(s) in fasta format.' 
+	log.info '			This are the file(s) that have to be predicted by selenoprofiles, a whole genome a chromosome or a gene region.'
+	log.info '--INPUT_ALN		This parameter is optional, it switch to mode (2), it is the path to the multiple sequence alignment file(s) in fasta format.' 
+	log.info '			Friom this file it builds custom selenoprotein profiles used during the DNA prediction step.'
+	log.info '                      If more then one file is given as input each DNA file will be predicted with each custom profile.'
+	log.info '--PROFILE		optional flag, it is mandatory if no ---INPUT_ALN has been given.'
+	log.info '			It specifies the name of the pre-build profiles, for possible values refer to selenoprofiles4 documentation page.'
+	log.info '--OUTPUT_DIR		optional flag, specifies the output directory for the selenoprotein annotation results.'
+	log.info '			default value ${params.TEST_DIR}seleno_out/ , where the value of params.TEST_DIR is found in the nextflow.config file'
+	log.info '--OUTPUT_FORMAT1	optional flag, specifies the output format for the predicted genes. default value   fasta  .'
+	log.info '--OUTPUT_FORMAT2	optional flag, specifies the output format for the predicted genes. default value   gff  .'
+	log.info '--PUBLISH		specifies whether to publish or not the output file and the custom profile, default true = publish = output'
+	log.info '--SPECIES		optional flag, the name of the species analized, it can be whatever string value. It is used in internal filenames so be carefull.'
+	log.info '			it is the value of the oprion -s in selenoprofiles.'
+	log.info '\n####   WARNING  #####\n'
+	log.info 'the pipeline always outputs 4 files + custom profile (3 files) if in mode(2). Out of the non-profile files 2 are always present:'
+	log.info '.p2g and .ali (defaults in selenoprofiles4) on top of this the pipeline outputs two other files   .fasta and .gff  by default'
+	log.info 'However this last 2 can be changed to any other type of supported output format. For the complete list refer to selenoprofiles4 documenattion page.'
         log.info '\n'
         exit 1
 }
@@ -50,7 +70,8 @@ process seleno_build_profile {
 
 
 process seleno_runner_custom {
-	publishDir(params.OUTPUT_DIR, mode: 'move', overwrite: true, saveAs:  { filename ->  "${out_names}.${filename.split('\\.')[-1]}" })
+	publishDir(params.OUTPUT_DIR, mode: 'move', overwrite: true, saveAs:  { filename -> if(filename.endsWith(".ali")) "${out_names}.${filename.split('\\.')[-1]}"
+										else "${out_names}.${filename.split('\\.')[-3]}.${filename.split('\\.')[-2]}.${filename.split('\\.')[-1]}" })
 	tag { "${infasta}" }
 	container params.CONTAINER
 	scratch true 
@@ -76,9 +97,11 @@ process seleno_runner_custom {
 
 
 process seleno_runner {
-	publishDir(params.OUTPUT_DIR, mode: 'move', overwrite: true)
-        tag { "${infasta}" }
+	publishDir(params.OUTPUT_DIR, mode: 'move', overwrite: true, saveAs:  { filename -> if(filename.endsWith(".ali")) "${out_names}.${filename.split('\\.')[-1]}"
+                                                                                else "${out_names}.${filename.split('\\.')[-3]}.${filename.split('\\.')[-2]}.${filename.split('\\.')[-1]}" })
+	tag { "${infasta}" }
         container params.CONTAINER
+	scratch true
 
         input:
         path infasta
