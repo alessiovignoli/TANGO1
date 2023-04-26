@@ -19,7 +19,8 @@ params.INPUT = "${params.TEST_DIR}bubbabubba"
 params.INPUT_ALN = null
 params.PROFILE = false
 params.OUTPUT_DIR = "${params.TEST_DIR}seleno_out/"
-params.OUTPUT_FORMAT = "p2g"
+params.OUTPUT_FORMAT1 = "fasta"
+params.OUTPUT_FORMAT2 = "gff"
 params.PUBLISH = true
 params.SPECIES = "homo_sapiens"
 
@@ -49,9 +50,10 @@ process seleno_build_profile {
 
 
 process seleno_runner_custom {
-	publishDir(params.OUTPUT_DIR, mode: 'move', overwrite: true)
+	publishDir(params.OUTPUT_DIR, mode: 'move', overwrite: true, saveAs:  { filename ->  "${out_names}.${filename.split('\\.')[-1]}" })
 	tag { "${infasta}" }
 	container params.CONTAINER
+	scratch true 
 
 	input:
 	each path(infasta)
@@ -59,17 +61,15 @@ process seleno_runner_custom {
 	val species
 	
 	output:
-	//tuple path("tmp/*/output/*.p2g"), path("tmp/*/output/*.ali"), emit: out_files, optional: true
-	path "${out_names}*", emit: out_files, optional: true
+	path "${profile.simpleName}*", emit: out_files, optional: true
 	stdout emit: standardout
 
 	script:
 	out_names = "${infasta.simpleName}_" + "${profile.simpleName}"
 	"""
 	selenoprofiles -setup
- 	selenoprofiles -o tmp -t ${infasta} -s ${species} -P ${profile} -output_${params.OUTPUT_FORMAT}
-	mv tmp/*/output/* .
-	rename ${profile.simpleName} ${out_names} ${profile.simpleName}*
+ 	selenoprofiles -o tmp -t ${infasta} -s ${species} -P ${profile} -output_${params.OUTPUT_FORMAT1} -output_${params.OUTPUT_FORMAT2}
+	mv tmp//${species}.${infasta.simpleName}/output/* .
 	"""
 }
 
@@ -93,7 +93,7 @@ process seleno_runner {
         """
         selenoprofiles -setup
         selenoprofiles -download -y
-        selenoprofiles -o tmp -t ${infasta} -s ${species} -P ${profile} -output_${params.OUTPUT_FORMAT}
+        selenoprofiles -o tmp -t ${infasta} -s ${species} -P ${profile} -output_${params.OUTPUT_FORMAT1}
         """
 }
 
