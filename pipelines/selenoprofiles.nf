@@ -43,6 +43,53 @@ params.OUTPUT_FORMAT1 = "fasta"
 params.OUTPUT_FORMAT2 = "gff"
 params.PUBLISH = true
 params.SPECIES = "homo_sapiens"
+params.BLAST_FILTER = 'default'
+params.P2G_FILTER = 'default'
+params.P2G_REFILTER = 'default'
+
+
+process  generate_config_file {
+	container params.CONTAINER
+	
+	output:
+        path ".selenoprofiles_config.txt", emit: config_file, hidden: true
+	
+	script:
+        """
+        selenoprofiles -setup
+        """
+}
+
+
+
+process apply_custom_filters {
+        container params.CONTAINER
+	stageInMode 'copy'
+
+        input:
+        path config_file
+	val blast
+	val filter
+	val refilter
+
+        output:
+        path ".selenoprofiles_config.txt", emit: config_file, hidden: true
+        stdout emit: standardout						// for debug
+
+        script:
+        """
+	if [ ${blast} != 'default' ]; then
+		sed -i "s/x.evalue < 1e-2  or x.sec_is_aligned()/${blast}/" .selenoprofiles_config.txt
+	fi
+	if [ ${filter} != 'default' ]; then
+                sed -i "s/len(x.protein()) >60 or x.coverage()> 0.4/${filter}/" .selenoprofiles_config.txt
+        fi
+	if [ ${refilter} != 'default' ]; then
+                sed -i "s/x.awsi_filter()/${refilter}/" .selenoprofiles_config.txt
+        fi
+        cat .selenoprofiles_config.txt
+        """
+}
 
 
 
@@ -53,6 +100,7 @@ process seleno_build_profile {
 
 	input:
 	path inaln
+	path config_file
 
 	output:
         tuple path("${out_profile_name}"), path("${out_profile_name}.config"), path("${out_profile_name}.profile_data"), emit: tupled_profile
@@ -61,10 +109,8 @@ process seleno_build_profile {
 	script:
 	out_profile_name = "${inaln.BaseName}" + "_profile.fa"
         """
-        selenoprofiles -setup
         selenoprofiles build -i ${inaln} -o ${out_profile_name} -y
         """
-
 }
 
 
@@ -74,11 +120,12 @@ process seleno_runner_custom {
 										else "${out_names}.${filename.split('\\.')[-3]}.${filename.split('\\.')[-2]}.${filename.split('\\.')[-1]}" })
 	tag { "${infasta}" }
 	container params.CONTAINER
-	scratch true 
+	//scratch true 
 
 	input:
 	each path(infasta)
 	tuple path(profile), path(pro_config), path(pro_data)
+	path config_file
 	val species
 	
 	output:
@@ -88,7 +135,6 @@ process seleno_runner_custom {
 	script:
 	out_names = "${infasta.simpleName}_" + "${profile.simpleName}"
 	"""
-	selenoprofiles -setup
  	selenoprofiles -o tmp -t ${infasta} -s ${species} -P ${profile} -output_${params.OUTPUT_FORMAT1} -output_${params.OUTPUT_FORMAT2}
 	if [ "\$(ls -A tmp/${species}.${infasta.simpleName}/output/)"  ]; then
 		mv tmp/${species}.${infasta.simpleName}/output/* .
@@ -108,6 +154,7 @@ process seleno_runner {
         input:
         path infasta
 	each profile
+	path config_file
 	val species
 
 	output:
@@ -116,7 +163,6 @@ process seleno_runner {
 
         script:
         """
-        selenoprofiles -setup
         selenoprofiles -download -y
         selenoprofiles -o tmp -t ${infasta} -s ${species} -P ${profile} -output_${params.OUTPUT_FORMAT1}
 	if [ "\$(ls -A tmp/${species}.${infasta.simpleName}/output/)"  ]; then
@@ -139,27 +185,38 @@ workflow seleno_louncher {
 	main:
 	in_fasta = Channel.fromPath(pattern_to_fasta)
 
-	output_files = null
+	// Creating the config file only once at the beginning
+	conf_file = generate_config_file()
 
+	// Modifying the config file according to the filtering criterias if necessary
+	config_with_filter = conf_file
+	if (params.BLAST_FILTER != 'default' ||  params.P2G_FILTER != 'default' || params.P2G_REFILTER != 'default') {
+		apply_custom_filters(conf_file, params.BLAST_FILTER, params.P2G_FILTER, params.P2G_REFILTER)
+		config_with_filter = apply_custom_filters.out.config_file	
+	}
+
+	output_files = null
 	if (pattern_to_aln != null) {
 		in_aln = Channel.fromPath(pattern_to_aln)
-		seleno_build_profile(in_aln)
-		seleno_runner_custom(in_fasta, seleno_build_profile.out.tupled_profile, spcies_name)
+		seleno_build_profile(in_aln, conf_file)
+		seleno_runner_custom(in_fasta, seleno_build_profile.out.tupled_profile, config_with_filter, spcies_name)
 		output_files = seleno_runner_custom.out.out_files
 	} else {
 		profiles = Channel.of("${profile_name}".split(","))
-		seleno_runner(in_fasta, profiles, spcies_name)
+		seleno_runner(in_fasta, profiles, config_with_filter, spcies_name)
 		output_files = seleno_runner.out.out_files
 	}
 
 	emit:
 	outfile = output_files
+	stout = apply_custom_filters.out.standardout		// for debug
 }	
 
 
 workflow {
 	seleno_louncher(params.OUTPUT_DIR, params.INPUT, params.INPUT_ALN, params.PROFILE, params.SPECIES)
 	seleno_louncher.out.outfile.view()
+	seleno_louncher.out.stout.view()			// for debug
 }
 
 workflow.onComplete { println 'Done' }
