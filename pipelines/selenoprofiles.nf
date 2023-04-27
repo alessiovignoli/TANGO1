@@ -90,7 +90,9 @@ process seleno_runner_custom {
 	"""
 	selenoprofiles -setup
  	selenoprofiles -o tmp -t ${infasta} -s ${species} -P ${profile} -output_${params.OUTPUT_FORMAT1} -output_${params.OUTPUT_FORMAT2}
-	mv tmp//${species}.${infasta.simpleName}/output/* .
+	if [ "\$(ls -A tmp/${species}.${infasta.simpleName}/output/)"  ]; then
+		mv tmp/${species}.${infasta.simpleName}/output/* .
+	fi
 	"""
 }
 
@@ -117,6 +119,9 @@ process seleno_runner {
         selenoprofiles -setup
         selenoprofiles -download -y
         selenoprofiles -o tmp -t ${infasta} -s ${species} -P ${profile} -output_${params.OUTPUT_FORMAT1}
+	if [ "\$(ls -A tmp/${species}.${infasta.simpleName}/output/)"  ]; then
+                mv tmp/${species}.${infasta.simpleName}/output/* .
+        fi
         """
 }
 
@@ -157,4 +162,4 @@ workflow {
 	seleno_louncher.out.outfile.view()
 }
 
-
+workflow.onComplete { println 'Done' }
