@@ -120,7 +120,7 @@ process seleno_runner_custom {
 										else "${out_names}.${filename.split('\\.')[-3]}.${filename.split('\\.')[-2]}.${filename.split('\\.')[-1]}" })
 	tag { "${infasta}" }
 	container params.CONTAINER
-	//scratch true 
+	scratch true 
 
 	input:
 	each path(infasta)
