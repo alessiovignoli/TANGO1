@@ -74,7 +74,7 @@ process apply_custom_filters {
 
         output:
         path ".selenoprofiles_config.txt", emit: config_file, hidden: true
-        stdout emit: standardout						// for debug
+        //stdout emit: standardout						// for debug
 
         script:
         """
@@ -191,7 +191,21 @@ workflow seleno_louncher {
 	// Modifying the config file according to the filtering criterias if necessary
 	config_with_filter = conf_file
 	if (params.BLAST_FILTER != 'default' ||  params.P2G_FILTER != 'default' || params.P2G_REFILTER != 'default') {
-		apply_custom_filters(conf_file, params.BLAST_FILTER, params.P2G_FILTER, params.P2G_REFILTER)
+
+		// Nextflow automatically changes <True> in CLI to a boolean <true> but in python it is <True> with capital T
+		blast_filter = params.BLAST_FILTER
+		p2g_filter = params.P2G_FILTER
+		p2g_refilter = params.P2G_REFILTER 
+		if (params.BLAST_FILTER == true) {
+			blast_filter = 'True'
+		}
+		if (params.P2G_FILTER == true) {
+			p2g_filter = 'True'
+		}
+		if (params.P2G_REFILTER == true) {
+			p2g_refilter = 'True '
+		}
+		apply_custom_filters(conf_file, blast_filter, p2g_filter, p2g_refilter)
 		config_with_filter = apply_custom_filters.out.config_file	
 	}
 
@@ -209,14 +223,14 @@ workflow seleno_louncher {
 
 	emit:
 	outfile = output_files
-	stout = apply_custom_filters.out.standardout		// for debug
+	//stout = apply_custom_filters.out.standardout		// for debug
 }	
 
 
 workflow {
 	seleno_louncher(params.OUTPUT_DIR, params.INPUT, params.INPUT_ALN, params.PROFILE, params.SPECIES)
-	seleno_louncher.out.outfile.view()
-	seleno_louncher.out.stout.view()			// for debug
+	//seleno_louncher.out.outfile.view()
+	//seleno_louncher.out.stout.view()			// for debug
 }
 
 workflow.onComplete { println 'Done' }
