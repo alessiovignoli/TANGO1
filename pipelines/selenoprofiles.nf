@@ -42,6 +42,7 @@ params.OUTPUT_DIR = "${params.TEST_DIR}seleno_out/"
 params.OUTPUT_FORMAT1 = "fasta"
 params.OUTPUT_FORMAT2 = "gff"
 params.PUBLISH = true
+params.SCRATCH = true
 params.SPECIES = "homo_sapiens"
 params.BLAST_FILTER = 'default'
 params.P2G_FILTER = 'default'
@@ -78,13 +79,13 @@ process apply_custom_filters {
 
         script:
         """
-	if [ ${blast} != 'default' ]; then
+	if [ "${blast}" != 'default' ]; then
 		sed -i "s/x.evalue < 1e-2  or x.sec_is_aligned()/${blast}/" .selenoprofiles_config.txt
 	fi
-	if [ ${filter} != 'default' ]; then
+	if [ "${filter}" != 'default' ]; then
                 sed -i "s/len(x.protein()) >60 or x.coverage()> 0.4/${filter}/" .selenoprofiles_config.txt
         fi
-	if [ ${refilter} != 'default' ]; then
+	if [ "${refilter}" != 'default' ]; then
                 sed -i "s/x.awsi_filter()/${refilter}/" .selenoprofiles_config.txt
         fi
         cat .selenoprofiles_config.txt
@@ -120,7 +121,7 @@ process seleno_runner_custom {
 										else "${out_names}.${filename.split('\\.')[-3]}.${filename.split('\\.')[-2]}.${filename.split('\\.')[-1]}" })
 	tag { "${infasta}" }
 	container params.CONTAINER
-	scratch true 
+	scratch params.SCRATCH 
 
 	input:
 	each path(infasta)
