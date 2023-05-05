@@ -51,8 +51,10 @@ workflow ch_pairer {
 	input_files1.map{ it -> [it.baseName, it]}.set{tupled_1}
 	input_files2.map{ it -> [it.baseName, it]}.set{tupled_2}
 	//tupled_1.view()
+	//tupled_2.view()
 	tupled_1.combine(tupled_2, by:0).set{correct_pairs}
-	//right_pairs.view()
+	//correct_pairs.view()
+	correct_pairs.ifEmpty( { println('No matching scheme has been found between the input files. Remember it should be file1.some.txt file1.some.fasta,  <file1.some> is the matching key.')})
 	
 	emit:
 	correct_pairs
