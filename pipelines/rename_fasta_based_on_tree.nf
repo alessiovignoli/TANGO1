@@ -25,11 +25,9 @@ if (params.help) {
         log.info "with the flag --INPUT_TREE the tree is given to the pipeline, with --INPUT_FASTA the corresponding fasta file is given"
         log.info "for multiple couples of tree and fasta there is the following sheme:"
         log.info ""
-	log.info "Non-canonical (nextflow from filepairs) pairing scheme:"
-	log.info "In this case the tree file and the FASTA file name can be whatever. The only thing that links them is the content matched by the asterisk."
-	log.info "e.g. tree = sample1.txt, sample2.txt  fastafile = sample_1.fasta, sample_2.fasta"
- 	log.info "In this case, the flags will be --INPUT_TREE \"sample*.txt\" --fasta \"sample_*.fasta\""
- 	log.info "WARNING: Only one asterisk is recognized as glob pattern."
+	log.info "####  WARNIONG #####"
+	log.info "This module imports channel_files_pairer.nf ch_pairer workflow to handle matching of multiple file pairs."
+	log.info "go look help section of that script for more detaqils."
         log.info ""
         log.info "to work on the fasta file the sequence has to be on one line only so by default the pipeline will do it by itself"
         log.info "this behaviour can be changed, so to skip this process, pass any value to --ONE_LINE flag"
@@ -57,7 +55,7 @@ include { ch_pairer } from "${params.PIPES}channel_files_pairer"
 
 
 process   matcher_renamer_fasta {
-	//publishDir(params.OUTPUT_DIR, mode: 'copy', overwrite: false)
+	publishDir(params.OUTPUT_DIR, mode: 'move', overwrite: true)
 	container params.CONTAINER
 	tag { "${matcher}" }
 
@@ -72,10 +70,16 @@ process   matcher_renamer_fasta {
 	stdout emit: standardout
 
 	script:
-	out_renamedfasta = "${fastaFile}".split('\\.')[0] + ".renamed"
-	"""
-	./${matchrename_script} ${treeFile} ${fastaFile} ${out_renamedfasta} ${delimit}
-	"""
+	out_renamedfasta = "${fastaFile}".split('\\.')[0] + ".renamed.fasta"
+	if (delimit.isEmpty()) {
+		"""
+		python3 ${matchrename_script} -t ${treeFile} -f ${fastaFile} -o ${out_renamedfasta}
+		"""
+	} else {
+		"""
+		python3 ${matchrename_script} -t ${treeFile} -f ${fastaFile} -o ${out_renamedfasta} -d ${delimit}
+		"""
+	}
 }
 
 
@@ -104,11 +108,14 @@ workflow  match_and_order_treefasta {
 	matcher_renamer_fasta(ch_pairer.out.correct_pairs, delimiter, matchrename_pyscript)
 
 	emit:
+	final_out = matcher_renamer_fasta.out.renamed_fasta
 	stout = matcher_renamer_fasta.out.standardout
 }
 
 workflow {
 	match_and_order_treefasta(params.INPUT_TREE, params.INPUT_FASTA, params.DELIMITER)
+	match_and_order_treefasta.out.final_out.view()
 	match_and_order_treefasta.out.stout.view()
+	
 }
 
