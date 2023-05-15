@@ -70,7 +70,7 @@ process   matcher_renamer_fasta {
 	stdout emit: standardout
 
 	script:
-	out_renamedfasta = "${fastaFile}".split('\\.')[0] + ".renamed.fasta"
+	out_renamedfasta = "${fastaFile.baseName}" + ".renamed.fasta"
 	if (delimit.isEmpty()) {
 		"""
 		python3 ${matchrename_script} -t ${treeFile} -f ${fastaFile} -o ${out_renamedfasta}

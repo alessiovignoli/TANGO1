@@ -48,8 +48,8 @@ workflow ch_pairer {
 	input_files2
 
 	main:
-	input_files1.map{ it -> [it.baseName, it]}.set{tupled_1}
-	input_files2.map{ it -> [it.baseName, it]}.set{tupled_2}
+	input_files1.map{ it -> [it.simpleName, it]}.set{tupled_1}
+	input_files2.map{ it -> [it.simpleName, it]}.set{tupled_2}
 	//tupled_1.view()
 	//tupled_2.view()
 	tupled_1.combine(tupled_2, by:0).set{correct_pairs}
