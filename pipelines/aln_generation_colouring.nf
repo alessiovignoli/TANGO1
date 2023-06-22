@@ -414,7 +414,7 @@ process couloring_aln  {
 	if(params.SPECIAL_HELIX == false)
 		"""
 		export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/ncbi-blast/bin:/opt/tcoffee/bin:/opt/tcoffee/plugins/linux/ TEMP=/tmp PERL5LIB=/opt/tcoffee/perl/lib/perl5 DIR_4_TCOFFEE=/opt/tcoffee EMAIL_4_TCOFFEE=tcoffee.msa@gmail.com CACHE_4_TCOFFEE=/tmp/cache/ LOCKDIR_4_TCOFFEE=/tmp/lck/ TMP_4_TCOFFEE=/tmp/                           # for singularity env variables
-		export ALN_LINE_LENGTH=150		# to make allignments of that length in html format
+		export ALN_LINE_LENGTH=96		# to make allignments of that length in html format
 		touch ${html_sH_outfile}
 		echo ${html_outfile}
 		t_coffee -other_pg seq_reformat -in ${aln_file} -rename ${rename_file} -out ${renamed_aln}

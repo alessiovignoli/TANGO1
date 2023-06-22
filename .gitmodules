@@ -1,0 +1,3 @@
+[submodule "bin/python_codebase"]
+	path = bin/python_codebase
+	url = https://github.com/alessiovignoli/python_codebase.git
