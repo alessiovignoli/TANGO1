@@ -4,16 +4,20 @@
 
 process group_sample_per_tissue {
 	container params.CONTAINER
+	storeDir params.STORE_DIR
 
 	input:
 	path tissue_info
 
 	output:
-	stdout emit: standardout                                              // for debug
+	path tissue_dict_out, emit: tissue_sample_dict
+	//stdout emit: standardout                                              // for debug
 
 	script:
+	tissue_dict_out = "${tissue_info.baseName}" + ".pkl"
         """
 	gtex_group_sample_per_tissue.py --sample_annotations ${tissue_info} \
+					--out_name ${tissue_dict_out} \
 					--tissue_pos ${params.TISSUE_POS} \
 					--sample_pos ${params.SAMPLE_POS} \
 					--delimiter ${params.TISSUE_DELIMITER}
@@ -39,7 +43,8 @@ workflow GTEx_id_tissue_expr {
 	group_sample_per_tissue(in_tissue_info)
 
 	emit:
-	stout = group_sample_per_tissue.out.standardout			//for debug
+	outfile = group_sample_per_tissue.out.tissue_sample_dict
+	stout = 'bubba' //group_sample_per_tissue.out.standardout			//for debug
 
 }
 

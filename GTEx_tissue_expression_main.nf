@@ -46,7 +46,8 @@ params.IN_DATA = null
 params.TISSUE_DELIMITER = '\t'
 params.TISSUE_POS = 6
 params.SAMPLE_POS = 0
-params.OUTPUT_DIR = "${params.TEST_DIR}"
+params.OUTPUT_DIR = "${params.TEST_DIR}"	
+params.STORE_DIR = "${params.TEST_DIR}GTEx_data/"
 params.PUBLISH = true
 params.SCRATCH = true
 
@@ -59,7 +60,7 @@ include { GTEx_id_tissue_expr } from "${params.PIPES}GTEx_tissue_expression_per_
 
 workflow {
         GTEx_id_tissue_expr(params.IN_IDS, params.IN_TISSUE, params.IN_DATA)
-        //GTEx_id_tissue_expr.out.outfile.view()
+        GTEx_id_tissue_expr.out.outfile.view()
         GTEx_id_tissue_expr.out.stout.view()                      // for debug
 }
 
