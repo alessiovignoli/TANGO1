@@ -20,10 +20,33 @@ process group_sample_per_tissue {
 					--out_name ${tissue_dict_out} \
 					--tissue_pos ${params.TISSUE_POS} \
 					--sample_pos ${params.SAMPLE_POS} \
-					--delimiter ${params.TISSUE_DELIMITER}
+					--delimiter ${params.GTEX_DELIMITER}
 	"""
 }
 
+
+process id_tissue_average {
+	container params.CONTAINER
+
+	input:
+        path tissue_info
+	path bulk_data
+	each ID
+
+	output:
+	stdout emit: standardout                                              // for debug
+
+	script:
+	out_name = "${bulk_data.baseName}" + ".${ID}"
+	"""
+	gtex_id_expr_per_tissue.py --tissue_dict ${tissue_info} \
+				   --gtex_data  ${bulk_data} \
+				   --ID ${ID} \
+				   --out_name ${out_name} \
+				   --id_pos ${params.ID_POS} \
+				   --delimiter ${params.GTEX_DELIMITER}
+	"""
+}
 
 
 
@@ -42,9 +65,18 @@ workflow GTEx_id_tissue_expr {
 	// Build the dictionary that connects sample ids to tissue
 	group_sample_per_tissue(in_tissue_info)
 
+	// Extract IDs to work one ID at time
+	in_ids.splitText().set{ all_IDS }
+	id_tissue_average(group_sample_per_tissue.out.tissue_sample_dict, in_bulk_data, all_IDS)
+
+
+	// if params.OUT_NAME is not false collect the output files IDs in one single file
+
+
+
 	emit:
 	outfile = group_sample_per_tissue.out.tissue_sample_dict
-	stout = 'bubba' //group_sample_per_tissue.out.standardout			//for debug
+	stout = id_tissue_average.out.standardout			//for debug
 
 }
 
