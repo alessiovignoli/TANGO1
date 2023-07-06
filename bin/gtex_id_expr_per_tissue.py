@@ -2,6 +2,7 @@
 
 import argparse
 from python_codebase.tabular import TabularFile
+from python_codebase.tabular import TabularLine
 from python_codebase.file_main import File
 
 def get_args():
@@ -24,18 +25,34 @@ def get_args():
 
 def main(tissue_dict, gtex_data, ID, out_name, id_pos, delimiter, header_line):
 
-    #print(tissue_dict, gtex_data, ID, out_name, id_pos, delimiter, header_line)
+    print(tissue_dict, gtex_data, ID, out_name, id_pos, delimiter, header_line)
 
     # Load dict
     file_obj = File(tissue_dict)
     loaded_dict = file_obj.PickleLoad()
 
-    # Open and extract the query ID line
+    # Open and extract the query ID line and place it in a list
     tabular_obj = TabularFile(gtex_data, delimiter)
-    query_line = tabular_obj.GrepLine(ID)
-    print(query_line)
-    #file_obj = File(out_name)
-    
+    query_line = tabular_obj.GrepLine(ID)			# this function returns a list 
+    tabline_obj = TabularLine(query_line[0], delimiter)
+    query_list = tabline_obj.ExtractAllButField(position=id_pos, return_type='list')
+    print(query_list)
+
+    # Get header line
+    opened_file = tabular_obj.OpenRead(uncompress=True)
+    header_list = tabular_obj.ReturnHeader(opened_file, header_lines=header_line)		# returns all the lines up to the one asked
+    tabline_obj = TabularLine(header_list[ ( header_line - 1 ) ], delimiter)
+    header_elems = tabline_obj.ExtractAllButField(position=id_pos, return_type='list')
+    print(header_elems)
+
+    # now that all is loaded the actual look up strategy
+    for i, expr_value in enumerate(query_list):
+        #print(i, value)
+        #print(header_elems[i])
+        for key, value in loaded_dict.items():
+            if header_elems[i] in value:
+                print(key)
+        
 
 
 
