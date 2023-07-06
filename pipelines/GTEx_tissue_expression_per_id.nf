@@ -42,9 +42,10 @@ process id_tissue_average {
 	gtex_id_expr_per_tissue.py --tissue_dict ${tissue_info} \
 				   --gtex_data  ${bulk_data} \
 				   --ID ${ID} \
-				   --out_name ${out_name} \
+ 				   --out_name ${out_name} \
 				   --id_pos ${params.ID_POS} \
-				   --delimiter ${params.GTEX_DELIMITER}
+				   --delimiter ${params.GTEX_DELIMITER} \
+				   --header_line ${params.HEADER_LINE}
 	"""
 }
 
@@ -66,7 +67,7 @@ workflow GTEx_id_tissue_expr {
 	group_sample_per_tissue(in_tissue_info)
 
 	// Extract IDs to work one ID at time
-	in_ids.splitText().set{ all_IDS }
+	in_ids.splitText(){ it.trim() }.set{ all_IDS }
 	id_tissue_average(group_sample_per_tissue.out.tissue_sample_dict, in_bulk_data, all_IDS)
 
 
