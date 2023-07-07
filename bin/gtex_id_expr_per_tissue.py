@@ -25,33 +25,42 @@ def get_args():
 
 def main(tissue_dict, gtex_data, ID, out_name, id_pos, delimiter, header_line):
 
-    print(tissue_dict, gtex_data, ID, out_name, id_pos, delimiter, header_line)
-
     # Load dict
     file_obj = File(tissue_dict)
     loaded_dict = file_obj.PickleLoad()
-
+    #print(loaded_dict)
     # Open and extract the query ID line and place it in a list
     tabular_obj = TabularFile(gtex_data, delimiter)
     query_line = tabular_obj.GrepLine(ID)			# this function returns a list 
     tabline_obj = TabularLine(query_line[0], delimiter)
     query_list = tabline_obj.ExtractAllButField(position=id_pos, return_type='list')
-    print(query_list)
-
+    #print(query_list)
     # Get header line
     opened_file = tabular_obj.OpenRead(uncompress=True)
     header_list = tabular_obj.ReturnHeader(opened_file, header_lines=header_line)		# returns all the lines up to the one asked
     tabline_obj = TabularLine(header_list[ ( header_line - 1 ) ], delimiter)
     header_elems = tabline_obj.ExtractAllButField(position=id_pos, return_type='list')
-    print(header_elems)
-
+    #print(header_elems)
     # now that all is loaded the actual look up strategy
+    expr_dict = {}
     for i, expr_value in enumerate(query_list):
-        #print(i, value)
-        #print(header_elems[i])
-        for key, value in loaded_dict.items():
-            if header_elems[i] in value:
-                print(key)
+        for tissue, samples in loaded_dict.items():
+            if header_elems[i] in samples:
+
+                # Update values and counts of existing tissues in final dict
+                if tissue in expr_dict:
+                    expr_dict[tissue][0] += float(expr_value)
+                    expr_dict[tissue][1] += 1
+
+                # To create a new key in expr dict
+                else:
+                    expr_dict[tissue] = [float(expr_value), 1]
+    
+    # compute average and write to output
+    output_obj = TabularFile(out_name, delimiter)
+    opened_out = output_obj.OpenWrite()
+    for tissue_name, counts in expr_dict.items():
+        opened_out.write( tissue_name + delimiter + str(counts[0]/counts[1]) + delimiter + str(counts[1]) + '\n' )
         
 
 

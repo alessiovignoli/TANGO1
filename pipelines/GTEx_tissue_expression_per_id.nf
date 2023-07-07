@@ -34,6 +34,7 @@ process id_tissue_average {
 	each ID
 
 	output:
+	path out_name, emit: id_tissue_avg_expr
 	stdout emit: standardout                                              // for debug
 
 	script:
@@ -72,11 +73,16 @@ workflow GTEx_id_tissue_expr {
 
 
 	// if params.OUT_NAME is not false collect the output files IDs in one single file
-
+	outfile = null
+	if (params.OUT_NAME) {
+		outfile = id_tissue_average.out.id_tissue_avg_expr.collectFile( name: params.OUT_NAME, storeDir: params.OUTPUT_DIR ) 
+	} else {
+		outfile = id_tissue_average.out.id_tissue_avg_expr.collectFile( storeDir: params.OUTPUT_DIR)
+	}
 
 
 	emit:
-	outfile = group_sample_per_tissue.out.tissue_sample_dict
+	outfile // id_tissue_average.out.id_tissue_avg_expr
 	stout = id_tissue_average.out.standardout			//for debug
 
 }
