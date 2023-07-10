@@ -60,7 +60,7 @@ def main(tissue_dict, gtex_data, ID, out_name, id_pos, delimiter, header_line):
     output_obj = TabularFile(out_name, delimiter)
     opened_out = output_obj.OpenWrite()
     for tissue_name, counts in expr_dict.items():
-        opened_out.write( tissue_name + delimiter + str(counts[0]/counts[1]) + delimiter + str(counts[1]) + '\n' )
+        opened_out.write( tissue_name + delimiter + str(counts[0]/counts[1])[:9] + delimiter + str(counts[1]) + '\n' )
         
 
 
