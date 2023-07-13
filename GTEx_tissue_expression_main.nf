@@ -17,6 +17,19 @@ if (params.help) {
         log.info 'based on the tissue type of that column sample_id. Since the tissue types are in the order of 60 it becames more understandable.'
         log.info 'This is done per transcript/gene or genarally speacking ID. So that at the end it will look something like:'
         log.info 'requested_ID Brain-frontal_average Muscle-skeletal_average ecc..'
+        log.info 'This is the list of flags the pipeline accepts:'
+        log.info '--IN_IDS              mandatory field, the txt file containing the IDs for which the analisys should be done. This file should'
+        log.info '                      contain only an id per line and nothing else.'
+        log.info '--IN_TISSUE           mandatory flag, The sample annotation file. In version v8 this is a tab separeted file (tsv). '
+        log.info '                      This file contains the relationship between the samples_IDs and the tissue of extraction.'
+        log.info '                      It is though to have on each line a sample_id and the info for that sample in differrent fields, in them one is '
+        log.info '                      the tissue. The file is expected to have a first line as header that is going to be excluded.'
+        log.info '--IN_DATA             mandatory flag, the bulk data downloaqdable from GTEx from which the IN_IDS have to be extracted.'
+        log.info '                      It is assumed that each line contains all the sample values associated to only one gene/transcript ID.'
+        log.info '                      Basically every line of this file has a differerent ID per line.'
+        log.info '                      It also has to have an header line (specifiable which exactly) that contains the sample-IDs in it as basically column labels/names.'
+        log.info '                      From this line and the file above the relations ship between value expressions and tissues arte gathered.'
+        log.info '--OUT_NAME            '
         log.info ''
         log.info ''
         log.info ''
@@ -35,6 +48,8 @@ if (params.help) {
         log.info ''
         log.info ''
         log.info ''
+        log.info ''
+        log.info '--CONTAINER           optional flag, The container used to run the piepiline, python3 is the only requirement'
         exit 1
 }
 
