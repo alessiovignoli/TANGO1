@@ -29,20 +29,19 @@ process id_tissue_average {
 	container params.CONTAINER
 
 	input:
-        path tissue_info
-	path bulk_data
-	each ID
+	tuple path(tissue_info), path(bulk_data), val(ID1), val(ID2)
 
 	output:
 	path out_name, emit: id_tissue_avg_expr
 	stdout emit: standardout                                              // for debug
 
 	script:
-	out_name = "${bulk_data.baseName}" + ".${ID}"
+	out_name = "${bulk_data.baseName}" + ".${ID1}-${ID2}"
 	"""
 	gtex_id_expr_per_tissue.py --tissue_dict ${tissue_info} \
 				   --gtex_data  ${bulk_data} \
-				   --ID ${ID} \
+				   --ID1 ${ID1} \
+				   --ID2 ${ID2} \
  				   --out_name ${out_name} \
 				   --id_pos ${params.ID_POS} \
 				   --delimiter ${params.GTEX_DELIMITER} \
@@ -67,9 +66,15 @@ workflow GTEx_id_tissue_expr {
 	// Build the dictionary that connects sample ids to tissue
 	group_sample_per_tissue(in_tissue_info)
 
-	// Extract IDs to work one ID at time
-	in_ids.splitText(){ it.trim() }.set{ all_IDS }
-	id_tissue_average(group_sample_per_tissue.out.tissue_sample_dict, in_bulk_data, all_IDS)
+	// Extract IDs to work a pair of IDs at time
+	in_ids.splitText(){ it.trim() }.map{ it -> [ it.split(',')[0], it.split(',')[1] ] }.set{ all_IDS }
+	
+	// pair up also the input files
+	group_sample_per_tissue.out.tissue_sample_dict.combine(in_bulk_data).set{ pair_in }
+	
+	// unite everything in one tuple and go
+	pair_in.combine(all_IDS).set{ final_pairs }
+	id_tissue_average(final_pairs)
 
 
 	// if params.OUT_NAME is not false collect the output files IDs in one single file
