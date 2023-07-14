@@ -8,7 +8,7 @@ def get_args():
 
     "get the arguments when using from the commandline"
 
-    parser = argparse.ArgumentParser(description="Read GTEx downlaodable sample annotation file, this file contains description and info for all the samples IDs present in the bulk data. This script pèarse such file to build a dictionary that has tissue names as keys and all sample ids belonging to that tissue as arguments of the corresponding tissue key. It themnn savves such file to a compressed (pickle) file.")
+    parser = argparse.ArgumentParser(description="Read GTEx downlaodable sample annotation file, this file contains description and info for all the samples IDs present in the bulk data. This script pèarse such file to build a dictionary that has tissue names as keys and all sample ids belonging to that tissue as arguments of the corresponding tissue key. It then saves such file to a compressed (pickle) file.")
     parser.add_argument("-sa", "--sample_annotations", type=str, required=True, metavar="FILE", help='The sample annotation file. In version v8 this is a tab separeted file (tsv).')
     parser.add_argument("-o", "--out_name", type=str, required=True, metavar="FILE", help='The path to where to save the output dictionary. Is going to be save compressed in .pkl format (pickle).')
     parser.add_argument("-tp", "--tissue_pos", type=int, required=False, nargs='?', const=6, default=6, metavar="POS", help='the column in the sample annotation file containing the Tissue name. In GTEx v8 is column 7 (6) in python notation. This field follows python notation, first column is 0. Default for this fla is 6.')

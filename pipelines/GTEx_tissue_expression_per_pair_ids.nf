@@ -25,7 +25,7 @@ process group_sample_per_tissue {
 }
 
 
-process id_tissue_average {
+process pair_id_tissue_ratios_average {
 	container params.CONTAINER
 
 	input:
@@ -38,7 +38,7 @@ process id_tissue_average {
 	script:
 	out_name = "${bulk_data.baseName}" + ".${ID1}-${ID2}"
 	"""
-	gtex_id_expr_per_tissue.py --tissue_dict ${tissue_info} \
+	gtex_pair_id_expr_per_tissue.py --tissue_dict ${tissue_info} \
 				   --gtex_data  ${bulk_data} \
 				   --ID1 ${ID1} \
 				   --ID2 ${ID2} \
@@ -51,7 +51,7 @@ process id_tissue_average {
 
 
 
-workflow GTEx_id_tissue_expr {
+workflow GTEx_pair_id_tissue_expr {
 
 	take:
 	path_to_ids
@@ -74,21 +74,21 @@ workflow GTEx_id_tissue_expr {
 	
 	// unite everything in one tuple and go
 	pair_in.combine(all_IDS).set{ final_pairs }
-	id_tissue_average(final_pairs)
+	pair_id_tissue_ratios_average(final_pairs)
 
 
 	// if params.OUT_NAME is not false collect the output files IDs in one single file
 	outfile = null
 	if (params.OUT_NAME) {
-		outfile = id_tissue_average.out.id_tissue_avg_expr.collectFile( name: params.OUT_NAME, storeDir: params.OUTPUT_DIR ) 
+		outfile = pair_id_tissue_ratios_average.out.id_tissue_avg_expr.collectFile( name: params.OUT_NAME, storeDir: params.OUTPUT_DIR ) 
 	} else {
-		outfile = id_tissue_average.out.id_tissue_avg_expr.collectFile( storeDir: params.OUTPUT_DIR)
+		outfile = pair_id_tissue_ratios_average.out.id_tissue_avg_expr.collectFile( storeDir: params.OUTPUT_DIR)
 	}
 
 
 	emit:
 	outfile // id_tissue_average.out.id_tissue_avg_expr
-	stout = id_tissue_average.out.standardout			//for debug
+	stout = pair_id_tissue_ratios_average.out.standardout			//for debug
 
 }
 

@@ -18,8 +18,9 @@ if (params.help) {
         log.info 'This is done per transcript/gene or genarally speacking ID. So that at the end it will look something like:'
         log.info 'requested_ID Brain-frontal_average Muscle-skeletal_average ecc..'
         log.info 'This is the list of flags the pipeline accepts:'
-        log.info '--IN_IDS              mandatory field, the txt file containing the IDs for which the analisys should be done. This file should'
-        log.info '                      contain only an id per line and nothing else.'
+        log.info '--IN_IDS              mandatory field, the file containing the pairs of IDs to be analized (do the ratio). It has to be a csv file (comma separated) '
+        log.info '                      where the first field is the first ID (numerator in the ratio) a comma and second ID (denominator). It should have'
+        log.info '                      a pair per line and nothing else.'
         log.info '--IN_TISSUE           mandatory flag, The sample annotation file. In version v8 this is a tab separeted file (tsv). '
         log.info '                      This file contains the relationship between the samples_IDs and the tissue of extraction.'
         log.info '                      It is though to have on each line a sample_id and the info for that sample in differrent fields, in them one is '
@@ -29,27 +30,30 @@ if (params.help) {
         log.info '                      Basically every line of this file has a differerent ID per line.'
         log.info '                      It also has to have an header line (specifiable which exactly) that contains the sample-IDs in it as basically column labels/names.'
         log.info '                      From this line and the file above the relations ship between value expressions and tissues arte gathered.'
-        log.info '--OUT_NAME            '
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info ''
-        log.info '--CONTAINER           optional flag, The container used to run the piepiline, python3 is the only requirement'
+        log.info '--OUT_NAME            optional flag, default false. The output will not be renamed. If a string is given to this variable'
+        log.info '                      that would be the name of the output file. On top of this since the pipeline works on each pair IDs in parallel.'
+        log.info "                      there will be as many output files as there are pairs if this flag is not given. They will be named as:"
+        log.info '                      IN_DATA(wiothout extension).ID1-ID2'
+        log.info '                      Instead if this flag is given all the pairs files will be concatenated in a single file named OUT_NAME.'
+        log.info '--GTEX_DELIMITER      optional flag, default <tab>. Since in v8 of GTEx the files are tab separated this is the default,'
+        log.info '                      but it can be changed if need be.'
+        log.info '--ID_POS              optional field, default 0. The column position (first = 0) that identifies where the query ID is in'
+        log.info '                      the IN_TISSUE file. It is used to tell the script where to look for the IDs given.'
+        log.info '--TISSUE_POS          optional field, default 6. the column in the sample annotation file containing the Tissue name.'
+        log.info '                      In GTEx v8 is column 7 (6) in python notation. This field follows python notation, first column is 0.'
+        log.info '--SAMPLE_POS          optional field, default 0. the column in the sample annotation file containing the sampleID.'
+        log.info '                      In GTEx v8 is column 1 (0) in python notation. '
+        log.info '--HEADER_LINE         optional field, default 3. The very important line in IN_DATA that contains the sample_IDs present as values of the dictionary.'
+        log.info '                      From this line the values found in the line of the query IDs are correlated (through  the dictionary) to the tissue. first line = 1'
+        log.info '                      this HEADER_LINE contains the sample ID present in the Dictionary computed on the IN_TISSUE file,'
+        log.info '                      and that the column identified by this sample ID always contains values associated with it.'
+        log.info '--OUTPUT_DIR          optional field, default params.TEST_DIR. Variable found in the nextflow.config file.'
+        log.info '                      This is the directory where the output file/s are saved.'
+        log.info '--STORE_DIR           optional field, default params.TEST_DIR/GTEx_data/ . Internal variable for making the pipeline more fast.'
+        log.info '                      It uses the functionality of nextflow of StoreDir directive.'
+        log.info '                      In brief if the file dictionary computed on IN_TISSUE is alredy existing in the STORE_DIR path the execution'
+        log.info '                      of the first process is skipped. Basically if the dictionary has already been computed for this data just use that.'
+        log.info '--CONTAINER           optional flag, The container used to run the piepiline, python3 is the only requirement. Better not change this.'
         exit 1
 }
 
@@ -66,20 +70,19 @@ params.SAMPLE_POS = 0
 params.HEADER_LINE = 3
 params.OUTPUT_DIR = "${params.TEST_DIR}"	
 params.STORE_DIR = "${params.TEST_DIR}GTEx_data/"
-params.PUBLISH = true
-params.SCRATCH = true
+
 
 
 // Include section
 
-include { GTEx_id_tissue_expr } from "${params.PIPES}GTEx_tissue_expression_per_id"
+include { GTEx_pair_id_tissue_expr } from "${params.PIPES}GTEx_tissue_expression_per_pair_ids"
 
 
 
 workflow {
-        GTEx_id_tissue_expr(params.IN_IDS, params.IN_TISSUE, params.IN_DATA)
-        GTEx_id_tissue_expr.out.outfile.view()
-        GTEx_id_tissue_expr.out.stout.view()                      // for debug
+        GTEx_pair_id_tissue_expr(params.IN_IDS, params.IN_TISSUE, params.IN_DATA)
+        GTEx_pair_id_tissue_expr.out.outfile.view()
+        GTEx_pair_id_tissue_expr.out.stout.view()                      // for debug
 }
 
 workflow.onComplete { println 'Done' }
