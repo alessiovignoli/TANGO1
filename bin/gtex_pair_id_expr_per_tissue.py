@@ -38,7 +38,7 @@ def main(tissue_dict, gtex_data, ID1, ID2, out_name, id_pos, delimiter, header_l
     query_list1 = tabline1_obj.ExtractAllButField(position=id_pos, return_type='list')
     tabline2_obj = TabularLine(query_lines[1], delimiter)
     query_list2 = tabline2_obj.ExtractAllButField(position=id_pos, return_type='list')
-    
+
     # Get header line
     opened_file = tabular_obj.OpenRead(uncompress=True)
     header_list = tabular_obj.ReturnHeader(opened_file, header_lines=header_line)		# returns all the lines up to the one asked
