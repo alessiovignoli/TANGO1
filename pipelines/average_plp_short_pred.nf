@@ -13,7 +13,6 @@
 *  check the help message for the allowed values
 */
 
-nextflow.enable.dsl=2
 
 params.help = false
 
@@ -81,7 +80,7 @@ process based_on_short_average_plp {
 	prefix_plp = "${plp}".split('\\.')[0]
 	output_name = prefix_plp + ".average"
 	"""
-	./${pyscript1} ${params.SWITCH} ${plp} ${field_id} ${txt} ${params.MAX_ITER} ${params.SEC_KEYWORD} 2>tmp.err 1>${output_name}
+	python ${pyscript1} ${params.SWITCH} ${plp} ${field_id} ${txt} ${params.MAX_ITER} ${params.SEC_KEYWORD} 2>tmp.err 1>${output_name}
 	cat tmp.err
 	"""
 }
@@ -151,5 +150,5 @@ workflow {
 	short_pred_average_plp.out.stout1.view()
 	//short_pred_average_plp.out.stout2.view()
 	short_pred_average_plp.out.finalaverage.view()
-	short_pred_average_plp.out.averageplp.view()	
+	short_pred_average_plp.out.averageplp.view() 
 }
